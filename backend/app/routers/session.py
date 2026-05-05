@@ -27,6 +27,7 @@ from app.services.profile import compute_profile
 from app.services.recommendations import compute_first_nine, get_batch, get_cross_sell_items
 from app.services.session_code import generate_session_code
 from app.services.email import send_handoff_email
+from app.services.llm import generate_key_features, generate_talking_points
 
 logger = logging.getLogger(__name__)
 
@@ -195,6 +196,7 @@ async def submit_quiz(
 
 @router.get("/current/recommendations", response_model=RecommendationBatchResponse)
 async def get_recommendations(
+    background_tasks: BackgroundTasks,
     batch: int = Query(default=1, ge=1),
     session_id: Optional[str] = Cookie(default=None),
 ):
@@ -275,10 +277,12 @@ async def get_recommendations(
         )
         await db.commit()
 
-    # Trigger background key features generation if not cached
     llm_kf = json.loads(session["llm_key_features"]) if session.get("llm_key_features") else {}
 
     products = _build_products(batch_ids, profile, catalog, llm_kf)
+    missing_key_features = [id_ for id_ in batch_ids if id_ not in llm_kf]
+    if missing_key_features:
+        background_tasks.add_task(_generate_key_features_for_products, session_id, missing_key_features, profile)
 
     return RecommendationBatchResponse(
         batch=batch,
@@ -327,6 +331,58 @@ def _build_products(
             show_cross_sell_chips=show_chips,
         ))
     return products
+
+
+async def _generate_key_features_for_products(session_id: str, product_ids: list[str], profile: str):
+    session = await _get_session(session_id)
+    cached = json.loads(session["llm_key_features"]) if session.get("llm_key_features") else {}
+    catalog = get_catalog()
+
+    changed = False
+    for product_id in product_ids:
+        if product_id in cached:
+            continue
+        stroller = catalog.get_stroller(product_id)
+        if not stroller:
+            continue
+        features = await generate_key_features(stroller, profile)
+        if features:
+            cached[product_id] = features
+            changed = True
+
+    if changed:
+        db = await get_db()
+        await db.execute(
+            "UPDATE sessions SET llm_key_features=? WHERE session_id=?",
+            (json.dumps(cached), session_id),
+        )
+        await db.commit()
+
+
+async def _generate_talking_points_for_session(session_id: str):
+    session = await _get_session(session_id)
+    if session.get("llm_talking_points"):
+        return
+
+    context = {
+        "source": session.get("source"),
+        "profile": session.get("derived_profile"),
+        "quiz_answers": json.loads(session["quiz_answers"]) if session.get("quiz_answers") else [],
+        "optional_note": session.get("optional_note"),
+        "shown_products": json.loads(session["shown_products"]) if session.get("shown_products") else [],
+        "stroller_favorites": json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else [],
+        "accessory_favorites": json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else [],
+    }
+    points = await generate_talking_points(context)
+    if not points:
+        return
+
+    db = await get_db()
+    await db.execute(
+        "UPDATE sessions SET llm_talking_points=? WHERE session_id=?",
+        (json.dumps(points[:3]), session_id),
+    )
+    await db.commit()
 
 
 @router.post("/current/favorites", response_model=FavoriteToggleResponse)
@@ -403,6 +459,7 @@ async def handoff(
     # Reload session for email
     updated = await _get_session(session_id)
     background_tasks.add_task(send_handoff_email, updated)
+    background_tasks.add_task(_generate_talking_points_for_session, session_id)
 
     return HandoffResponse(
         session_code=session["session_code"],

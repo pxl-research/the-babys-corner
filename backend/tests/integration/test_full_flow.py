@@ -1,5 +1,6 @@
 import pytest
 import json
+from unittest.mock import AsyncMock, patch
 from httpx import AsyncClient, ASGITransport
 
 
@@ -120,3 +121,46 @@ async def test_abandon_after_handoff_returns_409(client):
 
     resp = await client.post("/api/sessions/current/abandon")
     assert resp.status_code == 409
+
+
+async def test_recommendations_generate_and_cache_llm_key_features(client, reset_db):
+    resp = await client.post("/api/sessions?source=home")
+    assert resp.status_code == 200
+
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(5)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+
+    with patch("app.routers.session.generate_key_features", new=AsyncMock(return_value="Compact en wendbaar.")):
+        resp = await client.get("/api/sessions/current/recommendations?batch=1")
+
+    assert resp.status_code == 200
+    product_ids = [p["id"] for p in resp.json()["products"]]
+
+    async with reset_db.execute("SELECT llm_key_features FROM sessions") as cur:
+        row = await cur.fetchone()
+
+    cached = json.loads(row["llm_key_features"])
+    assert set(product_ids).issubset(cached.keys())
+    assert all(cached[id_] == "Compact en wendbaar." for id_ in product_ids)
+
+
+async def test_handoff_generates_talking_points_in_background(client, reset_db):
+    resp = await client.post("/api/sessions?source=home")
+    assert resp.status_code == 200
+
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(5)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+    await client.get("/api/sessions/current/recommendations?batch=1")
+
+    points = ["Vraag naar de auto.", "Toon compacte plooien.", "Vergelijk accessoires."]
+    with (
+        patch("app.routers.session.send_handoff_email", new=AsyncMock()),
+        patch("app.routers.session.generate_talking_points", new=AsyncMock(return_value=points)),
+    ):
+        resp = await client.post("/api/sessions/current/handoff")
+
+    assert resp.status_code == 200
+    async with reset_db.execute("SELECT llm_talking_points FROM sessions") as cur:
+        row = await cur.fetchone()
+
+    assert json.loads(row["llm_talking_points"]) == points
