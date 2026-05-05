@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import init_db
+from app.routers import session
 
 app = FastAPI(title="The Baby's Corner API", version="0.1.0")
 
@@ -17,6 +18,9 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup():
     await init_db()
+
+
+app.include_router(session.router)
 
 
 @app.get("/api/health")

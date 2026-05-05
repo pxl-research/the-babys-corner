@@ -1,0 +1,429 @@
+import json
+import uuid
+import logging
+from datetime import datetime, timezone
+from typing import Optional
+
+from fastapi import APIRouter, Cookie, HTTPException, BackgroundTasks, Query
+from fastapi.responses import JSONResponse
+
+from app.config import settings
+from app.content import load_quiz_config
+from app.database import get_db
+from app.schemas import (
+    SessionCreateResponse,
+    SessionCurrentResponse,
+    QuizSubmitRequest,
+    QuizSubmitResponse,
+    RecommendationBatchResponse,
+    StrollerItem,
+    AccessoryItem,
+    FavoriteToggleRequest,
+    FavoriteToggleResponse,
+    HandoffResponse,
+)
+from app.services.catalog import get_catalog, is_available
+from app.services.profile import compute_profile
+from app.services.recommendations import compute_first_nine, get_batch, get_cross_sell_items
+from app.services.session_code import generate_session_code
+from app.services.email import send_handoff_email
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/api/sessions", tags=["sessions"])
+
+TRANSITION_PHRASES = {
+    "A": "Helder. Ik hou het compact en stel enkel de essentials voor.",
+    "B": "Top. Ik leid jullie door de meest gekozen combinaties, stap voor stap.",
+    "C": "Fijn! We bekijken alles tot in detail, inclusief de matching accessoires.",
+}
+
+KEY_FEATURES_FALLBACK = "Meer info binnenkort beschikbaar."
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _make_session_cookie_response(session_id: str, session_code: str) -> JSONResponse:
+    response = JSONResponse(content={"session_id": session_id, "session_code": session_code})
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        samesite="lax",
+        secure=settings.session_cookie_secure,
+    )
+    return response
+
+
+async def _get_session(session_id: str) -> dict:
+    db = await get_db()
+    async with db.execute("SELECT * FROM sessions WHERE session_id=?", (session_id,)) as cur:
+        row = await cur.fetchone()
+    if not row:
+        raise HTTPException(404, detail="Session not found.")
+    return dict(row)
+
+
+def _require_active(session: dict):
+    if session["status"] == "handed_off":
+        raise HTTPException(409, detail="Session is locked after handoff.")
+    if session["status"] == "abandoned":
+        raise HTTPException(409, detail="Session is abandoned.")
+
+
+@router.post("", response_model=SessionCreateResponse)
+async def create_session(source: str = Query(default="home")):
+    session_id = str(uuid.uuid4())
+    session_code = generate_session_code()
+    now = _now()
+    db = await get_db()
+    await db.execute(
+        """INSERT INTO sessions (session_id, session_code, source, status, started_at,
+            stroller_favorites, accessory_favorites, shown_products)
+           VALUES (?, ?, ?, 'active', ?, '[]', '[]', '[]')""",
+        (session_id, session_code, source, now),
+    )
+    await db.commit()
+    return _make_session_cookie_response(session_id, session_code)
+
+
+@router.get("/quiz-config")
+async def quiz_config():
+    config = load_quiz_config()
+    # Strip internal profile labels from customer response
+    questions = []
+    for q in config["questions"]:
+        questions.append({
+            "id": q["id"],
+            "text": q["text"],
+            "options": [{"index": o["index"], "text": o["text"]} for o in q["options"]],
+        })
+    return {"questions": questions, "optional_note": config["optional_note"]}
+
+
+@router.get("/current", response_model=SessionCurrentResponse)
+async def get_current(session_id: Optional[str] = Cookie(default=None)):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+
+    profile = session.get("derived_profile")
+    return SessionCurrentResponse(
+        session_id=session["session_id"],
+        session_code=session["session_code"],
+        source=session["source"],
+        status=session["status"],
+        started_at=session["started_at"],
+        quiz_submitted_at=session.get("quiz_submitted_at"),
+        handoff_at=session.get("handoff_at"),
+        quiz_answers=json.loads(session["quiz_answers"]) if session.get("quiz_answers") else [],
+        optional_note=session.get("optional_note"),
+        profile=profile,
+        transition_phrase=TRANSITION_PHRASES.get(profile) if profile else None,
+        shown_products=json.loads(session["shown_products"]) if session.get("shown_products") else [],
+        stroller_favorites=json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else [],
+        accessory_favorites=json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else [],
+        email_status=session.get("email_status", "not_sent"),
+        favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
+    )
+
+
+@router.post("/current/quiz", response_model=QuizSubmitResponse)
+async def submit_quiz(
+    body: QuizSubmitRequest,
+    session_id: Optional[str] = Cookie(default=None),
+):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+    _require_active(session)
+
+    if session.get("quiz_submitted_at"):
+        raise HTTPException(409, detail="Quiz already submitted.")
+
+    config = load_quiz_config()
+    question_map = {q["id"]: q for q in config["questions"]}
+
+    if len(body.answers) != 5:
+        raise HTTPException(422, detail="Exactly 5 answers required.")
+
+    enriched_answers = []
+    for ans in body.answers:
+        q = question_map.get(ans.question_id)
+        if not q:
+            raise HTTPException(422, detail=f"Unknown question_id: {ans.question_id}")
+        opts = {o["index"]: o for o in q["options"]}
+        opt = opts.get(ans.option_index)
+        if not opt:
+            raise HTTPException(422, detail=f"Invalid option_index: {ans.option_index}")
+        enriched_answers.append({
+            "q": ans.question_id,
+            "question_text": q["text"],
+            "opt": ans.option_index,
+            "option_text": opt["text"],
+            "profile": opt["profile"],
+        })
+
+    profile = compute_profile(enriched_answers)
+    catalog = get_catalog()
+    first_nine = compute_first_nine(profile, catalog, optional_note=body.optional_note or "")
+    reco_order = [s["id"] for s in first_nine]
+
+    if body.optional_note and body.optional_note.strip():
+        from app.services.llm import rank_first_nine as llm_rank
+        llm_result = await llm_rank(reco_order, profile, body.optional_note.strip())
+        if llm_result:
+            reco_order = llm_result
+
+    now = _now()
+    note = body.optional_note[:1000] if body.optional_note else None
+    db = await get_db()
+    await db.execute(
+        """UPDATE sessions SET quiz_submitted_at=?, derived_profile=?, quiz_answers=?,
+           optional_note=?, reco_order=? WHERE session_id=?""",
+        (now, profile, json.dumps(enriched_answers), note, json.dumps(reco_order), session_id),
+    )
+    await db.commit()
+
+    return QuizSubmitResponse(
+        profile=profile,
+        transition_phrase=TRANSITION_PHRASES[profile],
+    )
+
+
+@router.get("/current/recommendations", response_model=RecommendationBatchResponse)
+async def get_recommendations(
+    batch: int = Query(default=1, ge=1),
+    session_id: Optional[str] = Cookie(default=None),
+):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+
+    if not session.get("quiz_submitted_at"):
+        raise HTTPException(422, detail="Quiz not submitted yet.")
+
+    reco_order: list[str] = json.loads(session["reco_order"]) if session.get("reco_order") else []
+    shown_raw: list[list[str]] = json.loads(session["shown_products"]) if session.get("shown_products") else []
+    shown_batches_count = len(shown_raw)
+    extra_reco_order: list[str] = json.loads(session["extra_reco_order"]) if session.get("extra_reco_order") else []
+    stroller_favs: list[str] = json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else []
+    accessory_favs: list[str] = json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else []
+    profile = session.get("derived_profile", "B")
+
+    # Lock check: if handed_off, only allow already-shown batches
+    if session["status"] == "handed_off":
+        if batch > shown_batches_count:
+            raise HTTPException(409, detail="Session is locked after handoff.")
+        # Return cached batch
+        batch_ids = shown_raw[batch - 1] if batch <= len(shown_raw) else []
+        catalog = get_catalog()
+        products = _build_products(batch_ids, profile, catalog)
+        return RecommendationBatchResponse(
+            batch=batch,
+            favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
+            products=products,
+        )
+
+    catalog = get_catalog()
+    acc_favs_list = accessory_favs
+
+    # Handle favorites-based adaptation for batch 4+
+    favorites_adaptation_active = bool(session.get("favorites_adaptation_active", 0))
+    if batch >= 4 and stroller_favs and not extra_reco_order:
+        from app.services.llm import rank_similar_strollers
+        all_ids = [s["id"] for s in catalog.get_all_strollers()]
+        shown_flat = {id_ for b in shown_raw for id_ in b}
+        remaining_pool = [catalog.get_stroller(id_) for id_ in all_ids if id_ not in shown_flat and id_ not in reco_order]
+        remaining_pool = [s for s in remaining_pool if s]
+        fav_strollers = [catalog.get_stroller(id_) for id_ in stroller_favs]
+        fav_strollers = [s for s in fav_strollers if s]
+        llm_order = await rank_similar_strollers(fav_strollers, remaining_pool)
+        if llm_order:
+            extra_reco_order = llm_order
+            favorites_adaptation_active = True
+
+    batch_products = get_batch(
+        batch, reco_order, acc_favs_list, catalog,
+        stroller_favorites=stroller_favs,
+        extra_reco_order=extra_reco_order or None,
+    )
+    batch_ids = [p["id"] for p in batch_products]
+
+    # Update shown_products and other state
+    db = await get_db()
+    updates = {}
+
+    if batch > shown_batches_count:
+        shown_raw.append(batch_ids)
+        updates["shown_products"] = json.dumps(shown_raw)
+
+    if batch == 1 and not session.get("first_reco_at"):
+        updates["first_reco_at"] = _now()
+
+    if extra_reco_order and not session.get("extra_reco_order"):
+        updates["extra_reco_order"] = json.dumps(extra_reco_order)
+        updates["favorites_adaptation_active"] = 1 if favorites_adaptation_active else 0
+
+    if updates:
+        set_clause = ", ".join(f"{k}=?" for k in updates)
+        await db.execute(
+            f"UPDATE sessions SET {set_clause} WHERE session_id=?",
+            (*updates.values(), session_id),
+        )
+        await db.commit()
+
+    # Trigger background key features generation if not cached
+    llm_kf = json.loads(session["llm_key_features"]) if session.get("llm_key_features") else {}
+
+    products = _build_products(batch_ids, profile, catalog, llm_kf)
+
+    return RecommendationBatchResponse(
+        batch=batch,
+        favorites_adaptation_active=favorites_adaptation_active,
+        products=products,
+    )
+
+
+def _build_products(
+    batch_ids: list[str],
+    profile: str,
+    catalog,
+    llm_kf: dict | None = None,
+) -> list[StrollerItem]:
+    products = []
+    for id_ in batch_ids:
+        s = catalog.get_stroller(id_)
+        if not s:
+            continue
+        cross_sell = get_cross_sell_items(s, profile, catalog)
+        show_chips = profile in ("B", "C")
+        key_features = (llm_kf or {}).get(id_) or KEY_FEATURES_FALLBACK
+        products.append(StrollerItem(
+            id=s["id"],
+            name=s["name"],
+            brand=s["brand"],
+            price=s["price"],
+            description=s["description"],
+            image_url=s["image_url"],
+            availability=s["availability"],
+            is_available=is_available(s),
+            key_features=key_features,
+            cross_sell_items=[
+                AccessoryItem(
+                    id=a["id"],
+                    name=a["name"],
+                    brand=a["brand"],
+                    price=a["price"],
+                    description=a["description"],
+                    image_url=a["image_url"],
+                    availability=a["availability"],
+                    is_available=is_available(a),
+                )
+                for a in cross_sell
+            ],
+            show_cross_sell_chips=show_chips,
+        ))
+    return products
+
+
+@router.post("/current/favorites", response_model=FavoriteToggleResponse)
+async def toggle_favorite(
+    body: FavoriteToggleRequest,
+    session_id: Optional[str] = Cookie(default=None),
+):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+    _require_active(session)
+
+    catalog = get_catalog()
+    stroller_favs: list[str] = json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else []
+    accessory_favs: list[str] = json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else []
+
+    if body.item_type == "stroller":
+        item = catalog.get_stroller(body.item_id)
+        if not item:
+            raise HTTPException(404, detail="Stroller not found.")
+        if body.item_id in stroller_favs:
+            stroller_favs.remove(body.item_id)
+        else:
+            if not is_available(item):
+                raise HTTPException(422, detail="Unavailable stroller cannot be favorited.")
+            stroller_favs.append(body.item_id)
+    elif body.item_type == "accessory":
+        item = catalog.get_accessory(body.item_id)
+        if not item:
+            raise HTTPException(404, detail="Accessory not found.")
+        if body.item_id in accessory_favs:
+            accessory_favs.remove(body.item_id)
+        else:
+            if not is_available(item):
+                raise HTTPException(422, detail="Unavailable accessory cannot be added.")
+            accessory_favs.append(body.item_id)
+    else:
+        raise HTTPException(422, detail="item_type must be 'stroller' or 'accessory'.")
+
+    db = await get_db()
+    await db.execute(
+        "UPDATE sessions SET stroller_favorites=?, accessory_favorites=? WHERE session_id=?",
+        (json.dumps(stroller_favs), json.dumps(accessory_favs), session_id),
+    )
+    await db.commit()
+
+    return FavoriteToggleResponse(stroller_favorites=stroller_favs, accessory_favorites=accessory_favs)
+
+
+@router.post("/current/handoff", response_model=HandoffResponse)
+async def handoff(
+    background_tasks: BackgroundTasks,
+    session_id: Optional[str] = Cookie(default=None),
+):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+
+    if session["status"] == "handed_off":
+        raise HTTPException(409, detail="Session already handed off.")
+    if not session.get("quiz_submitted_at"):
+        raise HTTPException(422, detail="Quiz not submitted yet.")
+    if not session.get("first_reco_at"):
+        raise HTTPException(422, detail="No recommendations shown yet.")
+
+    now = _now()
+    db = await get_db()
+    await db.execute(
+        "UPDATE sessions SET status='handed_off', handoff_at=?, email_status='pending' WHERE session_id=?",
+        (now, session_id),
+    )
+    await db.commit()
+
+    # Reload session for email
+    updated = await _get_session(session_id)
+    background_tasks.add_task(send_handoff_email, updated)
+
+    return HandoffResponse(
+        session_code=session["session_code"],
+        handoff_at=now,
+        email_status="pending",
+    )
+
+
+@router.post("/current/abandon")
+async def abandon(session_id: Optional[str] = Cookie(default=None)):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+
+    if session["status"] == "handed_off":
+        raise HTTPException(409, detail="Session is locked after handoff.")
+
+    db = await get_db()
+    await db.execute(
+        "UPDATE sessions SET status='abandoned' WHERE session_id=?",
+        (session_id,),
+    )
+    await db.commit()
+    return {"status": "abandoned"}
