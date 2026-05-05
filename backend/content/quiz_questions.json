@@ -1,0 +1,55 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "text": "Welke sfeer zien jullie voor de babyuitzet?",
+      "options": [
+        {"index": 0, "text": "Strak, rustig, enkel het nodige.", "profile": "A"},
+        {"index": 1, "text": "Een mix van comfort en bewezen kwaliteit.", "profile": "B"},
+        {"index": 2, "text": "Tot in de puntjes gestyled, met accessoires.", "profile": "C"}
+      ]
+    },
+    {
+      "id": 2,
+      "text": "Hoe belangrijk is het voor jullie dat de kinderwagen opvalt?",
+      "options": [
+        {"index": 0, "text": "Helemaal niet — discreet en functioneel is prima.", "profile": "A"},
+        {"index": 1, "text": "Een beetje stijl mag, maar functie primeert.", "profile": "B"},
+        {"index": 2, "text": "Heel belangrijk — het is een verlengstuk van onze stijl.", "profile": "C"}
+      ]
+    },
+    {
+      "id": 3,
+      "text": "Wat is jullie prioriteit bij het kiezen van een kinderwagen?",
+      "options": [
+        {"index": 0, "text": "Compact en licht — makkelijk te hanteren.", "profile": "A"},
+        {"index": 1, "text": "Veelzijdig en betrouwbaar voor dagelijks gebruik.", "profile": "B"},
+        {"index": 2, "text": "Volledig uitgerust met alles erbij.", "profile": "C"}
+      ]
+    },
+    {
+      "id": 4,
+      "text": "Hoe gaan jullie de kinderwagen hoofdzakelijk gebruiken?",
+      "options": [
+        {"index": 0, "text": "Korte ritten, openbaar vervoer, stedelijk.", "profile": "A"},
+        {"index": 1, "text": "Mix van stad en natuur, regelmatig gebruik.", "profile": "B"},
+        {"index": 2, "text": "Uitgebreide wandelingen, ook op oneven terreinen.", "profile": "C"}
+      ]
+    },
+    {
+      "id": 5,
+      "text": "Hoe kijken jullie naar accessoires en extra's?",
+      "options": [
+        {"index": 0, "text": "Zo min mogelijk — het essentiële volstaat.", "profile": "A"},
+        {"index": 1, "text": "Nuttige toevoegingen die het leven makkelijker maken.", "profile": "B"},
+        {"index": 2, "text": "Graag alles matchen en aanvullen met passende items.", "profile": "C"}
+      ]
+    }
+  ],
+  "optional_note": {
+    "text": "Is er nog iets dat we mogen meenemen in jullie advies?",
+    "skip_label": "Niet nodig",
+    "continue_label": "Bekijk aanbevelingen",
+    "max_length": 1000
+  }
+}
