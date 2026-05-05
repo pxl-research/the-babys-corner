@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
-import type { StaffSessionDetail } from '../api/client'
+import type { SessionState } from '../api/client'
 
 const PROFILE_LABELS: Record<string, string> = {
   A: 'Minimalist',
@@ -11,15 +11,28 @@ const PROFILE_LABELS: Record<string, string> = {
 }
 
 export default function StaffHandoffPage() {
-  const { sessionCode, reset } = useSessionStore()
-  const [detail, setDetail] = useState<StaffSessionDetail | null>(null)
+  const { reset } = useSessionStore()
+  const [detail, setDetail] = useState<SessionState | null>(null)
 
   useEffect(() => {
-    const creds = sessionStorage.getItem('staff_creds')
-    if (sessionCode && creds) {
-      api.getStaffSessionDetail(sessionCode, creds).then(setDetail).catch(() => {})
+    let attempts = 0
+    let cancelled = false
+
+    async function load() {
+      try {
+        const session = await api.getSession()
+        if (!cancelled) setDetail(session)
+        if (session.talking_points?.length || attempts >= 3) return
+        attempts += 1
+        window.setTimeout(load, 5000)
+      } catch {
+        if (!cancelled) setDetail(null)
+      }
     }
-  }, [sessionCode])
+
+    load()
+    return () => { cancelled = true }
+  }, [])
 
   function handleNewClient() {
     reset()
@@ -79,12 +92,12 @@ export default function StaffHandoffPage() {
 
             {detail.talking_points && detail.talking_points.length > 0 && (
               <section className="mb-6">
-                <h2 className="font-semibold text-ink mb-2">Gespreksopeners</h2>
-                <ul className="space-y-1">
+              <h2 className="font-semibold text-ink mb-2">Gespreksopeners</h2>
+              <ul className="space-y-1">
                   {detail.talking_points.map((tp, i) => (
                     <li key={i} className="text-sm text-ink/80">• {tp}</li>
                   ))}
-                </ul>
+              </ul>
               </section>
             )}
           </>

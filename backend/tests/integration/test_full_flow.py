@@ -164,3 +164,23 @@ async def test_handoff_generates_talking_points_in_background(client, reset_db):
         row = await cur.fetchone()
 
     assert json.loads(row["llm_talking_points"]) == points
+
+
+async def test_current_session_exposes_talking_points_after_handoff(client):
+    resp = await client.post("/api/sessions?source=store")
+    assert resp.status_code == 200
+
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(5)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+    await client.get("/api/sessions/current/recommendations?batch=1")
+
+    points = ["Vraag naar de auto.", "Toon compacte plooien.", "Vergelijk accessoires."]
+    with (
+        patch("app.routers.session.send_handoff_email", new=AsyncMock()),
+        patch("app.routers.session.generate_talking_points", new=AsyncMock(return_value=points)),
+    ):
+        await client.post("/api/sessions/current/handoff")
+
+    resp = await client.get("/api/sessions/current")
+    assert resp.status_code == 200
+    assert resp.json()["talking_points"] == points

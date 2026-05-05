@@ -128,6 +128,7 @@ async def get_current(session_id: Optional[str] = Cookie(default=None)):
         accessory_favorites=json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else [],
         email_status=session.get("email_status", "not_sent"),
         favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
+        talking_points=json.loads(session["llm_talking_points"]) if session.get("llm_talking_points") else None,
     )
 
 

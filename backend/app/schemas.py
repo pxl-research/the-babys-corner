@@ -122,6 +122,7 @@ class SessionCurrentResponse(BaseModel):
     accessory_favorites: list[str] = []
     email_status: str = "not_sent"
     favorites_adaptation_active: bool = False
+    talking_points: Optional[list[str]] = None
 
 
 class HandoffResponse(BaseModel):

@@ -69,6 +69,7 @@ export interface SessionState {
   accessory_favorites: string[]
   email_status: string
   favorites_adaptation_active: boolean
+  talking_points: string[] | null
 }
 
 export interface HandoffResponse {
