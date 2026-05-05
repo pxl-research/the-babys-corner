@@ -19,6 +19,8 @@ async def reset_db(tmp_path):
     patches = [
         patch("app.database.get_db", mock_get_db),
         patch("app.routers.session.get_db", mock_get_db),
+        patch("app.routers.staff.get_db", mock_get_db),
+        patch("app.routers.admin.get_db", mock_get_db),
         patch("app.services.email._update_email_status", AsyncMock()),
     ]
 
