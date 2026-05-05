@@ -1,7 +1,10 @@
 services:
   backend:
     build: ./backend
-    env_file: .env
+    env_file:
+      - path: .env.example
+      - path: .env
+        required: false
     volumes:
       - sqlite_data:/app/data
     expose:
