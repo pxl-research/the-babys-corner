@@ -1,5 +1,76 @@
-import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
+from types import SimpleNamespace
+
+
+class _FakeCompletions:
+    def __init__(self, captured_kwargs):
+        self.captured_kwargs = captured_kwargs
+
+    async def create(self, **kwargs):
+        self.captured_kwargs.update(kwargs)
+        return SimpleNamespace(
+            choices=[
+                SimpleNamespace(message=SimpleNamespace(content="ok"))
+            ]
+        )
+
+
+class _FakeChat:
+    def __init__(self, captured_kwargs):
+        self.completions = _FakeCompletions(captured_kwargs)
+
+
+class _FakeClient:
+    def __init__(self, captured_kwargs):
+        self.chat = _FakeChat(captured_kwargs)
+
+
+async def test_try_azure_uses_max_completion_tokens(monkeypatch):
+    from app.services import llm
+
+    captured_kwargs = {}
+
+    class FakeAzureOpenAI:
+        def __init__(self, **kwargs):
+            pass
+
+        @property
+        def chat(self):
+            return _FakeChat(captured_kwargs)
+
+    monkeypatch.setattr(llm.settings, "azure_openai_endpoint", "https://example.openai.azure.com")
+    monkeypatch.setattr(llm.settings, "azure_openai_api_key", "key")
+    monkeypatch.setattr("openai.AsyncAzureOpenAI", FakeAzureOpenAI)
+
+    result = await llm._try_azure("prompt", "system", "gpt-5-nano")
+
+    assert result == "ok"
+    assert captured_kwargs["max_completion_tokens"] == 1024
+    assert "max_tokens" not in captured_kwargs
+
+
+async def test_try_openrouter_uses_max_completion_tokens(monkeypatch):
+    from app.services import llm
+
+    captured_kwargs = {}
+
+    class FakeOpenAI:
+        def __init__(self, **kwargs):
+            pass
+
+        @property
+        def chat(self):
+            return _FakeChat(captured_kwargs)
+
+    monkeypatch.setattr(llm.settings, "openrouter_api_key", "key")
+    monkeypatch.setattr(llm.settings, "openrouter_model", "deepseek/deepseek-chat-v4")
+    monkeypatch.setattr("openai.AsyncOpenAI", FakeOpenAI)
+
+    result = await llm._try_openrouter("prompt", "system")
+
+    assert result == "ok"
+    assert captured_kwargs["max_completion_tokens"] == 1024
+    assert "max_tokens" not in captured_kwargs
 
 
 async def test_complete_returns_none_when_all_providers_fail():

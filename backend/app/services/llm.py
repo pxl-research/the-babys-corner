@@ -20,7 +20,7 @@ async def _try_azure(prompt: str, system: str, model: str) -> str | None:
             model=model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
             temperature=0.3,
-            max_tokens=1024,
+            max_completion_tokens=1024,
         )
         return resp.choices[0].message.content
     except Exception as e:
@@ -41,7 +41,7 @@ async def _try_openrouter(prompt: str, system: str) -> str | None:
             model=settings.openrouter_model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
             temperature=0.3,
-            max_tokens=1024,
+            max_completion_tokens=1024,
         )
         return resp.choices[0].message.content
     except Exception as e:
