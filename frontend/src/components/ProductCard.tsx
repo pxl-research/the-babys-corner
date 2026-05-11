@@ -38,8 +38,7 @@ export default function ProductCard({
         </div>
         <button
           onClick={onToggleFavorite}
-          disabled={!stroller.is_available && !isFavorited || locked}
-          title={!stroller.is_available ? 'Deze kinderwagen is momenteel niet beschikbaar.' : undefined}
+          disabled={locked}
           className="text-2xl disabled:opacity-40 ml-2"
         >
           {isFavorited ? '♥' : '♡'}

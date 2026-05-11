@@ -66,16 +66,10 @@ export default function ProductModal({
               )}
               <button
                 onClick={onToggleFavorite}
-                disabled={!stroller.is_available && !isFavorited}
-                className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
+                className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium"
               >
                 {isFavorited ? '♥ In mijn lijst' : 'Voeg toe aan mijn lijst'}
               </button>
-              {!stroller.is_available && !isFavorited && (
-                <p className="text-center text-ink/50 text-xs mt-2">
-                  Deze kinderwagen is momenteel niet beschikbaar.
-                </p>
-              )}
             </div>
           </motion.div>
         </>
