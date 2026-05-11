@@ -501,6 +501,7 @@ async def save_note(
 
     if note and reco_order:
         from app.services.llm import rerank_by_note
+        catalog = get_catalog()
         stroller_dicts = [s for id_ in reco_order if (s := catalog.get_stroller(id_))]
         llm_result = await rerank_by_note(stroller_dicts, note)
         if llm_result:
