@@ -35,9 +35,9 @@ export default function QuizPage() {
     }
   }, [quizConfig, setQuizConfig])
 
-  // Prefetch tags on step 5 so step 6 loads instantly
+  // Load tags on step 5 (prefetch) or step 6 (direct navigation / refresh)
   useEffect(() => {
-    if (stepNum === 5 && availableTags.length === 0) {
+    if ((stepNum === 5 || stepNum === 6) && availableTags.length === 0) {
       api.getTags().then((r) => setAvailableTags(r.tags)).catch(console.error)
     }
   }, [stepNum, availableTags.length, setAvailableTags])
