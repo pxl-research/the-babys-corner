@@ -43,7 +43,7 @@ class CatalogService:
         path = settings.catalog_path
         if not os.path.exists(path):
             # fallback for dev
-            path = os.path.join(os.path.dirname(__file__), "..", "..", "catalog", "catalog_dummy.json")
+            path = os.path.join(os.path.dirname(__file__), "..", "..", "catalog", "catalog.json")
         with open(path, encoding="utf-8") as f:
             return json.load(f)
 

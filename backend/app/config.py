@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     pxl_admin_password: str = "changeme"
 
     # Catalog
-    catalog_path: str = "/app/catalog/catalog_dummy.json"
+    catalog_path: str = "/app/catalog/catalog.json"
 
     # App
     session_secret_key: str = "dev-secret-key"

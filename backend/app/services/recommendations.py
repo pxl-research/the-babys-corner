@@ -5,9 +5,11 @@ from app.services.catalog import CatalogService, is_available
 def _tier(stroller: dict, profile: str) -> int:
     if profile in stroller.get("must_have_profiles", []):
         return 0
-    if profile in stroller.get("nice_to_have_profiles", []):
+    if profile in stroller.get("should_have_profiles", []):
         return 1
-    return 2
+    if profile in stroller.get("nice_to_have_profiles", []):
+        return 2
+    return 3
 
 
 def compute_first_nine(
