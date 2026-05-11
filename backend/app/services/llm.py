@@ -19,7 +19,7 @@ async def _try_azure(prompt: str, system: str, model: str) -> str | None:
         resp = await client.chat.completions.create(
             model=model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-            max_completion_tokens=2048,
+            max_completion_tokens=16384,
         )
         content = resp.choices[0].message.content
         if not content:
