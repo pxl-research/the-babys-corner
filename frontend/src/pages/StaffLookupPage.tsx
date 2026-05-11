@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
+import StaffAnswerList from '../components/StaffAnswerList'
 import { api } from '../api/client'
 import type { StaffSession, StaffSessionDetail } from '../api/client'
 
@@ -104,12 +105,8 @@ export default function StaffLookupPage() {
             </p>
           )}
           <section className="mb-4">
-            <h3 className="font-semibold text-ink mb-1">Antwoorden</h3>
-            <ul className="space-y-1">
-              {detail.quiz_answers.map((a: any, i: number) => (
-                <li key={i} className="text-sm text-ink/80">{a.question_text}: {a.option_text}</li>
-              ))}
-            </ul>
+            <h3 className="font-semibold text-ink mb-2">Antwoorden</h3>
+            <StaffAnswerList answers={detail.quiz_answers} />
           </section>
           {detail.optional_note && (
             <section className="mb-4">

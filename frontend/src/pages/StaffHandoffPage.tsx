@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Header from '../components/Header'
+import StaffAnswerList from '../components/StaffAnswerList'
 import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
 import type { SessionState } from '../api/client'
@@ -53,13 +54,7 @@ export default function StaffHandoffPage() {
 
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-2">Antwoorden</h2>
-              <ul className="space-y-1">
-                {detail.quiz_answers.map((a: any, i: number) => (
-                  <li key={i} className="text-sm text-ink/80">
-                    <span className="font-medium">{a.question_text}: </span>{a.option_text}
-                  </li>
-                ))}
-              </ul>
+              <StaffAnswerList answers={detail.quiz_answers} />
             </section>
 
             {detail.optional_note && (
