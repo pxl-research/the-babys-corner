@@ -174,6 +174,29 @@ export default function QuizPage() {
   // Step 9: optional note
   if (stepNum === 9) {
     const noteConfig = quizConfig.optional_note
+
+    if (submitting) {
+      return (
+        <div className="min-h-screen bg-cream text-ink font-sans flex flex-col items-center justify-center gap-6 px-6">
+          <div className="flex gap-2">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="w-3 h-3 rounded-full bg-brand animate-bounce"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              />
+            ))}
+          </div>
+          <p className="font-display text-xl font-bold text-ink text-center">
+            We zoeken de beste matches voor jullie…
+          </p>
+          <p className="text-sm text-ink/60 text-center max-w-xs">
+            We vergelijken jullie wensen met ons volledige assortiment. Dit duurt even.
+          </p>
+        </div>
+      )
+    }
+
     return (
       <div className="min-h-screen bg-cream text-ink font-sans">
         <Header />
@@ -191,19 +214,17 @@ export default function QuizPage() {
           <div className="flex flex-col gap-3 mt-6">
             <button
               onClick={() => handleNoteSubmit(optionalNote)}
-              disabled={submitting}
-              className="bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
+              className="bg-brand text-white rounded-btn px-6 py-3 font-medium"
             >
-              {submitting ? 'Bezig…' : noteConfig.continue_label}
+              {noteConfig.continue_label}
             </button>
             <button
               onClick={() => handleNoteSubmit('')}
-              disabled={submitting}
-              className="border border-brand text-brand rounded-btn px-6 py-3 font-medium disabled:opacity-50"
+              className="border border-brand text-brand rounded-btn px-6 py-3 font-medium"
             >
               {noteConfig.skip_label}
             </button>
-            <button onClick={() => navigate('/quiz/8')} disabled={submitting} className="border border-brand text-brand rounded-btn px-6 py-3 font-medium">
+            <button onClick={() => navigate('/quiz/8')} className="border border-brand text-brand rounded-btn px-6 py-3 font-medium">
               Terug
             </button>
           </div>

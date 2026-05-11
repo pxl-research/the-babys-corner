@@ -148,7 +148,7 @@ async def generate_talking_points(session_context: dict) -> list[str] | None:
 async def rerank_by_note(
     candidates: list[dict],
     note: str,
-    timeout_s: float = 25.0,
+    timeout_s: float = 100.0,
 ) -> list[str] | None:
     """Re-rank strollers by semantic match of note against their descriptions."""
     if not candidates or not note.strip():
