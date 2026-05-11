@@ -72,6 +72,29 @@ export interface SessionState {
   talking_points: string[] | null
 }
 
+export interface BrandCollections {
+  brand: string
+  collections: string[]
+}
+
+export interface FilterTagsResponse {
+  brands: string[]
+}
+
+export interface FilterBrandsResponse {
+  brands: BrandCollections[]
+}
+
+export interface FilterCollectionsResponse {
+  stroller_count: number
+  accessory_count: number
+}
+
+export interface CollectionSelection {
+  brand: string
+  collection: string | null
+}
+
 export interface HandoffResponse {
   session_code: string
   handoff_at: string
@@ -120,10 +143,36 @@ export const api = {
 
   getSession: () => request<SessionState>('/api/sessions/current'),
 
-  submitQuiz: (answers: { question_id: number; option_index: number }[], optional_note: string) =>
+  submitQuiz: (answers: { question_id: number; option_index: number }[]) =>
     request<{ profile: string; transition_phrase: string }>('/api/sessions/current/quiz', {
       method: 'POST',
-      body: JSON.stringify({ answers, optional_note }),
+      body: JSON.stringify({ answers, optional_note: '' }),
+    }),
+
+  getTags: () => request<{ tags: string[] }>('/api/filters/tags'),
+
+  filterTags: (tags: string[]) =>
+    request<FilterTagsResponse>('/api/sessions/current/filters/tags', {
+      method: 'POST',
+      body: JSON.stringify({ tags }),
+    }),
+
+  filterBrands: (brands: string[]) =>
+    request<FilterBrandsResponse>('/api/sessions/current/filters/brands', {
+      method: 'POST',
+      body: JSON.stringify({ brands }),
+    }),
+
+  filterCollections: (selections: CollectionSelection[]) =>
+    request<FilterCollectionsResponse>('/api/sessions/current/filters/collections', {
+      method: 'POST',
+      body: JSON.stringify({ selections }),
+    }),
+
+  saveNote: (note: string) =>
+    request<{ note: string | null }>('/api/sessions/current/note', {
+      method: 'POST',
+      body: JSON.stringify({ note }),
     }),
 
   getRecommendations: (batch: number) =>

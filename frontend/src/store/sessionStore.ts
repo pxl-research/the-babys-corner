@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { StrollerItem, QuizQuestion, OptionalNoteConfig } from '../api/client'
+import type { StrollerItem, QuizQuestion, OptionalNoteConfig, BrandCollections, CollectionSelection } from '../api/client'
 
 export type AppStatus =
   | 'idle'
@@ -28,6 +28,12 @@ interface SessionStore {
   emailStatus: 'not_sent' | 'pending' | 'sent' | 'failed'
   favoritesAdaptationActive: boolean
   quizConfig: { questions: QuizQuestion[]; optional_note: OptionalNoteConfig } | null
+  availableTags: string[]
+  filterTagsSelected: string[]
+  availableBrands: string[]
+  filterBrandsSelected: string[]
+  availableCollections: BrandCollections[]
+  filterCollectionsSelected: CollectionSelection[]
 
   setSource: (source: 'store' | 'home') => void
   setSession: (id: string, code: string) => void
@@ -41,6 +47,12 @@ interface SessionStore {
   setEmailStatus: (status: 'not_sent' | 'pending' | 'sent' | 'failed') => void
   setFavoritesAdaptation: (active: boolean) => void
   setQuizConfig: (config: { questions: QuizQuestion[]; optional_note: OptionalNoteConfig }) => void
+  setAvailableTags: (tags: string[]) => void
+  setFilterTagsSelected: (tags: string[]) => void
+  setAvailableBrands: (brands: string[]) => void
+  setFilterBrandsSelected: (brands: string[]) => void
+  setAvailableCollections: (collections: BrandCollections[]) => void
+  setFilterCollectionsSelected: (selections: CollectionSelection[]) => void
   reset: () => void
 }
 
@@ -61,6 +73,12 @@ const initial = {
   emailStatus: 'not_sent' as const,
   favoritesAdaptationActive: false,
   quizConfig: null,
+  availableTags: [],
+  filterTagsSelected: [],
+  availableBrands: [],
+  filterBrandsSelected: [],
+  availableCollections: [],
+  filterCollectionsSelected: [],
 }
 
 export const useSessionStore = create<SessionStore>()(
@@ -90,6 +108,12 @@ export const useSessionStore = create<SessionStore>()(
       setEmailStatus: (emailStatus) => set({ emailStatus }),
       setFavoritesAdaptation: (favoritesAdaptationActive) => set({ favoritesAdaptationActive }),
       setQuizConfig: (quizConfig) => set({ quizConfig }),
+      setAvailableTags: (availableTags) => set({ availableTags }),
+      setFilterTagsSelected: (filterTagsSelected) => set({ filterTagsSelected }),
+      setAvailableBrands: (availableBrands) => set({ availableBrands }),
+      setFilterBrandsSelected: (filterBrandsSelected) => set({ filterBrandsSelected }),
+      setAvailableCollections: (availableCollections) => set({ availableCollections }),
+      setFilterCollectionsSelected: (filterCollectionsSelected) => set({ filterCollectionsSelected }),
       reset: () => set(initial),
     }),
     { name: 'babys-corner-session' }
