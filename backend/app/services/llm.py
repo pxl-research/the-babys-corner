@@ -172,10 +172,11 @@ async def rerank_by_note(
     )
 
     async def _call() -> str | None:
-        result = await _try_azure(prompt, system, settings.azure_openai_deployment_mini)
+        # nano (reasoning model) is ~13s for 50 strollers; mini is ~80s for same — use nano first
+        result = await _try_azure(prompt, system, settings.azure_openai_deployment_nano)
         if result is not None:
             return result
-        result = await _try_azure(prompt, system, settings.azure_openai_deployment_nano)
+        result = await _try_azure(prompt, system, settings.azure_openai_deployment_mini)
         if result is not None:
             return result
         return await _try_openrouter(prompt, system)
