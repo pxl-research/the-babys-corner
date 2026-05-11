@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_runtime_config_issues
 from app.database import init_db
-from app.routers import session, staff, admin
+from app.routers import session, staff, admin, filters
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,7 @@ async def startup():
 app.include_router(session.router)
 app.include_router(staff.router)
 app.include_router(admin.router)
+app.include_router(filters.router)
 
 
 @app.get("/api/health")

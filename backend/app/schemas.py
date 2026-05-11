@@ -142,6 +142,49 @@ class StaffSessionItem(BaseModel):
     email_status: Optional[str] = None
 
 
+class TagsListResponse(BaseModel):
+    tags: list[str]
+
+
+class FilterTagsRequest(BaseModel):
+    tags: list[str] = []
+
+
+class FilterTagsResponse(BaseModel):
+    brands: list[str]
+
+
+class FilterBrandsRequest(BaseModel):
+    brands: list[str] = []
+
+
+class BrandCollections(BaseModel):
+    brand: str
+    collections: list[str]
+
+
+class FilterBrandsResponse(BaseModel):
+    brands: list[BrandCollections]
+
+
+class CollectionSelection(BaseModel):
+    brand: str
+    collection: Optional[str] = None
+
+
+class FilterCollectionsRequest(BaseModel):
+    selections: list[CollectionSelection] = []
+
+
+class FilterCollectionsResponse(BaseModel):
+    stroller_count: int
+    accessory_count: int
+
+
+class NoteRequest(BaseModel):
+    note: str = ""
+
+
 class StaffSessionDetail(BaseModel):
     session_id: str
     session_code: str

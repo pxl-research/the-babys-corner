@@ -59,6 +59,75 @@ class CatalogService:
     def get_all_accessories(self) -> list[dict]:
         return list(self._accessories.values())
 
+    def get_tags(self) -> list[str]:
+        tags: set[str] = set()
+        for item in list(self._strollers.values()) + list(self._accessories.values()):
+            tags.update(item.get("tags", []))
+        return sorted(tags)
+
+    def get_brands_for_tags(self, tags: list[str]) -> list[str]:
+        brands: set[str] = set()
+        for item in list(self._strollers.values()) + list(self._accessories.values()):
+            if not tags or any(t in item.get("tags", []) for t in tags):
+                brands.add(item["brand"])
+        return sorted(brands)
+
+    def get_collections_for_brands(self, brands: list[str]) -> dict[str, list[str]]:
+        brand_lower = {b.lower(): b for b in brands}
+        result: dict[str, list[str]] = {b: [] for b in brands}
+        for item in list(self._strollers.values()) + list(self._accessories.values()):
+            b_key = item["brand"].lower()
+            if b_key in brand_lower:
+                b = brand_lower[b_key]
+                coll = item.get("collection")
+                if coll and coll not in result[b]:
+                    result[b].append(coll)
+        return {b: sorted(colls) for b, colls in result.items()}
+
+    def _matches_filter(
+        self,
+        item: dict,
+        tags: list[str],
+        brands: list[str],
+        collections: list[dict],
+    ) -> bool:
+        if tags and not any(t in item.get("tags", []) for t in tags):
+            return False
+        if brands and item.get("brand", "").lower() not in {b.lower() for b in brands}:
+            return False
+        if collections:
+            item_brand = item.get("brand", "").lower()
+            item_coll = item.get("collection")
+            if not any(
+                sel.get("brand", "").lower() == item_brand
+                and (sel.get("collection") is None or sel.get("collection") == item_coll)
+                for sel in collections
+            ):
+                return False
+        return True
+
+    def get_filtered_strollers(
+        self,
+        tags: list[str] | None = None,
+        brands: list[str] | None = None,
+        collections: list[dict] | None = None,
+    ) -> list[dict]:
+        t, b, c = tags or [], brands or [], collections or []
+        if not t and not b and not c:
+            return self.get_all_strollers()
+        return [s for s in self._strollers.values() if self._matches_filter(s, t, b, c)]
+
+    def get_filtered_accessories(
+        self,
+        tags: list[str] | None = None,
+        brands: list[str] | None = None,
+        collections: list[dict] | None = None,
+    ) -> list[dict]:
+        t, b, c = tags or [], brands or [], collections or []
+        if not t and not b and not c:
+            return self.get_all_accessories()
+        return [a for a in self._accessories.values() if self._matches_filter(a, t, b, c)]
+
 
 _catalog: CatalogService | None = None
 

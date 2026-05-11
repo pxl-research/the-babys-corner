@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS sessions (
     llm_key_features TEXT,
     llm_talking_points TEXT,
     llm_ranking_output TEXT,
-    llm_similarity_output TEXT
+    llm_similarity_output TEXT,
+    filter_tags TEXT,
+    filter_brands TEXT,
+    filter_collections TEXT
 );
 """
 
@@ -43,7 +46,19 @@ async def get_db() -> aiosqlite.Connection:
     return _db
 
 
+_MIGRATION_COLUMNS = [
+    "filter_tags TEXT",
+    "filter_brands TEXT",
+    "filter_collections TEXT",
+]
+
+
 async def init_db():
     db = await get_db()
     await db.execute(CREATE_SESSIONS_SQL)
+    for col_def in _MIGRATION_COLUMNS:
+        try:
+            await db.execute(f"ALTER TABLE sessions ADD COLUMN {col_def}")
+        except Exception:
+            pass
     await db.commit()

@@ -21,10 +21,18 @@ from app.schemas import (
     FavoriteToggleRequest,
     FavoriteToggleResponse,
     HandoffResponse,
+    FilterTagsRequest,
+    FilterTagsResponse,
+    FilterBrandsRequest,
+    FilterBrandsResponse,
+    BrandCollections,
+    FilterCollectionsRequest,
+    FilterCollectionsResponse,
+    NoteRequest,
 )
 from app.services.catalog import get_catalog, is_available
 from app.services.profile import compute_profile
-from app.services.recommendations import compute_first_nine, get_batch, get_cross_sell_items
+from app.services.recommendations import compute_first_nine, compute_filtered_order, get_batch, get_cross_sell_items
 from app.services.session_code import generate_session_code
 from app.services.email import send_handoff_email
 from app.services.llm import generate_key_features, generate_talking_points
@@ -237,9 +245,17 @@ async def get_recommendations(
     favorites_adaptation_active = bool(session.get("favorites_adaptation_active", 0))
     if batch >= 4 and stroller_favs and not extra_reco_order:
         from app.services.llm import rank_similar_strollers
-        all_ids = [s["id"] for s in catalog.get_all_strollers()]
         shown_flat = {id_ for b in shown_raw for id_ in b}
-        remaining_pool = [catalog.get_stroller(id_) for id_ in all_ids if id_ not in shown_flat and id_ not in reco_order]
+        if len(reco_order) > 9:
+            # Full filtered order stored — remaining is reco_order[9:]
+            remaining_ids = [id_ for id_ in reco_order[9:] if id_ not in shown_flat]
+        else:
+            reco_set = set(reco_order)
+            remaining_ids = [
+                s["id"] for s in catalog.get_all_strollers()
+                if s["id"] not in shown_flat and s["id"] not in reco_set
+            ]
+        remaining_pool = [catalog.get_stroller(id_) for id_ in remaining_ids]
         remaining_pool = [s for s in remaining_pool if s]
         fav_strollers = [catalog.get_stroller(id_) for id_ in stroller_favs]
         fav_strollers = [s for s in fav_strollers if s]
@@ -384,6 +400,120 @@ async def _generate_talking_points_for_session(session_id: str):
         (json.dumps(points[:3]), session_id),
     )
     await db.commit()
+
+
+@router.post("/current/filters/tags", response_model=FilterTagsResponse)
+async def save_filter_tags(
+    body: FilterTagsRequest,
+    session_id: Optional[str] = Cookie(default=None),
+):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+    _require_active(session)
+    if not session.get("quiz_submitted_at"):
+        raise HTTPException(422, detail="Quiz not submitted yet.")
+
+    db = await get_db()
+    await db.execute(
+        "UPDATE sessions SET filter_tags=?, filter_brands=NULL, filter_collections=NULL WHERE session_id=?",
+        (json.dumps(body.tags), session_id),
+    )
+    await db.commit()
+
+    catalog = get_catalog()
+    return FilterTagsResponse(brands=catalog.get_brands_for_tags(body.tags))
+
+
+@router.post("/current/filters/brands", response_model=FilterBrandsResponse)
+async def save_filter_brands(
+    body: FilterBrandsRequest,
+    session_id: Optional[str] = Cookie(default=None),
+):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+    _require_active(session)
+    if not session.get("quiz_submitted_at"):
+        raise HTTPException(422, detail="Quiz not submitted yet.")
+
+    db = await get_db()
+    await db.execute(
+        "UPDATE sessions SET filter_brands=?, filter_collections=NULL WHERE session_id=?",
+        (json.dumps(body.brands), session_id),
+    )
+    await db.commit()
+
+    catalog = get_catalog()
+    coll_map = catalog.get_collections_for_brands(body.brands)
+    brands_response = [
+        BrandCollections(brand=brand, collections=colls)
+        for brand, colls in sorted(coll_map.items())
+    ]
+    return FilterBrandsResponse(brands=brands_response)
+
+
+@router.post("/current/filters/collections", response_model=FilterCollectionsResponse)
+async def save_filter_collections(
+    body: FilterCollectionsRequest,
+    session_id: Optional[str] = Cookie(default=None),
+):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+    _require_active(session)
+    if not session.get("quiz_submitted_at"):
+        raise HTTPException(422, detail="Quiz not submitted yet.")
+
+    tags = json.loads(session["filter_tags"]) if session.get("filter_tags") else []
+    brands = json.loads(session["filter_brands"]) if session.get("filter_brands") else []
+    selections = [s.model_dump() for s in body.selections]
+
+    catalog = get_catalog()
+    reco_order = compute_filtered_order(catalog, tags or None, brands or None, selections or None)
+    stroller_count = len(reco_order)
+    accessory_count = len(catalog.get_filtered_accessories(tags or None, brands or None, selections or None))
+
+    db = await get_db()
+    await db.execute(
+        "UPDATE sessions SET filter_collections=?, reco_order=?, extra_reco_order=NULL WHERE session_id=?",
+        (json.dumps(selections), json.dumps(reco_order), session_id),
+    )
+    await db.commit()
+
+    return FilterCollectionsResponse(stroller_count=stroller_count, accessory_count=accessory_count)
+
+
+@router.post("/current/note")
+async def save_note(
+    body: NoteRequest,
+    session_id: Optional[str] = Cookie(default=None),
+):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+    _require_active(session)
+    if not session.get("quiz_submitted_at"):
+        raise HTTPException(422, detail="Quiz not submitted yet.")
+
+    note = body.note[:1000] if body.note else None
+    reco_order: list[str] = json.loads(session["reco_order"]) if session.get("reco_order") else []
+
+    if note and reco_order:
+        profile = session.get("derived_profile", "B")
+        from app.services.llm import rank_first_nine as llm_rank
+        llm_result = await llm_rank(reco_order[:9], profile, note)
+        if llm_result:
+            reco_order = llm_result + reco_order[9:]
+
+    db = await get_db()
+    await db.execute(
+        "UPDATE sessions SET optional_note=?, reco_order=? WHERE session_id=?",
+        (note, json.dumps(reco_order) if reco_order else None, session_id),
+    )
+    await db.commit()
+
+    return {"note": note}
 
 
 @router.post("/current/favorites", response_model=FavoriteToggleResponse)

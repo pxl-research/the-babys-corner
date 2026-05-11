@@ -68,6 +68,8 @@ def build_profiles(row: dict) -> tuple[list[str], list[str], list[str]]:
 def convert_row(row: dict, is_stroller: bool) -> dict:
     item_id = extract_id(row["link"])
     must, should, nice = build_profiles(row)
+    tags = [t.strip() for t in row.get("Product tags", "").split(",") if t.strip()]
+    collection = row.get("Collection", "").strip() or None
 
     item = {
         "id": item_id,
@@ -77,6 +79,8 @@ def convert_row(row: dict, is_stroller: bool) -> dict:
         "description": row["description"].strip(),
         "image_url": row["image_link"].strip(),
         "availability": AVAILABILITY_MAP.get(row["availability"].strip(), row["availability"].strip()),
+        "tags": tags,
+        "collection": collection,
         "must_have_profiles": must,
         "should_have_profiles": should,
         "nice_to_have_profiles": nice,

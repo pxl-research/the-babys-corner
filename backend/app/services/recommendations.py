@@ -1,4 +1,3 @@
-import random
 from app.services.catalog import CatalogService, is_available
 
 
@@ -43,6 +42,21 @@ def _validate_llm_order(llm_order: list[str], valid_ids: list[str]) -> list[str]
     return llm_order
 
 
+def compute_filtered_order(
+    catalog: CatalogService,
+    tags: list[str] | None = None,
+    brands: list[str] | None = None,
+    collections: list[dict] | None = None,
+) -> list[str]:
+    """Return all filtered stroller IDs sorted by availability then name (no profile)."""
+    strollers = catalog.get_filtered_strollers(tags, brands, collections)
+    strollers_sorted = sorted(
+        strollers,
+        key=lambda s: (0 if is_available(s) else 1, s["name"].lower()),
+    )
+    return [s["id"] for s in strollers_sorted]
+
+
 def get_batch(
     batch_num: int,
     reco_order: list[str],
@@ -56,34 +70,25 @@ def get_batch(
 
     if batch_num <= 3:
         batch_ids = reco_order[start:end]
-        result = []
-        for id_ in batch_ids:
-            s = catalog.get_stroller(id_)
-            if s:
-                result.append(s)
-        return result
+        return [s for id_ in batch_ids if (s := catalog.get_stroller(id_))]
 
-    # Batch 4+: use extra_reco_order or build from remaining
-    shown_ids = set(reco_order)
-    all_ids = [s["id"] for s in catalog.get_all_strollers()]
-    remaining = [id_ for id_ in all_ids if id_ not in shown_ids]
+    # Batch 4+: prefer items beyond position 9 in reco_order (filter-generated full order);
+    # fall back to catalog remainder when reco_order has only 9 entries (quiz-generated).
+    remaining_from_reco = reco_order[9:]
+    if remaining_from_reco:
+        remaining = remaining_from_reco
+    else:
+        shown_ids = set(reco_order)
+        all_ids = [s["id"] for s in catalog.get_all_strollers()]
+        remaining = [id_ for id_ in all_ids if id_ not in shown_ids]
 
     if extra_reco_order:
-        # Use cached order, remove already shown
         remaining_set = set(remaining)
         remaining = [id_ for id_ in extra_reco_order if id_ in remaining_set]
 
-    # Calculate which slice of remaining to show
     extra_start = (batch_num - 4) * 3
-    extra_end = extra_start + 3
-    batch_ids = remaining[extra_start:extra_end]
-
-    result = []
-    for id_ in batch_ids:
-        s = catalog.get_stroller(id_)
-        if s:
-            result.append(s)
-    return result
+    batch_ids = remaining[extra_start:extra_start + 3]
+    return [s for id_ in batch_ids if (s := catalog.get_stroller(id_))]
 
 
 def get_cross_sell_items(
