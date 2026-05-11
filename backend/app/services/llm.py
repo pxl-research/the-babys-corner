@@ -19,11 +19,15 @@ async def _try_azure(prompt: str, system: str, model: str) -> str | None:
         resp = await client.chat.completions.create(
             model=model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-            max_completion_tokens=1024,
+            max_completion_tokens=2048,
         )
-        return resp.choices[0].message.content
+        content = resp.choices[0].message.content
+        if not content:
+            logger.warning("Azure model %s returned empty content (finish_reason=%s)", model, resp.choices[0].finish_reason)
+            return None
+        return content
     except Exception as e:
-        logger.warning("Azure LLM error: %s", e)
+        logger.warning("Azure LLM error (%s): %s", model, e)
         return None
 
 
@@ -48,11 +52,11 @@ async def _try_openrouter(prompt: str, system: str) -> str | None:
         return None
 
 
-async def complete(prompt: str, system: str, timeout_s: float = 10.0) -> str | None:
-    result = await _try_azure(prompt, system, settings.azure_openai_deployment_nano)
+async def complete(prompt: str, system: str, timeout_s: float = 20.0) -> str | None:
+    result = await _try_azure(prompt, system, settings.azure_openai_deployment_mini)
     if result is not None:
         return result
-    result = await _try_azure(prompt, system, settings.azure_openai_deployment_mini)
+    result = await _try_azure(prompt, system, settings.azure_openai_deployment_nano)
     if result is not None:
         return result
     result = await _try_openrouter(prompt, system)
