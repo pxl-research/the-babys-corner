@@ -17,6 +17,7 @@ export default function QuizPage() {
     quizAnswers, setAnswer,
     optionalNote, setOptionalNote,
     profile, setProfile,
+    transitionPhrase,
     quizConfig, setQuizConfig,
     availableTags, setAvailableTags,
     filterTagsSelected, setFilterTagsSelected,
@@ -150,7 +151,7 @@ export default function QuizPage() {
     setSubmitting(true)
     try {
       await api.saveNote(note)
-      navigate('/transition')
+      navigate('/recommendations')
     } finally {
       setSubmitting(false)
     }
@@ -178,6 +179,11 @@ export default function QuizPage() {
     if (submitting) {
       return (
         <div className="min-h-screen bg-cream text-ink font-sans flex flex-col items-center justify-center gap-6 px-6">
+          {transitionPhrase && (
+            <p className="font-display text-2xl font-bold text-ink text-center max-w-md">
+              {transitionPhrase}
+            </p>
+          )}
           <div className="flex gap-2">
             {[0, 1, 2].map((i) => (
               <span
@@ -217,12 +223,6 @@ export default function QuizPage() {
               className="bg-brand text-white rounded-btn px-6 py-3 font-medium"
             >
               {noteConfig.continue_label}
-            </button>
-            <button
-              onClick={() => handleNoteSubmit('')}
-              className="border border-brand text-brand rounded-btn px-6 py-3 font-medium"
-            >
-              {noteConfig.skip_label}
             </button>
             <button onClick={() => navigate('/quiz/8')} className="border border-brand text-brand rounded-btn px-6 py-3 font-medium">
               Terug
