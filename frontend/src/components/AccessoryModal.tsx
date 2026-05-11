@@ -1,0 +1,68 @@
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import type { AccessoryItem } from '../api/client'
+
+interface Props {
+  accessory: AccessoryItem | null
+  isFavorited: boolean
+  onToggleFavorite: () => void
+  onClose: () => void
+}
+
+export default function AccessoryModal({ accessory, isFavorited, onToggleFavorite, onClose }: Props) {
+  const reduceMotion = useReducedMotion()
+  const canRemove = isFavorited
+  const canAdd = accessory?.is_available && !isFavorited
+
+  return (
+    <AnimatePresence>
+      {accessory && (
+        <>
+          <motion.div
+            className="fixed inset-0 bg-black/40 z-40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.2 }}
+            onClick={onClose}
+          />
+          <motion.div
+            className="fixed bottom-0 left-0 right-0 z-50 bg-cream rounded-t-2xl shadow-xl max-h-[85vh] overflow-y-auto"
+            initial={reduceMotion ? {} : { y: '100%' }}
+            animate={{ y: 0 }}
+            exit={reduceMotion ? {} : { y: '100%' }}
+            transition={{ duration: reduceMotion ? 0 : 0.3, ease: 'easeOut' }}
+          >
+            <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2" />
+            <div className="p-6">
+              {accessory.image_url && (
+                <img src={accessory.image_url} alt={accessory.name} className="w-full h-48 object-contain mb-4 rounded-card" />
+              )}
+              <p className="text-xs font-semibold tracking-widest uppercase text-ink/60 mb-1">{accessory.brand}</p>
+              <h2 className="font-display text-xl font-bold text-ink mb-1">{accessory.name}</h2>
+              <p className="text-lg font-medium text-ink mb-2">€ {accessory.price.toFixed(2)}</p>
+              {!accessory.is_available && (
+                <span className="bg-muted/60 text-ink/60 text-xs px-2 py-0.5 rounded-full mb-2 inline-block">
+                  Niet beschikbaar
+                </span>
+              )}
+              <p className="text-ink/80 mb-6">{accessory.description}</p>
+              {(canAdd || canRemove) && (
+                <button
+                  onClick={onToggleFavorite}
+                  className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium"
+                >
+                  {isFavorited ? '♥ In mijn lijst' : 'Voeg toe aan mijn lijst'}
+                </button>
+              )}
+              {!canAdd && !canRemove && (
+                <p className="text-center text-ink/50 text-sm">
+                  Deze accessoire is momenteel niet beschikbaar.
+                </p>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  )
+}
