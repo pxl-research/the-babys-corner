@@ -37,3 +37,17 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_runtime_config_issues(config: Settings = settings) -> list[str]:
+    issues: list[str] = []
+    azure_configured = bool(config.azure_openai_endpoint and config.azure_openai_api_key)
+    openrouter_configured = bool(config.openrouter_api_key)
+
+    if not azure_configured and not openrouter_configured:
+        issues.append(
+            "No LLM provider configured. Set AZURE_OPENAI_ENDPOINT + "
+            "AZURE_OPENAI_API_KEY or OPENROUTER_API_KEY."
+        )
+
+    return issues

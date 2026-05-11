@@ -105,6 +105,18 @@ async def test_complete_returns_none_when_all_providers_fail():
     assert result is None
 
 
+async def test_rank_first_nine_logs_warning_when_llm_fallback_used(caplog):
+    from app.services.llm import rank_first_nine
+
+    caplog.set_level(logging.WARNING)
+    with patch("app.services.llm.complete", new=AsyncMock(return_value=None)):
+        result = await rank_first_nine(["ST001", "ST002"], "A", "note")
+
+    assert result is None
+    assert "LLM ranking unavailable" in caplog.text
+    assert "using deterministic recommendation order" in caplog.text
+
+
 async def test_rank_first_nine_times_out_to_none(caplog):
     from app.services.llm import rank_first_nine
     import asyncio
@@ -113,13 +125,14 @@ async def test_rank_first_nine_times_out_to_none(caplog):
         await asyncio.sleep(10)
         return None
 
-    caplog.set_level(logging.INFO)
+    caplog.set_level(logging.WARNING)
     with patch("app.services.llm.complete", new=slow):
         result = await rank_first_nine(
             ["ST001", "ST002"], "A", "some note", timeout_s=0.05
         )
     assert result is None
-    assert not [record for record in caplog.records if record.levelno >= logging.WARNING]
+    assert "LLM ranking timed out" in caplog.text
+    assert "using deterministic recommendation order" in caplog.text
 
 
 async def test_rank_first_nine_rejects_ids_not_in_candidates():
@@ -138,6 +151,43 @@ async def test_generate_key_features_fallback_is_none():
     with patch("app.services.llm.complete", new=AsyncMock(return_value=None)):
         result = await generate_key_features({"id": "ST001", "name": "x"}, "A")
     assert result is None
+
+
+async def test_generate_key_features_logs_warning_when_fallback_used(caplog):
+    from app.services.llm import generate_key_features
+
+    caplog.set_level(logging.WARNING)
+    with patch("app.services.llm.complete", new=AsyncMock(return_value=None)):
+        result = await generate_key_features({"id": "ST001", "name": "x"}, "A")
+
+    assert result is None
+    assert "LLM key features unavailable" in caplog.text
+    assert "ST001" in caplog.text
+
+
+async def test_generate_talking_points_logs_warning_when_fallback_used(caplog):
+    from app.services.llm import generate_talking_points
+
+    caplog.set_level(logging.WARNING)
+    with patch("app.services.llm.complete", new=AsyncMock(return_value=None)):
+        result = await generate_talking_points({"session_id": "S1"})
+
+    assert result is None
+    assert "LLM talking points unavailable" in caplog.text
+
+
+async def test_rank_similar_strollers_logs_warning_when_fallback_used(caplog):
+    from app.services.llm import rank_similar_strollers
+
+    caplog.set_level(logging.WARNING)
+    with patch("app.services.llm.complete", new=AsyncMock(return_value=None)):
+        result = await rank_similar_strollers(
+            [{"id": "ST001", "name": "Fav", "description": "desc"}],
+            [{"id": "ST002", "name": "Pool", "description": "desc"}],
+        )
+
+    assert result is None
+    assert "LLM similarity ranking unavailable" in caplog.text
 
 
 async def test_generate_talking_points_limits_to_top_three():

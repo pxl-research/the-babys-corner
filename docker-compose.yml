@@ -4,7 +4,7 @@ services:
     env_file:
       - path: .env.example
       - path: .env
-        required: false
+        required: true
     volumes:
       - sqlite_data:/app/data
     expose:

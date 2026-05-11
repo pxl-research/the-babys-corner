@@ -80,10 +80,11 @@ async def rank_first_nine(
     try:
         raw = await asyncio.wait_for(complete(prompt, system), timeout=timeout_s)
     except asyncio.TimeoutError:
-        logger.info("rank_first_nine timed out; using deterministic order")
+        logger.warning("LLM ranking timed out; using deterministic recommendation order.")
         return None
 
     if not raw:
+        logger.warning("LLM ranking unavailable; using deterministic recommendation order.")
         return None
 
     try:
@@ -111,7 +112,14 @@ async def generate_key_features(stroller: dict, profile: str) -> str | None:
         f"Profile: {profile}\n"
         "Return 2-3 bullet points in Dutch."
     )
-    return await complete(prompt, system)
+    features = await complete(prompt, system)
+    if not features:
+        logger.warning(
+            "LLM key features unavailable for stroller %s; using fallback key features.",
+            stroller.get("id", "?"),
+        )
+        return None
+    return features
 
 
 async def generate_talking_points(session_context: dict) -> list[str] | None:
@@ -122,6 +130,7 @@ async def generate_talking_points(session_context: dict) -> list[str] | None:
     prompt = f"Session context: {json.dumps(session_context, ensure_ascii=False)}\nReturn JSON array of 3 strings."
     raw = await complete(prompt, system)
     if not raw:
+        logger.warning("LLM talking points unavailable; staff handoff will omit generated talking points.")
         return None
     try:
         points = json.loads(raw)
@@ -150,6 +159,7 @@ async def rank_similar_strollers(
     )
     raw = await complete(prompt, system)
     if not raw:
+        logger.warning("LLM similarity ranking unavailable; using normal recommendation order.")
         return None
     try:
         ordered = json.loads(raw)

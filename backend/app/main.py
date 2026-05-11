@@ -1,8 +1,13 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import get_runtime_config_issues
 from app.database import init_db
 from app.routers import session, staff, admin
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="The Baby's Corner API", version="0.1.0")
 
@@ -17,6 +22,8 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
+    for issue in get_runtime_config_issues():
+        logger.warning("Runtime config issue: %s", issue)
     await init_db()
 
 
