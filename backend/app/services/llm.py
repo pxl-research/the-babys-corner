@@ -19,7 +19,6 @@ async def _try_azure(prompt: str, system: str, model: str) -> str | None:
         resp = await client.chat.completions.create(
             model=model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-            temperature=0.3,
             max_completion_tokens=1024,
         )
         return resp.choices[0].message.content
@@ -81,7 +80,7 @@ async def rank_first_nine(
     try:
         raw = await asyncio.wait_for(complete(prompt, system), timeout=timeout_s)
     except asyncio.TimeoutError:
-        logger.warning("rank_first_nine timed out")
+        logger.info("rank_first_nine timed out; using deterministic order")
         return None
 
     if not raw:

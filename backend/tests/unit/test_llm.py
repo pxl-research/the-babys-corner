@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import AsyncMock, patch
 from types import SimpleNamespace
 
@@ -49,6 +50,29 @@ async def test_try_azure_uses_max_completion_tokens(monkeypatch):
     assert "max_tokens" not in captured_kwargs
 
 
+async def test_try_azure_omits_temperature_for_default_only_models(monkeypatch):
+    from app.services import llm
+
+    captured_kwargs = {}
+
+    class FakeAzureOpenAI:
+        def __init__(self, **kwargs):
+            pass
+
+        @property
+        def chat(self):
+            return _FakeChat(captured_kwargs)
+
+    monkeypatch.setattr(llm.settings, "azure_openai_endpoint", "https://example.openai.azure.com")
+    monkeypatch.setattr(llm.settings, "azure_openai_api_key", "key")
+    monkeypatch.setattr("openai.AsyncAzureOpenAI", FakeAzureOpenAI)
+
+    result = await llm._try_azure("prompt", "system", "gpt-5-nano")
+
+    assert result == "ok"
+    assert "temperature" not in captured_kwargs
+
+
 async def test_try_openrouter_uses_max_completion_tokens(monkeypatch):
     from app.services import llm
 
@@ -81,7 +105,7 @@ async def test_complete_returns_none_when_all_providers_fail():
     assert result is None
 
 
-async def test_rank_first_nine_times_out_to_none():
+async def test_rank_first_nine_times_out_to_none(caplog):
     from app.services.llm import rank_first_nine
     import asyncio
 
@@ -89,11 +113,13 @@ async def test_rank_first_nine_times_out_to_none():
         await asyncio.sleep(10)
         return None
 
+    caplog.set_level(logging.INFO)
     with patch("app.services.llm.complete", new=slow):
         result = await rank_first_nine(
             ["ST001", "ST002"], "A", "some note", timeout_s=0.05
         )
     assert result is None
+    assert not [record for record in caplog.records if record.levelno >= logging.WARNING]
 
 
 async def test_rank_first_nine_rejects_ids_not_in_candidates():

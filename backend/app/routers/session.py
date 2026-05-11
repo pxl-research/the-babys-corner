@@ -407,8 +407,6 @@ async def toggle_favorite(
         if body.item_id in stroller_favs:
             stroller_favs.remove(body.item_id)
         else:
-            if not is_available(item):
-                raise HTTPException(422, detail="Unavailable stroller cannot be favorited.")
             stroller_favs.append(body.item_id)
     elif body.item_type == "accessory":
         item = catalog.get_accessory(body.item_id)

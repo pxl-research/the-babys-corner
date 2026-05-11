@@ -97,6 +97,19 @@ async def test_after_handoff_favorite_toggle_returns_409(client):
     assert resp.status_code == 409
 
 
+async def test_unavailable_stroller_can_be_favorited(client):
+    resp = await client.post("/api/sessions?source=home")
+    assert resp.status_code == 200
+
+    resp = await client.post(
+        "/api/sessions/current/favorites",
+        json={"item_id": "ST003", "item_type": "stroller"},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["stroller_favorites"] == ["ST003"]
+
+
 async def test_after_handoff_new_batch_returns_409(client):
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
