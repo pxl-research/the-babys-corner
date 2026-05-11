@@ -141,6 +141,63 @@ async def generate_talking_points(session_context: dict) -> list[str] | None:
         return None
 
 
+async def rerank_by_note(
+    candidates: list[dict],
+    note: str,
+    timeout_s: float = 25.0,
+) -> list[str] | None:
+    """Re-rank strollers by semantic match of note against their descriptions."""
+    if not candidates or not note.strip():
+        return None
+
+    system = (
+        "You are a stroller advisor assistant. "
+        "Re-order the given strollers by how well they match the customer's note, "
+        "using the Dutch product descriptions to understand relevance. "
+        "Return ONLY a JSON array of ALL provided IDs in order from best to worst match. "
+        "Do not add, remove, or invent any IDs."
+    )
+    items = [
+        {"id": c["id"], "desc": (c.get("description") or "")[:200]}
+        for c in candidates
+    ]
+    prompt = (
+        f"Customer note: {note}\n\n"
+        f"Strollers:\n{json.dumps(items, ensure_ascii=False)}\n\n"
+        "Return JSON array of IDs only."
+    )
+
+    async def _call() -> str | None:
+        result = await _try_azure(prompt, system, settings.azure_openai_deployment_mini)
+        if result is not None:
+            return result
+        result = await _try_azure(prompt, system, settings.azure_openai_deployment_nano)
+        if result is not None:
+            return result
+        return await _try_openrouter(prompt, system)
+
+    try:
+        raw = await asyncio.wait_for(_call(), timeout=timeout_s)
+    except asyncio.TimeoutError:
+        logger.warning("LLM note rerank timed out; keeping deterministic order.")
+        return None
+
+    if not raw:
+        logger.warning("LLM note rerank unavailable; keeping deterministic order.")
+        return None
+
+    try:
+        ordered = json.loads(raw)
+        if not isinstance(ordered, list):
+            return None
+        candidate_ids = {c["id"] for c in candidates}
+        if set(ordered) != candidate_ids:
+            return None
+        return [str(id_) for id_ in ordered]
+    except (json.JSONDecodeError, TypeError):
+        return None
+
+
 async def rank_similar_strollers(
     favorites: list[dict],
     pool: list[dict],

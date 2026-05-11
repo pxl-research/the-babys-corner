@@ -500,11 +500,13 @@ async def save_note(
     reco_order: list[str] = json.loads(session["reco_order"]) if session.get("reco_order") else []
 
     if note and reco_order:
-        profile = session.get("derived_profile", "B")
-        from app.services.llm import rank_first_nine as llm_rank
-        llm_result = await llm_rank(reco_order[:9], profile, note)
+        from app.services.llm import rerank_by_note
+        stroller_dicts = [s for id_ in reco_order if (s := catalog.get_stroller(id_))]
+        llm_result = await rerank_by_note(stroller_dicts, note)
         if llm_result:
-            reco_order = llm_result + reco_order[9:]
+            llm_set = set(llm_result)
+            missing = [id_ for id_ in reco_order if id_ not in llm_set]
+            reco_order = llm_result + missing
 
     db = await get_db()
     await db.execute(

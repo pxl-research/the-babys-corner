@@ -159,17 +159,16 @@ async def test_note_endpoint_triggers_llm_rerank(client, reset_db):
     async with reset_db.execute("SELECT reco_order FROM sessions") as cur:
         row = await cur.fetchone()
     reco_before = json.loads(row["reco_order"])
-    first_nine_ids = reco_before[:9]
-    reversed_ids = list(reversed(first_nine_ids))
+    reversed_all = list(reversed(reco_before))
 
-    with patch("app.services.llm.rank_first_nine", new=AsyncMock(return_value=reversed_ids)):
+    with patch("app.services.llm.rerank_by_note", new=AsyncMock(return_value=reversed_all)):
         resp = await client.post("/api/sessions/current/note", json={"note": "Iets sportiefs"})
 
     assert resp.status_code == 200
     async with reset_db.execute("SELECT reco_order FROM sessions") as cur:
         row = await cur.fetchone()
     new_reco = json.loads(row["reco_order"])
-    assert new_reco[:9] == reversed_ids
+    assert new_reco == reversed_all
 
 
 async def test_filter_tags_resets_downstream_filters(client, reset_db):
