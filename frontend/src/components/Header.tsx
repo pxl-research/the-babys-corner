@@ -21,7 +21,7 @@ export default function Header() {
     <header className="bg-cream border-b border-muted py-4">
       <div className="max-w-2xl mx-auto px-4 flex justify-center">
         <button onClick={handleLogoClick} className="focus:outline-none" aria-label="Opnieuw beginnen">
-          <img src="/logo.jpg" alt="The Baby's Corner" className="max-h-12 object-contain cursor-pointer hover:opacity-75 transition-opacity" />
+          <img src="/logo.png" alt="The Baby's Corner" className="max-h-[4.5rem] object-contain cursor-pointer hover:opacity-75 transition-opacity" />
         </button>
       </div>
     </header>
