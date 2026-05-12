@@ -162,7 +162,7 @@ async def rerank_by_note(
         "Do not add, remove, or invent any IDs."
     )
     items = [
-        {"id": c["id"], "desc": (c.get("description") or "")[:200]}
+        {"id": c["id"], "desc": c.get("compact_description") or (c.get("description") or "")[:200]}
         for c in candidates
     ]
     prompt = (
