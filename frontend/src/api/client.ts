@@ -204,6 +204,11 @@ export const api = {
       headers: { Authorization: `Basic ${credentials}` },
     }),
 
+  getAdminSessionDetail: (code: string, credentials: string) =>
+    request<StaffSessionDetail>(`/api/admin/sessions/${code}`, {
+      headers: { Authorization: `Basic ${credentials}` },
+    }),
+
   exportAdmin: (credentials: string) =>
     fetch('/api/admin/sessions/export', {
       headers: { Authorization: `Basic ${credentials}` },

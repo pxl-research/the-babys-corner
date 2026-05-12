@@ -7,7 +7,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from app.config import settings
 from app.database import get_db
-from app.schemas import StaffSessionItem
+from app.schemas import StaffSessionItem, StaffSessionDetail
 from app.services.export import build_xlsx
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -73,4 +73,53 @@ async def export_sessions(_: HTTPBasicCredentials = Depends(verify_admin)):
         content=xlsx_bytes,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=sessions.xlsx"},
+    )
+
+
+@router.get("/sessions/{session_code}", response_model=StaffSessionDetail)
+async def get_admin_session_detail(
+    session_code: str,
+    _: HTTPBasicCredentials = Depends(verify_admin),
+):
+    import json
+
+    db = await get_db()
+    async with db.execute(
+        "SELECT * FROM sessions WHERE session_code=? ORDER BY started_at DESC LIMIT 1",
+        (session_code,),
+    ) as cur:
+        row = await cur.fetchone()
+
+    if not row:
+        raise HTTPException(404, detail="Session not found.")
+
+    row = dict(row)
+    email_failed_warning = (
+        row["source"] == "home" and row.get("email_status") == "failed"
+    )
+
+    def _parse(field, default):
+        if not field:
+            return default
+        try:
+            return json.loads(field)
+        except Exception:
+            return default
+
+    return StaffSessionDetail(
+        session_id=row["session_id"],
+        session_code=row["session_code"],
+        source=row["source"],
+        status=row["status"],
+        started_at=row["started_at"],
+        handoff_at=row.get("handoff_at"),
+        profile=row.get("derived_profile"),
+        quiz_answers=_parse(row.get("quiz_answers"), []),
+        optional_note=row.get("optional_note"),
+        shown_products=_parse(row.get("shown_products"), []),
+        stroller_favorites=_parse(row.get("stroller_favorites"), []),
+        accessory_favorites=_parse(row.get("accessory_favorites"), []),
+        talking_points=_parse(row.get("llm_talking_points"), None),
+        email_status=row.get("email_status"),
+        email_failed_warning=email_failed_warning,
     )
