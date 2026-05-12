@@ -47,7 +47,7 @@ export default function ProductModal({
                   Niet beschikbaar
                 </span>
               )}
-              <p className="text-ink/80 mb-4">{stroller.description}</p>
+              <p className="text-ink/80 mb-4 whitespace-pre-line">{stroller.formatted_description ?? stroller.description}</p>
               {stroller.key_features && (
                 <div className="bg-brand/10 rounded-card p-4 mb-4">
                   <p className="font-semibold text-ink mb-1 text-sm">Kenmerken</p>

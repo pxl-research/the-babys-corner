@@ -38,6 +38,7 @@ export interface StrollerItem {
   brand: string
   price: number
   description: string
+  formatted_description?: string
   image_url: string
   availability: string
   is_available: boolean

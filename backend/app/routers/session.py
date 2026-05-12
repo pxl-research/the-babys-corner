@@ -328,6 +328,7 @@ def _build_products(
             brand=s["brand"],
             price=s["price"],
             description=s["description"],
+            formatted_description=s.get("formatted_description"),
             image_url=s["image_url"],
             availability=s["availability"],
             is_available=is_available(s),

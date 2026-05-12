@@ -76,6 +76,7 @@ class StrollerItem(BaseModel):
     brand: str
     price: float
     description: str
+    formatted_description: Optional[str] = None
     image_url: str
     availability: str
     is_available: bool
