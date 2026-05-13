@@ -206,6 +206,7 @@ async def rerank_by_note(
 async def rank_similar_strollers(
     favorites: list[dict],
     pool: list[dict],
+    timeout_s: float = 2.5,
 ) -> list[str] | None:
     if not favorites or not pool:
         return None
@@ -219,7 +220,11 @@ async def rank_similar_strollers(
         f"Favorited strollers: {json.dumps(fav_descs, ensure_ascii=False)}\n"
         f"Pool IDs to reorder: {json.dumps(pool_ids)}\nReturn JSON array only."
     )
-    raw = await complete(prompt, system)
+    try:
+        raw = await asyncio.wait_for(complete(prompt, system), timeout=timeout_s)
+    except asyncio.TimeoutError:
+        logger.warning("LLM similarity ranking timed out; using normal recommendation order.")
+        return None
     if not raw:
         logger.warning("LLM similarity ranking unavailable; using normal recommendation order.")
         return None
@@ -227,7 +232,12 @@ async def rank_similar_strollers(
         ordered = json.loads(raw)
         pool_set = set(pool_ids)
         if not isinstance(ordered, list) or any(id_ not in pool_set for id_ in ordered):
+            logger.warning("LLM similarity ranking invalid IDs; using normal recommendation order.")
+            return None
+        if set(ordered) != pool_set:
+            logger.warning("LLM similarity ranking incomplete list; using normal recommendation order.")
             return None
         return ordered
     except (json.JSONDecodeError, TypeError):
+        logger.warning("LLM similarity ranking unparseable; using normal recommendation order.")
         return None

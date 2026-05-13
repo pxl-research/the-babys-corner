@@ -190,6 +190,41 @@ async def test_rank_similar_strollers_logs_warning_when_fallback_used(caplog):
     assert "LLM similarity ranking unavailable" in caplog.text
 
 
+async def test_rank_similar_strollers_times_out_fast(caplog):
+    from app.services.llm import rank_similar_strollers
+    import asyncio
+
+    async def slow(*args, **kwargs):
+        await asyncio.sleep(10)
+        return None
+
+    caplog.set_level(logging.WARNING)
+    with patch("app.services.llm.complete", new=slow):
+        result = await rank_similar_strollers(
+            [{"id": "ST001", "name": "Fav", "description": "desc"}],
+            [{"id": "ST002", "name": "Pool", "description": "desc"}],
+            timeout_s=0.05,
+        )
+    assert result is None
+    assert "LLM similarity ranking timed out" in caplog.text
+
+
+async def test_rank_similar_strollers_rejects_incomplete_list(caplog):
+    from app.services.llm import rank_similar_strollers
+
+    caplog.set_level(logging.WARNING)
+    with patch("app.services.llm.complete", new=AsyncMock(return_value='["ST002"]')):
+        result = await rank_similar_strollers(
+            [{"id": "ST001", "name": "Fav", "description": "desc"}],
+            [
+                {"id": "ST002", "name": "Pool A", "description": "desc"},
+                {"id": "ST003", "name": "Pool B", "description": "desc"},
+            ],
+        )
+    assert result is None
+    assert "LLM similarity ranking incomplete list" in caplog.text
+
+
 async def test_generate_talking_points_limits_to_top_three():
     from app.services.llm import generate_talking_points
 
