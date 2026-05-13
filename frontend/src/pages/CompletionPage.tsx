@@ -91,20 +91,6 @@ export default function CompletionPage() {
             </section>
           ) : null}
 
-          {allProducts.length > 0 && (
-            <section>
-              <h2 className="font-semibold text-ink mb-3">Bekeken producten</h2>
-              <ul className="space-y-2">
-                {allProducts.map((stroller) => (
-                  <li key={stroller.id} className="rounded-card border border-muted bg-cream p-3">
-                    <p className="font-medium text-ink">{stroller.name}</p>
-                    <p className="text-sm text-ink/60">{stroller.brand}</p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
           {optionalNote.trim() && (
             <section>
               <h2 className="font-semibold text-ink mb-2">Extra info</h2>
