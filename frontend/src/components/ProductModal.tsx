@@ -14,6 +14,30 @@ export default function ProductModal({
   stroller, isFavorited, onToggleFavorite, onAccessoryClick, onClose,
 }: Props) {
   const reduceMotion = useReducedMotion()
+  const descriptionText = stroller?.formatted_description ?? stroller?.description ?? ''
+
+  function isRedundantKeyFeatures(features: string, description: string) {
+    const f = features.trim()
+    const d = description.trim()
+    if (!f || !d) return false
+    const headingSignals = ['belangrijkste kenmerken', 'kenmerken', 'specificaties', 'technische specificaties']
+    const hasHeadingInDescription = headingSignals.some((h) => d.toLowerCase().includes(h))
+    if (!hasHeadingInDescription) return false
+
+    const firstFeatureLine = f
+      .split('\n')
+      .map((line) => line.replace(/^[•\-*]\s*/, '').trim())
+      .find(Boolean)
+    if (!firstFeatureLine) return false
+
+    const normalizedNeedle = firstFeatureLine.toLowerCase().replace(/[^a-z0-9]+/g, '')
+    const normalizedHaystack = d.toLowerCase().replace(/[^a-z0-9]+/g, '')
+    return normalizedHaystack.includes(normalizedNeedle)
+  }
+
+  const showKeyFeatures = Boolean(
+    stroller?.key_features && !isRedundantKeyFeatures(stroller.key_features, descriptionText)
+  )
 
   return (
     <AnimatePresence>
@@ -55,8 +79,8 @@ export default function ProductModal({
                   Niet beschikbaar
                 </span>
               )}
-              <p className="text-ink/80 mb-4 whitespace-pre-line">{stroller.formatted_description ?? stroller.description}</p>
-              {stroller.key_features && (
+              <p className="text-ink/80 mb-4 whitespace-pre-line">{descriptionText}</p>
+              {showKeyFeatures && (
                 <div className="bg-brand/10 rounded-card p-4 mb-4">
                   <p className="font-semibold text-ink mb-1 text-sm">Kenmerken</p>
                   <p className="text-ink/80 text-sm whitespace-pre-line">{stroller.key_features}</p>
