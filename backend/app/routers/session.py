@@ -549,8 +549,6 @@ async def toggle_favorite(
         if body.item_id in accessory_favs:
             accessory_favs.remove(body.item_id)
         else:
-            if not is_available(item):
-                raise HTTPException(422, detail="Unavailable accessory cannot be added.")
             accessory_favs.append(body.item_id)
     else:
         raise HTTPException(422, detail="item_type must be 'stroller' or 'accessory'.")

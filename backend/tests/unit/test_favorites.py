@@ -29,18 +29,18 @@ def test_unavailable_stroller_favorite_disabled():
     assert not is_available(UNAVAILABLE_STROLLER)
 
 
-def test_unavailable_already_favorited_accessory_can_be_removed_not_added():
-    # Simulate: ACC_UNAVAIL is already in favorites → remove allowed, re-add not
+def test_unavailable_accessory_can_be_removed_and_readded():
+    # Simulate: ACC_UNAVAIL is already in favorites -> remove and re-add are both allowed
     favorites = ["ACC_UNAVAIL"]
     catalog = CatalogService(strollers=[], accessories=[UNAVAILABLE_ACC])
     acc = catalog.get_accessory("ACC_UNAVAIL")
     assert acc is not None
-    # Already favorited + unavailable → can remove (toggle removes it)
+    # Already favorited + unavailable -> can remove
     assert "ACC_UNAVAIL" in favorites
-    # Remove
     favorites.remove("ACC_UNAVAIL")
     assert "ACC_UNAVAIL" not in favorites
-    # Cannot re-add because unavailable
+    favorites.append("ACC_UNAVAIL")
+    assert "ACC_UNAVAIL" in favorites
     assert not is_available(acc)
 
 

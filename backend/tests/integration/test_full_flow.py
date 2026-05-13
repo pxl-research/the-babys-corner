@@ -110,6 +110,19 @@ async def test_unavailable_stroller_can_be_favorited(client):
     assert resp.json()["stroller_favorites"] == ["54918"]
 
 
+async def test_unavailable_accessory_can_be_favorited(client):
+    resp = await client.post("/api/sessions?source=home")
+    assert resp.status_code == 200
+
+    resp = await client.post(
+        "/api/sessions/current/favorites",
+        json={"item_id": "5930", "item_type": "accessory"},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["accessory_favorites"] == ["5930"]
+
+
 async def test_after_handoff_new_batch_returns_409(client):
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
