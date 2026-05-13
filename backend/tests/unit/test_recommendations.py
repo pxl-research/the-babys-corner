@@ -270,3 +270,24 @@ def test_cross_sell_keeps_unavailable_items():
     items = get_cross_sell_items(stroller, "A", catalog)
     assert len(items) == 5
     assert all(not a["availability"] == "Op voorraad" for a in items)
+
+
+def test_cross_sell_prefers_matching_color_in_titles():
+    stroller = {
+        **make_stroller("ST001", "A"),
+        "brand": "joolz",
+        "name": "Buggy ultracompact Aer2 - calming beige",
+    }
+    accessories = [
+        make_accessory("M1", "Voetenzak space black", "joolz", must=["A"]),
+        make_accessory("M2", "Voetenzak calming beige", "joolz", must=["A"]),
+        make_accessory("M3", "Regenhoes zwart", "joolz", must=["A"]),
+        make_accessory("M4", "Liner calming beige", "joolz", must=["A"]),
+        make_accessory("M5", "Organizer olive", "joolz", should=["A"]),
+        make_accessory("M6", "Adapter calming beige", "joolz", should=["A"]),
+    ]
+    catalog = CatalogService(strollers=[stroller], accessories=accessories)
+    items = get_cross_sell_items(stroller, "A", catalog)
+    names = [a["name"].lower() for a in items]
+    # Should include beige options when available.
+    assert any("beige" in n for n in names)

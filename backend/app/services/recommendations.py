@@ -2,6 +2,44 @@ from app.services.catalog import CatalogService, is_available
 import random
 import re
 
+_COLOR_ALIASES = {
+    "black": "black",
+    "zwart": "black",
+    "rich black": "black",
+    "nitro black": "black",
+    "grey": "grey",
+    "gray": "grey",
+    "grijs": "grey",
+    "graphite": "grey",
+    "moon grey": "grey",
+    "beige": "beige",
+    "taupe": "taupe",
+    "desert taupe": "taupe",
+    "green": "green",
+    "groen": "green",
+    "sage": "green",
+    "olive": "green",
+    "blue": "blue",
+    "blauw": "blue",
+    "navy": "blue",
+    "pink": "pink",
+    "roze": "pink",
+    "brown": "brown",
+    "bruin": "brown",
+    "white": "white",
+    "wit": "white",
+    "sand": "sand",
+    "clay": "clay",
+    "khaki": "khaki",
+    "mint": "mint",
+    "amber": "amber",
+    "orange": "orange",
+    "yellow": "yellow",
+    "red": "red",
+    "antraciet": "anthracite",
+    "anthracite": "anthracite",
+}
+
 
 def _tier(stroller: dict, profile: str) -> int:
     if profile in stroller.get("must_have_profiles", []):
@@ -113,6 +151,7 @@ def get_cross_sell_items(
     selected: list[dict] = []
     selected_ids: set[str] = set()
     selected_names: set[str] = set()
+    stroller_colors = _extract_colors(stroller.get("name", ""))
 
     def normalize_name(name: str) -> str:
         return re.sub(r"[^a-z0-9]+", "", (name or "").lower())
@@ -137,12 +176,24 @@ def get_cross_sell_items(
                 break
         return picked
 
+    def pick_with_color_priority(pool: list[dict], count: int) -> list[dict]:
+        if count <= 0:
+            return []
+        if not stroller_colors:
+            return pick_from_pool(pool, count)
+        color_matches = [a for a in pool if _extract_colors(a.get("name", "")) & stroller_colors]
+        non_matches = [a for a in pool if a not in color_matches]
+        first = pick_from_pool(color_matches, count)
+        if len(first) >= count:
+            return first
+        return first + pick_from_pool(non_matches, count - len(first))
+
     for tier_field, count in profile_quota.items():
         tier_pool = [a for a in all_accessories if profile in a.get(tier_field, [])]
         same_brand = [a for a in tier_pool if (a.get("brand") or "").strip().lower() == stroller_brand]
         other_brand = [a for a in tier_pool if (a.get("brand") or "").strip().lower() != stroller_brand]
 
-        picked_same = pick_from_pool(same_brand, count)
+        picked_same = pick_with_color_priority(same_brand, count)
         for acc in picked_same:
             selected.append(acc)
             selected_ids.add(acc["id"])
@@ -150,7 +201,7 @@ def get_cross_sell_items(
 
         remaining = count - len(picked_same)
         if remaining > 0:
-            picked_other = pick_from_pool(other_brand, remaining)
+            picked_other = pick_with_color_priority(other_brand, remaining)
             for acc in picked_other:
                 selected.append(acc)
                 selected_ids.add(acc["id"])
@@ -166,7 +217,7 @@ def get_cross_sell_items(
             needed = target_total - len(selected)
             if needed <= 0:
                 break
-            extra = pick_from_pool(pool, needed)
+            extra = pick_with_color_priority(pool, needed)
             for acc in extra:
                 selected.append(acc)
                 selected_ids.add(acc["id"])
@@ -174,3 +225,12 @@ def get_cross_sell_items(
 
     rng.shuffle(selected)
     return selected
+
+
+def _extract_colors(name: str) -> set[str]:
+    lowered = (name or "").lower()
+    colors: set[str] = set()
+    for token, canonical in _COLOR_ALIASES.items():
+        if token in lowered:
+            colors.add(canonical)
+    return colors
