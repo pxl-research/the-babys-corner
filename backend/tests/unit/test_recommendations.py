@@ -179,6 +179,28 @@ def test_diversify_llm_order_keeps_top_winner_and_randomizes_blocks(monkeypatch)
     assert diversified[1:3] == ["ST_A2", "ST_A1"]
 
 
+def test_diversify_llm_order_randomizes_non_contiguous_equal_rank(monkeypatch):
+    strollers = [
+        make_stroller("TOP", "A"),          # keep_top_n
+        make_stroller("M1", "A"),
+        make_stroller("N1", None, "A"),
+        make_stroller("M2", "A"),
+        make_stroller("N2", None, "A"),
+    ]
+    catalog = make_catalog(strollers)
+    ordered = ["TOP", "M1", "N1", "M2", "N2"]
+
+    def reverse_shuffle(seq):
+        seq.reverse()
+
+    monkeypatch.setattr("app.services.recommendations.random.shuffle", reverse_shuffle)
+    diversified = diversify_llm_order(ordered, "A", catalog, keep_top_n=1)
+    assert diversified[0] == "TOP"
+    # M1/M2 are equal-rank and non-contiguous in tail -> swapped.
+    assert diversified[1] == "M2"
+    assert diversified[3] == "M1"
+
+
 def test_cross_sell_visibility_by_profile():
     accessories = [
         {

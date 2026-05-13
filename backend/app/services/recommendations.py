@@ -103,11 +103,22 @@ def diversify_llm_order(
             return (99, 99)
         return (_tier(stroller, profile), 0 if is_available(stroller) else 1)
 
-    diversified_tail: list[str] = []
-    for _, group in groupby(tail, key=key_for):
-        block = list(group)
-        random.shuffle(block)
-        diversified_tail.extend(block)
+    # Shuffle equal-rank items globally in the tail (not only contiguous groups),
+    # then place them back into their original rank slots to keep overall pattern.
+    slots_by_key: dict[tuple[int, int], list[int]] = {}
+    ids_by_key: dict[tuple[int, int], list[str]] = {}
+    for idx, id_ in enumerate(tail):
+        key = key_for(id_)
+        slots_by_key.setdefault(key, []).append(idx)
+        ids_by_key.setdefault(key, []).append(id_)
+
+    diversified_tail = tail[:]
+    for key, ids in ids_by_key.items():
+        shuffled = ids[:]
+        random.shuffle(shuffled)
+        for slot, id_ in zip(slots_by_key[key], shuffled):
+            diversified_tail[slot] = id_
+
     return prefix + diversified_tail
 
 
