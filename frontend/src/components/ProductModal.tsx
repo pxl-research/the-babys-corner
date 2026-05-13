@@ -36,6 +36,14 @@ export default function ProductModal({
           >
             <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2" />
             <div className="p-6">
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={onClose}
+                  className="text-sm text-ink/70 border border-muted rounded-btn px-3 py-1"
+                >
+                  Sluiten
+                </button>
+              </div>
               {stroller.image_url && (
                 <img src={stroller.image_url} alt={stroller.name} className="w-full h-56 object-contain mb-4 rounded-card" />
               )}

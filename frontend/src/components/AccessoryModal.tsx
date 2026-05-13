@@ -5,10 +5,17 @@ interface Props {
   accessory: AccessoryItem | null
   isFavorited: boolean
   onToggleFavorite: () => void
+  backToStroller?: boolean
   onClose: () => void
 }
 
-export default function AccessoryModal({ accessory, isFavorited, onToggleFavorite, onClose }: Props) {
+export default function AccessoryModal({
+  accessory,
+  isFavorited,
+  onToggleFavorite,
+  backToStroller,
+  onClose,
+}: Props) {
   const reduceMotion = useReducedMotion()
   const canRemove = isFavorited
   const canAdd = !isFavorited
@@ -34,6 +41,14 @@ export default function AccessoryModal({ accessory, isFavorited, onToggleFavorit
           >
             <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2" />
             <div className="p-6">
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={onClose}
+                  className="text-sm text-ink/70 border border-muted rounded-btn px-3 py-1"
+                >
+                  {backToStroller ? 'Terug naar kinderwagen' : 'Sluiten'}
+                </button>
+              </div>
               {accessory.image_url && (
                 <img src={accessory.image_url} alt={accessory.name} className="w-full h-48 object-contain mb-4 rounded-card" />
               )}

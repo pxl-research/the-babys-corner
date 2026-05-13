@@ -21,6 +21,7 @@ export default function RecommendationsPage() {
   const [loading, setLoading] = useState(false)
   const [selectedStroller, setSelectedStroller] = useState<StrollerItem | null>(null)
   const [selectedAccessory, setSelectedAccessory] = useState<AccessoryItem | null>(null)
+  const [returnToStroller, setReturnToStroller] = useState<StrollerItem | null>(null)
   const inactivityRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Load batch 1 on mount
@@ -114,7 +115,11 @@ export default function RecommendationsPage() {
         stroller={selectedStroller}
         isFavorited={selectedStroller ? strollerFavorites.includes(selectedStroller.id) : false}
         onToggleFavorite={() => selectedStroller && handleToggleFavorite(selectedStroller.id, 'stroller')}
-        onAccessoryClick={setSelectedAccessory}
+        onAccessoryClick={(acc) => {
+          if (selectedStroller) setReturnToStroller(selectedStroller)
+          setSelectedStroller(null)
+          setSelectedAccessory(acc)
+        }}
         onClose={() => setSelectedStroller(null)}
       />
 
@@ -122,7 +127,14 @@ export default function RecommendationsPage() {
         accessory={selectedAccessory}
         isFavorited={selectedAccessory ? accessoryFavorites.includes(selectedAccessory.id) : false}
         onToggleFavorite={() => selectedAccessory && handleToggleFavorite(selectedAccessory.id, 'accessory')}
-        onClose={() => setSelectedAccessory(null)}
+        backToStroller={Boolean(returnToStroller)}
+        onClose={() => {
+          setSelectedAccessory(null)
+          if (returnToStroller) {
+            setSelectedStroller(returnToStroller)
+            setReturnToStroller(null)
+          }
+        }}
       />
     </div>
   )
