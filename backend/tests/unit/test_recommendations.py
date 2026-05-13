@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import AsyncMock, patch
 from app.services.recommendations import (
     compute_first_nine,
+    diversify_llm_order,
     get_batch,
     get_cross_sell_items,
 )
@@ -80,6 +81,20 @@ def test_first_nine_returns_up_to_nine():
     assert len(order) == 9
 
 
+def test_first_nine_randomizes_within_equal_rank_group(monkeypatch):
+    strollers = [make_stroller(f"ST{i:03}", "A") for i in range(6)]
+    catalog = make_catalog(strollers)
+
+    def reverse_shuffle(seq):
+        seq.reverse()
+
+    monkeypatch.setattr("app.services.recommendations.random.shuffle", reverse_shuffle)
+    order = compute_first_nine("A", catalog)
+    ids = [s["id"] for s in order]
+    assert ids[0] == "ST005"
+    assert ids[-1] == "ST000"
+
+
 def test_first_nine_fills_with_unavailable_if_less_than_three_available():
     strollers = [
         make_stroller("AV1", "A", available=True),
@@ -141,6 +156,27 @@ def test_later_batch_similarity_uses_stroller_favorites_only():
     acc_favs = ["ACC001", "ACC002"]
     batch4 = get_batch(4, reco_order, acc_favs, catalog, stroller_favorites=["ST000"])
     assert all(p["id"].startswith("ST") for p in batch4)
+
+
+def test_diversify_llm_order_keeps_top_winner_and_randomizes_blocks(monkeypatch):
+    strollers = [
+        make_stroller("ST_TOP", "A"),       # tier 0
+        make_stroller("ST_A1", "A"),        # tier 0
+        make_stroller("ST_A2", "A"),        # tier 0
+        make_stroller("ST_B1", None, "A"),  # tier 2
+        make_stroller("ST_B2", None, "A"),  # tier 2
+    ]
+    catalog = make_catalog(strollers)
+    ordered = ["ST_TOP", "ST_A1", "ST_A2", "ST_B1", "ST_B2"]
+
+    def reverse_shuffle(seq):
+        seq.reverse()
+
+    monkeypatch.setattr("app.services.recommendations.random.shuffle", reverse_shuffle)
+    diversified = diversify_llm_order(ordered, "A", catalog, keep_top_n=1)
+    assert diversified[0] == "ST_TOP"
+    # First tail block (same key) reversed.
+    assert diversified[1:3] == ["ST_A2", "ST_A1"]
 
 
 def test_cross_sell_visibility_by_profile():

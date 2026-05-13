@@ -33,7 +33,13 @@ from app.schemas import (
 )
 from app.services.catalog import get_catalog, is_available
 from app.services.profile import compute_profile
-from app.services.recommendations import compute_first_nine, compute_filtered_order, get_batch, get_cross_sell_items
+from app.services.recommendations import (
+    compute_first_nine,
+    compute_filtered_order,
+    diversify_llm_order,
+    get_batch,
+    get_cross_sell_items,
+)
 from app.services.session_code import generate_session_code
 from app.services.email import send_handoff_email
 from app.services.llm import generate_key_features, generate_talking_points
@@ -186,7 +192,7 @@ async def submit_quiz(
         from app.services.llm import rank_first_nine as llm_rank
         llm_result = await llm_rank(reco_order, profile, body.optional_note.strip())
         if llm_result:
-            reco_order = llm_result
+            reco_order = diversify_llm_order(llm_result, profile, catalog, keep_top_n=1)
 
     now = _now()
     note = body.optional_note[:1000] if body.optional_note else None

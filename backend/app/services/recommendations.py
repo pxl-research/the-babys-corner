@@ -1,6 +1,7 @@
 from app.services.catalog import CatalogService, is_available
 import random
 import re
+from itertools import groupby
 
 _COLOR_ALIASES = {
     "black": "black",
@@ -62,7 +63,10 @@ def compute_first_nine(
         strollers,
         key=lambda s: (_tier(s, profile), 0 if is_available(s) else 1),
     )
-    first_nine = strollers_sorted[:9]
+    first_nine = _shuffle_within_equal_groups(
+        strollers_sorted,
+        key_fn=lambda s: (_tier(s, profile), 0 if is_available(s) else 1),
+    )[:9]
 
     if optional_note and llm_order:
         validated = _validate_llm_order(llm_order, [s["id"] for s in first_nine])
@@ -71,6 +75,40 @@ def compute_first_nine(
             return [id_map[id_] for id_ in validated]
 
     return first_nine
+
+
+def _shuffle_within_equal_groups(items: list, key_fn) -> list:
+    shuffled: list = []
+    for _, group in groupby(items, key=key_fn):
+        block = list(group)
+        random.shuffle(block)
+        shuffled.extend(block)
+    return shuffled
+
+
+def diversify_llm_order(
+    ordered_ids: list[str],
+    profile: str,
+    catalog: CatalogService,
+    keep_top_n: int = 1,
+) -> list[str]:
+    if len(ordered_ids) <= keep_top_n:
+        return ordered_ids
+    prefix = ordered_ids[:keep_top_n]
+    tail = ordered_ids[keep_top_n:]
+
+    def key_for(id_: str) -> tuple[int, int]:
+        stroller = catalog.get_stroller(id_)
+        if not stroller:
+            return (99, 99)
+        return (_tier(stroller, profile), 0 if is_available(stroller) else 1)
+
+    diversified_tail: list[str] = []
+    for _, group in groupby(tail, key=key_for):
+        block = list(group)
+        random.shuffle(block)
+        diversified_tail.extend(block)
+    return prefix + diversified_tail
 
 
 def _validate_llm_order(llm_order: list[str], valid_ids: list[str]) -> list[str] | None:
