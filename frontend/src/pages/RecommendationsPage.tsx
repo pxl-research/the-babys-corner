@@ -85,7 +85,6 @@ export default function RecommendationsPage() {
               isFavorited={strollerFavorites.includes(stroller.id)}
               onToggleFavorite={() => handleToggleFavorite(stroller.id, 'stroller')}
               onClick={() => setSelectedStroller(stroller)}
-              onAccessoryClick={setSelectedAccessory}
             />
           ))}
         </div>

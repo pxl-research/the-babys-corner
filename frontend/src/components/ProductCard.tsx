@@ -1,17 +1,15 @@
-import type { StrollerItem, AccessoryItem } from '../api/client'
-import CrossSellChip from './CrossSellChip'
+import type { StrollerItem } from '../api/client'
 
 interface Props {
   stroller: StrollerItem
   isFavorited: boolean
   onToggleFavorite: () => void
   onClick: () => void
-  onAccessoryClick: (acc: AccessoryItem) => void
   locked?: boolean
 }
 
 export default function ProductCard({
-  stroller, isFavorited, onToggleFavorite, onClick, onAccessoryClick, locked,
+  stroller, isFavorited, onToggleFavorite, onClick, locked,
 }: Props) {
   return (
     <div className="rounded-card shadow-sm overflow-hidden bg-white border border-muted/50">
@@ -31,11 +29,7 @@ export default function ProductCard({
         </div>
       </button>
       <div className="px-4 pb-4 flex items-center justify-between">
-        <div className="flex flex-wrap gap-1">
-          {stroller.show_cross_sell_chips && stroller.cross_sell_items.map((acc) => (
-            <CrossSellChip key={acc.id} accessory={acc} onClick={() => onAccessoryClick(acc)} />
-          ))}
-        </div>
+        <div />
         <button
           onClick={onToggleFavorite}
           disabled={locked}
