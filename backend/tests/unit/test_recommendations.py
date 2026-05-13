@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import AsyncMock, patch
 from app.services.recommendations import (
     compute_first_nine,
+    compute_filtered_order,
     diversify_llm_order,
     get_batch,
     get_cross_sell_items,
@@ -93,6 +94,19 @@ def test_first_nine_randomizes_within_equal_rank_group(monkeypatch):
     ids = [s["id"] for s in order]
     assert ids[0] == "ST005"
     assert ids[-1] == "ST000"
+
+
+def test_compute_filtered_order_randomizes_equal_groups(monkeypatch):
+    strollers = [make_stroller(f"ST{i:03}", "A") for i in range(6)]
+    catalog = make_catalog(strollers)
+
+    def reverse_shuffle(seq):
+        seq.reverse()
+
+    monkeypatch.setattr("app.services.recommendations.random.shuffle", reverse_shuffle)
+    order = compute_filtered_order(catalog, "A")
+    assert order[0] == "ST005"
+    assert order[-1] == "ST000"
 
 
 def test_first_nine_fills_with_unavailable_if_less_than_three_available():

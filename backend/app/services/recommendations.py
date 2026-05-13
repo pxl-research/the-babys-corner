@@ -133,17 +133,32 @@ def _validate_llm_order(llm_order: list[str], valid_ids: list[str]) -> list[str]
 
 def compute_filtered_order(
     catalog: CatalogService,
+    profile: str | None = None,
     tags: list[str] | None = None,
     brands: list[str] | None = None,
     collections: list[dict] | None = None,
 ) -> list[str]:
-    """Return all filtered stroller IDs sorted by availability then name (no profile)."""
+    """Return filtered stroller IDs, diversified within equal-rank groups."""
     strollers = catalog.get_filtered_strollers(tags, brands, collections)
-    strollers_sorted = sorted(
-        strollers,
-        key=lambda s: (0 if is_available(s) else 1, s["name"].lower()),
-    )
-    return [s["id"] for s in strollers_sorted]
+    if profile:
+        strollers_sorted = sorted(
+            strollers,
+            key=lambda s: (_tier(s, profile), 0 if is_available(s) else 1),
+        )
+        diversified = _shuffle_within_equal_groups(
+            strollers_sorted,
+            key_fn=lambda s: (_tier(s, profile), 0 if is_available(s) else 1),
+        )
+    else:
+        strollers_sorted = sorted(
+            strollers,
+            key=lambda s: (0 if is_available(s) else 1),
+        )
+        diversified = _shuffle_within_equal_groups(
+            strollers_sorted,
+            key_fn=lambda s: (0 if is_available(s) else 1),
+        )
+    return [s["id"] for s in diversified]
 
 
 def get_batch(

@@ -572,7 +572,13 @@ async def save_filter_collections(
     selections = [s.model_dump() for s in body.selections]
 
     catalog = get_catalog()
-    reco_order = compute_filtered_order(catalog, tags or None, brands or None, selections or None)
+    reco_order = compute_filtered_order(
+        catalog,
+        session.get("derived_profile"),
+        tags or None,
+        brands or None,
+        selections or None,
+    )
     stroller_count = len(reco_order)
     accessory_count = len(catalog.get_filtered_accessories(tags or None, brands or None, selections or None))
 
