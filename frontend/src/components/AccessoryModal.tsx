@@ -11,7 +11,7 @@ interface Props {
 export default function AccessoryModal({ accessory, isFavorited, onToggleFavorite, onClose }: Props) {
   const reduceMotion = useReducedMotion()
   const canRemove = isFavorited
-  const canAdd = accessory?.is_available && !isFavorited
+  const canAdd = !isFavorited
 
   return (
     <AnimatePresence>
@@ -53,11 +53,6 @@ export default function AccessoryModal({ accessory, isFavorited, onToggleFavorit
                 >
                   {isFavorited ? '♥ In mijn lijst' : 'Voeg toe aan mijn lijst'}
                 </button>
-              )}
-              {!canAdd && !canRemove && (
-                <p className="text-center text-ink/50 text-sm">
-                  Deze accessoire is momenteel niet beschikbaar.
-                </p>
               )}
             </div>
           </motion.div>

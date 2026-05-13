@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import type { StrollerItem, AccessoryItem } from '../api/client'
-import CrossSellChip from './CrossSellChip'
+import AccessoryCarouselCard from './AccessoryCarouselCard'
 
 interface Props {
   stroller: StrollerItem | null
@@ -57,9 +57,9 @@ export default function ProductModal({
               {stroller.cross_sell_items.length > 0 && (
                 <div className="mb-4">
                   <p className="font-semibold text-ink mb-2 text-sm">Passende accessoires</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex gap-3 overflow-x-auto pb-1">
                     {stroller.cross_sell_items.map((acc) => (
-                      <CrossSellChip key={acc.id} accessory={acc} onClick={() => onAccessoryClick(acc)} />
+                      <AccessoryCarouselCard key={acc.id} accessory={acc} onClick={() => onAccessoryClick(acc)} />
                     ))}
                   </div>
                 </div>
