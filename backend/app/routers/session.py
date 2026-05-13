@@ -1,6 +1,7 @@
 import json
 import uuid
 import logging
+import re
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -321,7 +322,7 @@ def _build_products(
             continue
         cross_sell = get_cross_sell_items(s, profile, catalog)
         show_chips = profile in ("B", "C")
-        key_features = (llm_kf or {}).get(id_) or KEY_FEATURES_FALLBACK
+        key_features = _pick_key_features(s, (llm_kf or {}).get(id_))
         products.append(StrollerItem(
             id=s["id"],
             name=s["name"],
@@ -349,6 +350,100 @@ def _build_products(
             show_cross_sell_chips=show_chips,
         ))
     return products
+
+
+_FEATURE_HEADINGS = (
+    "belangrijkste kenmerken",
+    "kenmerken",
+    "technische specificaties",
+    "specificaties",
+)
+_STOP_HEADINGS = (
+    "wat zit er in de doos",
+    "onderhoud",
+    "kenmerken:",
+)
+
+
+def _looks_like_feature_line(line: str) -> bool:
+    s = line.strip()
+    if not s:
+        return False
+    if s.startswith(("•", "-", "*")):
+        return True
+    if ":" in s and len(s) <= 140:
+        return True
+    if re.search(r"\b(kg|cm|mm|liter|jaar|maanden|positie|posities|upf)\b", s.lower()):
+        return True
+    return False
+
+
+def _extract_features_from_text(text: str | None) -> str:
+    if not text:
+        return ""
+    clean = text.replace("\r\n", "\n").replace("\r", "\n")
+    lines = [line.strip() for line in clean.split("\n")]
+    if not any(lines):
+        return ""
+
+    start = -1
+    for i, line in enumerate(lines):
+        lowered = line.lower().strip(" :")
+        if any(lowered.startswith(h) for h in _FEATURE_HEADINGS):
+            start = i + 1
+            break
+
+    collected: list[str] = []
+    if start >= 0:
+        for line in lines[start:]:
+            lowered = line.lower().strip(" :")
+            if any(lowered.startswith(h) for h in _STOP_HEADINGS):
+                break
+            if line and _looks_like_feature_line(line):
+                collected.append(line)
+            elif collected and not line:
+                break
+
+    if not collected:
+        # Fallback: capture inline "Specificaties: ..." style text
+        m = re.search(
+            r"(belangrijkste kenmerken|technische specificaties|specificaties|kenmerken)\s*:?\s*(.+)",
+            clean,
+            flags=re.IGNORECASE | re.DOTALL,
+        )
+        if m:
+            tail = m.group(2).strip()
+            tail = re.split(r"\b(onderhoud|wat zit er in de doos)\b", tail, flags=re.IGNORECASE)[0]
+            parts = [p.strip(" •-\n\t") for p in re.split(r"[.;]\s+|\n+", tail) if p.strip()]
+            collected = [p for p in parts if _looks_like_feature_line(p)][:8]
+
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for line in collected:
+        item = line.strip()
+        if item.startswith(("•", "-", "*")):
+            item = item[1:].strip()
+        key = re.sub(r"[^a-z0-9]+", "", item.lower())
+        if not item or not key or key in seen:
+            continue
+        seen.add(key)
+        normalized.append(f"• {item}")
+        if len(normalized) == 8:
+            break
+
+    return "\n".join(normalized)
+
+
+def _pick_key_features(stroller: dict, llm_key_features: str | None) -> str:
+    if llm_key_features and llm_key_features.strip() and llm_key_features != KEY_FEATURES_FALLBACK:
+        return llm_key_features.strip()
+    from_formatted = _extract_features_from_text(stroller.get("formatted_description"))
+    if from_formatted:
+        return from_formatted
+    from_description = _extract_features_from_text(stroller.get("description"))
+    if from_description:
+        return from_description
+    return ""
 
 
 async def _generate_key_features_for_products(session_id: str, product_ids: list[str], profile: str):
