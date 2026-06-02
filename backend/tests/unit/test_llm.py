@@ -46,7 +46,8 @@ async def test_try_azure_uses_max_completion_tokens(monkeypatch):
     result = await llm._try_azure("prompt", "system", "gpt-5-nano")
 
     assert result == "ok"
-    assert captured_kwargs["max_completion_tokens"] == 1024
+    # Reasoning models require max_completion_tokens (not max_tokens).
+    assert captured_kwargs["max_completion_tokens"] == llm.AZURE_MAX_COMPLETION_TOKENS
     assert "max_tokens" not in captured_kwargs
 
 
@@ -93,7 +94,7 @@ async def test_try_openrouter_uses_max_completion_tokens(monkeypatch):
     result = await llm._try_openrouter("prompt", "system")
 
     assert result == "ok"
-    assert captured_kwargs["max_completion_tokens"] == 1024
+    assert captured_kwargs["max_completion_tokens"] == llm.OPENROUTER_MAX_COMPLETION_TOKENS
     assert "max_tokens" not in captured_kwargs
 
 

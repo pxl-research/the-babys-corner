@@ -6,6 +6,11 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
+# Output-token caps. Azure reasoning models (gpt-5-*) need a generous cap because
+# reasoning tokens count toward it; OpenRouter chat models use a tighter one.
+AZURE_MAX_COMPLETION_TOKENS = 16384
+OPENROUTER_MAX_COMPLETION_TOKENS = 1024
+
 
 def _extract_json_array(raw: str):
     """Parse a JSON array from a model reply, tolerating markdown fences / surrounding
@@ -43,7 +48,7 @@ async def _try_azure(prompt: str, system: str, model: str) -> str | None:
         resp = await client.chat.completions.create(
             model=model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-            max_completion_tokens=16384,
+            max_completion_tokens=AZURE_MAX_COMPLETION_TOKENS,
         )
         content = resp.choices[0].message.content
         if not content:
@@ -68,7 +73,7 @@ async def _try_openrouter(prompt: str, system: str) -> str | None:
             model=settings.openrouter_model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
             temperature=0.3,
-            max_completion_tokens=1024,
+            max_completion_tokens=OPENROUTER_MAX_COMPLETION_TOKENS,
         )
         return resp.choices[0].message.content
     except Exception as e:
