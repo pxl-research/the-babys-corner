@@ -87,6 +87,41 @@ async def complete(prompt: str, system: str, timeout_s: float = 20.0) -> str | N
     return result
 
 
+async def format_description_markdown(name: str, description: str) -> str | None:
+    """Reformat a glued product description into clean Markdown without changing facts.
+
+    The feed ships descriptions as delimiter-less walls of text; only an LLM can
+    recover the structure reliably. The prompt forbids inventing or dropping content,
+    so this is purely a reformat. Returns None if no provider is available.
+    """
+    if not description or not description.strip():
+        return None
+    system = (
+        "You are a copy editor for a Dutch baby-store catalog. Reformat the product "
+        "description into clean Markdown WITHOUT changing the wording or the facts.\n"
+        "Rules:\n"
+        "- Keep every sentence and every spec exactly as written. You MAY split words "
+        "that are glued together and fix HTML entities (e.g. '&amp;' -> '&').\n"
+        "- Put the opening marketing text as one short paragraph.\n"
+        "- Turn section labels such as 'Specificaties', 'Afmetingen en gewicht', "
+        "'Onderhoud', 'Kenmerken' into '## ' headings.\n"
+        "- Turn each listed item or spec into a '- ' bullet; use 'label: value' inside "
+        "the bullet when the source does.\n"
+        "- Do NOT invent, add, summarise away, or remove any information.\n"
+        "- Output Markdown only, in Dutch, with no code fences."
+    )
+    prompt = f"Title: {name}\n\nDescription:\n{description}\n\nReturn the reformatted Markdown."
+    raw = await complete(prompt, system)
+    if not raw:
+        logger.warning("LLM description formatting unavailable for %r; keeping raw text.", name)
+        return None
+    text = raw.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```[a-zA-Z]*\n?", "", text)
+        text = re.sub(r"\n?```$", "", text).strip()
+    return text or None
+
+
 async def rank_first_nine(
     candidates: list[str],
     profile: str,

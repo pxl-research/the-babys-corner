@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import type { StrollerItem, AccessoryItem } from '../api/client'
 import AccessoryCarouselCard from './AccessoryCarouselCard'
+import Markdown from './Markdown'
 
 interface Props {
   stroller: StrollerItem | null
@@ -79,7 +80,7 @@ export default function ProductModal({
                   Niet beschikbaar
                 </span>
               )}
-              <p className="text-ink/80 mb-4 whitespace-pre-line">{descriptionText}</p>
+              <Markdown text={descriptionText} className="text-ink/80 mb-4" />
               {showKeyFeatures && (
                 <div className="bg-brand/10 rounded-card p-4 mb-4">
                   <p className="font-semibold text-ink mb-1 text-sm">Kenmerken</p>

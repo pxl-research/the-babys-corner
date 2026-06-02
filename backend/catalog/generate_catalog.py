@@ -4,6 +4,10 @@
 Run from the repo root:
     python backend/catalog/generate_catalog.py
 
+Note: this rebuilds catalog.json from the feed and does NOT carry the
+`formatted_description` (Markdown) field. After regenerating, re-run
+catalog/format_descriptions.py to repopulate it.
+
 Profile mapping:
   AI minimalist → A | AI ontdekker → B | AI planner → C
   must   → must_have_profiles

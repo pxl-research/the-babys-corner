@@ -263,6 +263,32 @@ async def test_rerank_by_note_sends_name_so_colour_is_visible():
     assert result == ["ST_BLACK", "ST_BEIGE"]
 
 
+async def test_format_description_markdown_strips_code_fences():
+    from app.services.llm import format_description_markdown
+
+    async def fake_complete(prompt, system, timeout_s=20.0):
+        return "```markdown\n## Specificaties\n- Gewicht: 6 kg\n```"
+
+    with patch("app.services.llm.complete", new=fake_complete):
+        out = await format_description_markdown("Buggy", "Specificaties:Gewicht: 6 kg")
+    assert out == "## Specificaties\n- Gewicht: 6 kg"
+
+
+async def test_format_description_markdown_none_without_provider():
+    from app.services.llm import format_description_markdown
+
+    with patch("app.services.llm.complete", new=AsyncMock(return_value=None)):
+        out = await format_description_markdown("Buggy", "desc")
+    assert out is None
+
+
+async def test_format_description_markdown_empty_input_returns_none():
+    from app.services.llm import format_description_markdown
+
+    out = await format_description_markdown("Buggy", "   ")
+    assert out is None
+
+
 async def test_rerank_by_note_accepts_subset_and_drops_unknown_ids():
     from app.services.llm import rerank_by_note
 
