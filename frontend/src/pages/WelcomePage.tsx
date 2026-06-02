@@ -8,14 +8,13 @@ export default function WelcomePage() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const { setSource, setSession, reset } = useSessionStore()
+  const src = params.get('source') === 'store' ? 'store' : 'home'
 
   useEffect(() => {
-    const src = params.get('source') === 'store' ? 'store' : 'home'
     setSource(src)
-  }, [params, setSource])
+  }, [src, setSource])
 
   async function handleStart() {
-    const src = params.get('source') === 'store' ? 'store' : 'home'
     reset()
     setSource(src)
     const data = await api.createSession(src)
@@ -31,7 +30,7 @@ export default function WelcomePage() {
           Vind de kinderwagen die bij jullie past
         </h1>
         <p className="text-ink/70 text-lg">
-          Beantwoord 5 korte vragen en ontdek welke kinderwagen het beste bij jullie past.
+          Beantwoord enkele korte vragen en ontdek welke kinderwagen het beste bij jullie past.
         </p>
         <button
           onClick={handleStart}
