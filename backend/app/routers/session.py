@@ -51,7 +51,13 @@ from app.services.recommendations import (
 from app.services.session_code import generate_session_code
 from app.services.session_service import parse_json_field
 from app.services.email import send_handoff_email
-from app.services.llm import generate_key_features, generate_talking_points
+from app.services.llm import (
+    generate_key_features,
+    generate_talking_points,
+    rank_first_nine,
+    rank_similar_strollers,
+    rerank_by_note,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -221,8 +227,7 @@ async def submit_quiz(
     reco_order = [s["id"] for s in first_nine]
 
     if body.optional_note and body.optional_note.strip():
-        from app.services.llm import rank_first_nine as llm_rank
-        llm_result = await llm_rank(reco_order, profile, body.optional_note.strip())
+        llm_result = await rank_first_nine(reco_order, profile, body.optional_note.strip())
         if llm_result:
             reco_order = diversify_llm_order(llm_result, profile, catalog, keep_top_n=1)
 
@@ -283,7 +288,6 @@ async def get_recommendations(
     # Handle favorites-based adaptation for batch 4+
     favorites_adaptation_active = bool(session.get("favorites_adaptation_active", 0))
     if batch >= 4 and stroller_favs and not extra_reco_order:
-        from app.services.llm import rank_similar_strollers
         shown_flat = {id_ for b in shown_raw for id_ in b}
         if len(reco_order) > 9:
             # Full filtered order stored — remaining is reco_order[9:]
@@ -748,7 +752,6 @@ async def save_note(
     reco_order: list[str] = parse_json_field(session.get("reco_order"), [])
 
     if note and reco_order:
-        from app.services.llm import rerank_by_note
         catalog = get_catalog()
         stroller_dicts = [s for id_ in reco_order if (s := catalog.get_stroller(id_))]
         llm_result = await rerank_by_note(stroller_dicts, note)
