@@ -22,6 +22,8 @@ from app.schemas import (
     AccessoryItem,
     FavoriteToggleRequest,
     FavoriteToggleResponse,
+    ShortlistItem,
+    FavoriteItemsResponse,
     HandoffResponse,
     FilterTagsRequest,
     FilterTagsResponse,
@@ -806,6 +808,36 @@ async def toggle_favorite(
     await db.commit()
 
     return FavoriteToggleResponse(stroller_favorites=stroller_favs, accessory_favorites=accessory_favs)
+
+
+@router.get("/current/favorites/items", response_model=FavoriteItemsResponse)
+async def get_favorite_items(session_id: Optional[str] = Cookie(default=None)):
+    """Resolve favorite IDs to product details straight from the catalog.
+
+    The shortlist must not depend on which recommendation batches are still loaded
+    client-side, so favorites are resolved server-side here.
+    """
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+    catalog = get_catalog()
+
+    def _lite(item: dict) -> ShortlistItem:
+        return ShortlistItem(
+            id=item["id"],
+            name=item["name"],
+            brand=item["brand"],
+            price=item["price"],
+            image_url=item["image_url"],
+            availability=item["availability"],
+            is_available=is_available(item),
+        )
+
+    stroller_favs = parse_json_field(session.get("stroller_favorites"), [])
+    accessory_favs = parse_json_field(session.get("accessory_favorites"), [])
+    strollers = [_lite(s) for id_ in stroller_favs if (s := catalog.get_stroller(id_))]
+    accessories = [_lite(a) for id_ in accessory_favs if (a := catalog.get_accessory(id_))]
+    return FavoriteItemsResponse(strollers=strollers, accessories=accessories)
 
 
 @router.post("/current/handoff", response_model=HandoffResponse)

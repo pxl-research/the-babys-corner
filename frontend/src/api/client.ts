@@ -78,6 +78,21 @@ export interface StrollerItem {
   show_cross_sell_chips: boolean
 }
 
+export interface ShortlistItem {
+  id: string
+  name: string
+  brand: string
+  price: number
+  image_url: string
+  availability: string
+  is_available: boolean
+}
+
+export interface FavoriteItemsResponse {
+  strollers: ShortlistItem[]
+  accessories: ShortlistItem[]
+}
+
 export interface RecommendationBatch {
   batch: number
   favorites_adaptation_active: boolean
@@ -186,6 +201,9 @@ export const api = {
       '/api/sessions/current/favorites',
       { method: 'POST', body: JSON.stringify({ item_id, item_type }) }
     ),
+
+  getFavoriteItems: () =>
+    request<FavoriteItemsResponse>('/api/sessions/current/favorites/items'),
 
   handoff: () =>
     request<HandoffResponse>('/api/sessions/current/handoff', { method: 'POST' }),
