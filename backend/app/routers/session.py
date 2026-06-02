@@ -3,6 +3,7 @@ import uuid
 import logging
 import re
 from datetime import datetime, timezone
+from sqlite3 import IntegrityError
 from typing import Optional
 
 from fastapi import APIRouter, Cookie, HTTPException, BackgroundTasks, Query
@@ -21,6 +22,8 @@ from app.schemas import (
     AccessoryItem,
     FavoriteToggleRequest,
     FavoriteToggleResponse,
+    ShortlistItem,
+    FavoriteItemsResponse,
     HandoffResponse,
     FilterTagsRequest,
     FilterTagsResponse,
@@ -46,8 +49,15 @@ from app.services.recommendations import (
     get_cross_sell_items,
 )
 from app.services.session_code import generate_session_code
+from app.services.session_service import parse_json_field
 from app.services.email import send_handoff_email
-from app.services.llm import generate_key_features, generate_talking_points
+from app.services.llm import (
+    generate_key_features,
+    generate_talking_points,
+    rank_first_nine,
+    rank_similar_strollers,
+    rerank_by_note,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -97,17 +107,23 @@ def _require_active(session: dict):
 @router.post("", response_model=SessionCreateResponse)
 async def create_session(source: str = Query(default="home")):
     session_id = str(uuid.uuid4())
-    session_code = generate_session_code()
     now = _now()
     db = await get_db()
-    await db.execute(
-        """INSERT INTO sessions (session_id, session_code, source, status, started_at,
-            stroller_favorites, accessory_favorites, shown_products)
-           VALUES (?, ?, ?, 'active', ?, '[]', '[]', '[]')""",
-        (session_id, session_code, source, now),
-    )
-    await db.commit()
-    return _make_session_cookie_response(session_id, session_code)
+    # Retry on the rare session_code collision (UNIQUE index enforces uniqueness).
+    for attempt in range(5):
+        session_code = generate_session_code()
+        try:
+            await db.execute(
+                """INSERT INTO sessions (session_id, session_code, source, status, started_at,
+                    stroller_favorites, accessory_favorites, shown_products)
+                   VALUES (?, ?, ?, 'active', ?, '[]', '[]', '[]')""",
+                (session_id, session_code, source, now),
+            )
+            await db.commit()
+            return _make_session_cookie_response(session_id, session_code)
+        except IntegrityError:
+            await db.rollback()
+    raise HTTPException(500, detail="Could not allocate a unique session code.")
 
 
 @router.get("/quiz-config")
@@ -156,16 +172,16 @@ async def get_current(session_id: Optional[str] = Cookie(default=None)):
         started_at=session["started_at"],
         quiz_submitted_at=session.get("quiz_submitted_at"),
         handoff_at=session.get("handoff_at"),
-        quiz_answers=json.loads(session["quiz_answers"]) if session.get("quiz_answers") else [],
+        quiz_answers=parse_json_field(session.get("quiz_answers"), []),
         optional_note=session.get("optional_note"),
         profile=profile,
         transition_phrase=TRANSITION_PHRASES.get(profile) if profile else None,
-        shown_products=json.loads(session["shown_products"]) if session.get("shown_products") else [],
-        stroller_favorites=json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else [],
-        accessory_favorites=json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else [],
+        shown_products=parse_json_field(session.get("shown_products"), []),
+        stroller_favorites=parse_json_field(session.get("stroller_favorites"), []),
+        accessory_favorites=parse_json_field(session.get("accessory_favorites"), []),
         email_status=session.get("email_status", "not_sent"),
         favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
-        talking_points=json.loads(session["llm_talking_points"]) if session.get("llm_talking_points") else None,
+        talking_points=parse_json_field(session.get("llm_talking_points"), None),
     )
 
 
@@ -207,12 +223,11 @@ async def submit_quiz(
 
     profile = compute_profile(enriched_answers)
     catalog = get_catalog()
-    first_nine = compute_first_nine(profile, catalog, optional_note=body.optional_note or "")
+    first_nine = compute_first_nine(profile, catalog)
     reco_order = [s["id"] for s in first_nine]
 
     if body.optional_note and body.optional_note.strip():
-        from app.services.llm import rank_first_nine as llm_rank
-        llm_result = await llm_rank(reco_order, profile, body.optional_note.strip())
+        llm_result = await rank_first_nine(reco_order, profile, body.optional_note.strip())
         if llm_result:
             reco_order = diversify_llm_order(llm_result, profile, catalog, keep_top_n=1)
 
@@ -245,12 +260,12 @@ async def get_recommendations(
     if not session.get("quiz_submitted_at"):
         raise HTTPException(422, detail="Quiz not submitted yet.")
 
-    reco_order: list[str] = json.loads(session["reco_order"]) if session.get("reco_order") else []
-    shown_raw: list[list[str]] = json.loads(session["shown_products"]) if session.get("shown_products") else []
+    reco_order: list[str] = parse_json_field(session.get("reco_order"), [])
+    shown_raw: list[list[str]] = parse_json_field(session.get("shown_products"), [])
     shown_batches_count = len(shown_raw)
-    extra_reco_order: list[str] = json.loads(session["extra_reco_order"]) if session.get("extra_reco_order") else []
-    stroller_favs: list[str] = json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else []
-    accessory_favs: list[str] = json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else []
+    extra_reco_order: list[str] = parse_json_field(session.get("extra_reco_order"), [])
+    stroller_favs: list[str] = parse_json_field(session.get("stroller_favorites"), [])
+    accessory_favs: list[str] = parse_json_field(session.get("accessory_favorites"), [])
     profile = session.get("derived_profile", "B")
 
     # Lock check: if handed_off, only allow already-shown batches
@@ -273,7 +288,6 @@ async def get_recommendations(
     # Handle favorites-based adaptation for batch 4+
     favorites_adaptation_active = bool(session.get("favorites_adaptation_active", 0))
     if batch >= 4 and stroller_favs and not extra_reco_order:
-        from app.services.llm import rank_similar_strollers
         shown_flat = {id_ for b in shown_raw for id_ in b}
         if len(reco_order) > 9:
             # Full filtered order stored — remaining is reco_order[9:]
@@ -323,7 +337,7 @@ async def get_recommendations(
         )
         await db.commit()
 
-    llm_kf = json.loads(session["llm_key_features"]) if session.get("llm_key_features") else {}
+    llm_kf = parse_json_field(session.get("llm_key_features"), {})
 
     products = _build_products(batch_ids, profile, catalog, llm_kf)
     missing_key_features = [id_ for id_ in batch_ids if id_ not in llm_kf]
@@ -476,7 +490,7 @@ def _pick_key_features(stroller: dict, llm_key_features: str | None) -> str:
 
 async def _generate_key_features_for_products(session_id: str, product_ids: list[str], profile: str):
     session = await _get_session(session_id)
-    cached = json.loads(session["llm_key_features"]) if session.get("llm_key_features") else {}
+    cached = parse_json_field(session.get("llm_key_features"), {})
     catalog = get_catalog()
 
     changed = False
@@ -508,11 +522,11 @@ async def _generate_talking_points_for_session(session_id: str):
     context = {
         "source": session.get("source"),
         "profile": session.get("derived_profile"),
-        "quiz_answers": json.loads(session["quiz_answers"]) if session.get("quiz_answers") else [],
+        "quiz_answers": parse_json_field(session.get("quiz_answers"), []),
         "optional_note": session.get("optional_note"),
-        "shown_products": json.loads(session["shown_products"]) if session.get("shown_products") else [],
-        "stroller_favorites": json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else [],
-        "accessory_favorites": json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else [],
+        "shown_products": parse_json_field(session.get("shown_products"), []),
+        "stroller_favorites": parse_json_field(session.get("stroller_favorites"), []),
+        "accessory_favorites": parse_json_field(session.get("accessory_favorites"), []),
     }
     points = await generate_talking_points(context)
     if not points:
@@ -589,8 +603,8 @@ async def save_filter_collections(
     if not session.get("quiz_submitted_at"):
         raise HTTPException(422, detail="Quiz not submitted yet.")
 
-    tags = json.loads(session["filter_tags"]) if session.get("filter_tags") else []
-    brands = json.loads(session["filter_brands"]) if session.get("filter_brands") else []
+    tags = parse_json_field(session.get("filter_tags"), [])
+    brands = parse_json_field(session.get("filter_brands"), [])
     selections = [s.model_dump() for s in body.selections]
 
     catalog = get_catalog()
@@ -735,10 +749,9 @@ async def save_note(
         raise HTTPException(422, detail="Quiz not submitted yet.")
 
     note = body.note[:1000] if body.note else None
-    reco_order: list[str] = json.loads(session["reco_order"]) if session.get("reco_order") else []
+    reco_order: list[str] = parse_json_field(session.get("reco_order"), [])
 
     if note and reco_order:
-        from app.services.llm import rerank_by_note
         catalog = get_catalog()
         stroller_dicts = [s for id_ in reco_order if (s := catalog.get_stroller(id_))]
         llm_result = await rerank_by_note(stroller_dicts, note)
@@ -768,8 +781,8 @@ async def toggle_favorite(
     _require_active(session)
 
     catalog = get_catalog()
-    stroller_favs: list[str] = json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else []
-    accessory_favs: list[str] = json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else []
+    stroller_favs: list[str] = parse_json_field(session.get("stroller_favorites"), [])
+    accessory_favs: list[str] = parse_json_field(session.get("accessory_favorites"), [])
 
     if body.item_type == "stroller":
         item = catalog.get_stroller(body.item_id)
@@ -800,6 +813,36 @@ async def toggle_favorite(
     return FavoriteToggleResponse(stroller_favorites=stroller_favs, accessory_favorites=accessory_favs)
 
 
+@router.get("/current/favorites/items", response_model=FavoriteItemsResponse)
+async def get_favorite_items(session_id: Optional[str] = Cookie(default=None)):
+    """Resolve favorite IDs to product details straight from the catalog.
+
+    The shortlist must not depend on which recommendation batches are still loaded
+    client-side, so favorites are resolved server-side here.
+    """
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+    catalog = get_catalog()
+
+    def _lite(item: dict) -> ShortlistItem:
+        return ShortlistItem(
+            id=item["id"],
+            name=item["name"],
+            brand=item["brand"],
+            price=item["price"],
+            image_url=item["image_url"],
+            availability=item["availability"],
+            is_available=is_available(item),
+        )
+
+    stroller_favs = parse_json_field(session.get("stroller_favorites"), [])
+    accessory_favs = parse_json_field(session.get("accessory_favorites"), [])
+    strollers = [_lite(s) for id_ in stroller_favs if (s := catalog.get_stroller(id_))]
+    accessories = [_lite(a) for id_ in accessory_favs if (a := catalog.get_accessory(id_))]
+    return FavoriteItemsResponse(strollers=strollers, accessories=accessories)
+
+
 @router.post("/current/handoff", response_model=HandoffResponse)
 async def handoff(
     background_tasks: BackgroundTasks,
@@ -811,6 +854,8 @@ async def handoff(
 
     if session["status"] == "handed_off":
         raise HTTPException(409, detail="Session already handed off.")
+    # Reject abandoned (and any non-active) sessions — handoff must start from active.
+    _require_active(session)
     if not session.get("quiz_submitted_at"):
         raise HTTPException(422, detail="Quiz not submitted yet.")
     if not session.get("first_reco_at"):

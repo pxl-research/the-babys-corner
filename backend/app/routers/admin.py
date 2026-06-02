@@ -1,27 +1,40 @@
 import secrets
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Cookie, Depends, HTTPException
 from fastapi.responses import Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from app.config import settings
 from app.database import get_db
 from app.schemas import StaffSessionItem, StaffSessionDetail
+from app.services.auth import verify_token
 from app.services.export import build_xlsx
+from app.services.session_service import (
+    fetch_session_by_code,
+    session_detail_from_row,
+    session_item_from_row,
+)
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
-security = HTTPBasic()
+security = HTTPBasic(auto_error=False)
 
 
-def verify_admin(credentials: HTTPBasicCredentials = Depends(security)):
-    ok = (
-        secrets.compare_digest(credentials.username, settings.pxl_admin_username)
+def verify_admin(
+    auth_token: Optional[str] = Cookie(default=None),
+    credentials: Optional[HTTPBasicCredentials] = Depends(security),
+):
+    # Cookie session (preferred) — admin only.
+    if verify_token(auth_token) == "admin":
+        return
+    # Backwards-compatible HTTP Basic.
+    if (
+        credentials
+        and secrets.compare_digest(credentials.username, settings.pxl_admin_username)
         and secrets.compare_digest(credentials.password, settings.pxl_admin_password)
-    )
-    if not ok:
-        raise HTTPException(401, headers={"WWW-Authenticate": "Basic"})
-    return credentials
+    ):
+        return
+    raise HTTPException(401, headers={"WWW-Authenticate": "Basic"})
 
 
 @router.get("/sessions", response_model=list[StaffSessionItem])
@@ -47,19 +60,7 @@ async def list_sessions(
     async with db.execute(query, params) as cur:
         rows = await cur.fetchall()
 
-    return [
-        StaffSessionItem(
-            session_id=row["session_id"],
-            session_code=row["session_code"],
-            source=row["source"],
-            status=row["status"],
-            started_at=row["started_at"],
-            handoff_at=row["handoff_at"],
-            profile=row["derived_profile"],
-            email_status=row["email_status"],
-        )
-        for row in rows
-    ]
+    return [session_item_from_row(row) for row in rows]
 
 
 @router.get("/sessions/export")
@@ -81,45 +82,8 @@ async def get_admin_session_detail(
     session_code: str,
     _: HTTPBasicCredentials = Depends(verify_admin),
 ):
-    import json
-
     db = await get_db()
-    async with db.execute(
-        "SELECT * FROM sessions WHERE session_code=? ORDER BY started_at DESC LIMIT 1",
-        (session_code,),
-    ) as cur:
-        row = await cur.fetchone()
-
+    row = await fetch_session_by_code(db, session_code)
     if not row:
         raise HTTPException(404, detail="Session not found.")
-
-    row = dict(row)
-    email_failed_warning = (
-        row["source"] == "home" and row.get("email_status") == "failed"
-    )
-
-    def _parse(field, default):
-        if not field:
-            return default
-        try:
-            return json.loads(field)
-        except Exception:
-            return default
-
-    return StaffSessionDetail(
-        session_id=row["session_id"],
-        session_code=row["session_code"],
-        source=row["source"],
-        status=row["status"],
-        started_at=row["started_at"],
-        handoff_at=row.get("handoff_at"),
-        profile=row.get("derived_profile"),
-        quiz_answers=_parse(row.get("quiz_answers"), []),
-        optional_note=row.get("optional_note"),
-        shown_products=_parse(row.get("shown_products"), []),
-        stroller_favorites=_parse(row.get("stroller_favorites"), []),
-        accessory_favorites=_parse(row.get("accessory_favorites"), []),
-        talking_points=_parse(row.get("llm_talking_points"), None),
-        email_status=row.get("email_status"),
-        email_failed_warning=email_failed_warning,
-    )
+    return session_detail_from_row(row)

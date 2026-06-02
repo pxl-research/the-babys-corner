@@ -1,34 +1,27 @@
 import pytest
-import aiosqlite
-import json
-from datetime import datetime, timezone
-
-from app.database import CREATE_SESSIONS_SQL
-from app.schemas import SessionStatus
+from httpx import AsyncClient, ASGITransport
 
 
 @pytest.fixture
-async def db():
-    conn = await aiosqlite.connect(":memory:")
-    conn.row_factory = aiosqlite.Row
-    await conn.execute(CREATE_SESSIONS_SQL)
-    await conn.commit()
-    yield conn
-    await conn.close()
+async def client():
+    from app.main import app
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        yield c
 
 
-async def insert_session(db, session_id="sess1", status="active"):
-    now = datetime.now(timezone.utc).isoformat()
-    await db.execute(
-        """INSERT INTO sessions (session_id, session_code, source, status, started_at)
-           VALUES (?, ?, ?, ?, ?)""",
-        (session_id, "ABC123", "home", status, now),
-    )
-    await db.commit()
+async def _start_session(client):
+    await client.post("/api/sessions?source=home")
+    answers = [{"question_id": i + 1, "option_index": 0} for i in range(3)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
 
 
-async def test_schema_creates_sessions_table_with_required_columns(db):
-    async with db.execute("PRAGMA table_info(sessions)") as cursor:
+async def _set_status(reset_db, status):
+    await reset_db.execute("UPDATE sessions SET status=?", (status,))
+    await reset_db.commit()
+
+
+async def test_schema_creates_sessions_table_with_required_columns(reset_db):
+    async with reset_db.execute("PRAGMA table_info(sessions)") as cursor:
         cols = {row["name"] async for row in cursor}
     required = {
         "session_id", "session_code", "source", "status", "started_at",
@@ -42,40 +35,56 @@ async def test_schema_creates_sessions_table_with_required_columns(db):
     assert required.issubset(cols)
 
 
-async def test_locked_session_rejects_quiz_submit(db):
-    await insert_session(db, status="handed_off")
-    async with db.execute("SELECT status FROM sessions WHERE session_id=?", ("sess1",)) as cur:
-        row = await cur.fetchone()
-    assert row["status"] == "handed_off"
-    assert row["status"] != "active"
+async def test_handed_off_session_rejects_quiz_submit(client, reset_db):
+    await client.post("/api/sessions?source=home")
+    await _set_status(reset_db, "handed_off")
+    answers = [{"question_id": i + 1, "option_index": 0} for i in range(3)]
+    resp = await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+    assert resp.status_code == 409
 
 
-async def test_locked_session_rejects_favorite_toggle(db):
-    await insert_session(db, status="handed_off")
-    async with db.execute("SELECT status FROM sessions WHERE session_id=?", ("sess1",)) as cur:
-        row = await cur.fetchone()
-    assert row["status"] == "handed_off"
+async def test_handed_off_session_rejects_favorite_toggle(client, reset_db):
+    await _start_session(client)
+    await _set_status(reset_db, "handed_off")
+    resp = await client.post(
+        "/api/sessions/current/favorites", json={"item_id": "x", "item_type": "stroller"}
+    )
+    assert resp.status_code == 409
 
 
-async def test_locked_session_rejects_new_unshown_recommendation_batch(db):
-    await insert_session(db, status="handed_off")
-    async with db.execute("SELECT status FROM sessions WHERE session_id=?", ("sess1",)) as cur:
-        row = await cur.fetchone()
-    assert row["status"] == "handed_off"
+async def test_abandoned_session_rejects_favorite_toggle(client, reset_db):
+    await _start_session(client)
+    await _set_status(reset_db, "abandoned")
+    resp = await client.post(
+        "/api/sessions/current/favorites", json={"item_id": "x", "item_type": "stroller"}
+    )
+    assert resp.status_code == 409
 
 
-async def test_locked_session_allows_current_read(db):
-    await insert_session(db, status="handed_off")
-    async with db.execute("SELECT * FROM sessions WHERE session_id=?", ("sess1",)) as cur:
-        row = await cur.fetchone()
-    assert row is not None
-    assert row["session_id"] == "sess1"
+async def test_handed_off_session_rejects_tag_quiz(client, reset_db):
+    await _start_session(client)
+    await _set_status(reset_db, "handed_off")
+    resp = await client.post("/api/sessions/current/tag-quiz", json={"answers": []})
+    assert resp.status_code == 409
 
 
-async def test_abandon_rejects_handed_off_session(db):
-    await insert_session(db, status="handed_off")
-    async with db.execute("SELECT status FROM sessions WHERE session_id=?", ("sess1",)) as cur:
-        row = await cur.fetchone()
-    assert row["status"] == "handed_off"
-    # Abandon is only valid when status != handed_off
-    assert row["status"] != "active"
+async def test_locked_session_still_allows_current_read(client, reset_db):
+    await _start_session(client)
+    await _set_status(reset_db, "handed_off")
+    resp = await client.get("/api/sessions/current")
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "handed_off"
+
+
+async def test_handoff_rejects_abandoned_session(client, reset_db):
+    await _start_session(client)
+    await _set_status(reset_db, "abandoned")
+    resp = await client.post("/api/sessions/current/handoff")
+    assert resp.status_code == 409
+
+
+async def test_abandon_rejects_handed_off_session(client, reset_db):
+    await _start_session(client)
+    await _set_status(reset_db, "handed_off")
+    resp = await client.post("/api/sessions/current/abandon")
+    assert resp.status_code == 409

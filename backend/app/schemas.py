@@ -141,6 +141,21 @@ class FavoriteToggleResponse(BaseModel):
     accessory_favorites: list[str]
 
 
+class ShortlistItem(BaseModel):
+    id: str
+    name: str
+    brand: str
+    price: float
+    image_url: str
+    availability: str
+    is_available: bool
+
+
+class FavoriteItemsResponse(BaseModel):
+    strollers: list[ShortlistItem]
+    accessories: list[ShortlistItem]
+
+
 class SessionCreateResponse(BaseModel):
     session_id: str
     session_code: str

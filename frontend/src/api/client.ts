@@ -78,6 +78,21 @@ export interface StrollerItem {
   show_cross_sell_chips: boolean
 }
 
+export interface ShortlistItem {
+  id: string
+  name: string
+  brand: string
+  price: number
+  image_url: string
+  availability: string
+  is_available: boolean
+}
+
+export interface FavoriteItemsResponse {
+  strollers: ShortlistItem[]
+  accessories: ShortlistItem[]
+}
+
 export interface RecommendationBatch {
   batch: number
   favorites_adaptation_active: boolean
@@ -187,33 +202,37 @@ export const api = {
       { method: 'POST', body: JSON.stringify({ item_id, item_type }) }
     ),
 
+  getFavoriteItems: () =>
+    request<FavoriteItemsResponse>('/api/sessions/current/favorites/items'),
+
   handoff: () =>
     request<HandoffResponse>('/api/sessions/current/handoff', { method: 'POST' }),
 
   abandon: () => request<void>('/api/sessions/current/abandon', { method: 'POST' }),
 
-  getStaffSessions: (params: Record<string, string>, credentials: string) =>
-    request<StaffSession[]>(`/api/staff/sessions?${new URLSearchParams(params)}`, {
-      headers: { Authorization: `Basic ${credentials}` },
+  // Auth: credentials are sent once to /login, which sets an HttpOnly cookie.
+  // Later requests rely on that cookie (request() already sends credentials).
+  login: (username: string, password: string) =>
+    request<{ role: string }>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
     }),
 
-  getStaffSessionDetail: (code: string, credentials: string) =>
-    request<StaffSessionDetail>(`/api/staff/sessions/${code}`, {
-      headers: { Authorization: `Basic ${credentials}` },
-    }),
+  logout: () => request<{ status: string }>('/api/auth/logout', { method: 'POST' }),
 
-  getAdminSessions: (params: Record<string, string>, credentials: string) =>
-    request<StaffSession[]>(`/api/admin/sessions?${new URLSearchParams(params)}`, {
-      headers: { Authorization: `Basic ${credentials}` },
-    }),
+  authMe: () => request<{ role: string }>('/api/auth/me'),
 
-  getAdminSessionDetail: (code: string, credentials: string) =>
-    request<StaffSessionDetail>(`/api/admin/sessions/${code}`, {
-      headers: { Authorization: `Basic ${credentials}` },
-    }),
+  getStaffSessions: (params: Record<string, string>) =>
+    request<StaffSession[]>(`/api/staff/sessions?${new URLSearchParams(params)}`),
 
-  exportAdmin: (credentials: string) =>
-    fetch('/api/admin/sessions/export', {
-      headers: { Authorization: `Basic ${credentials}` },
-    }),
+  getStaffSessionDetail: (code: string) =>
+    request<StaffSessionDetail>(`/api/staff/sessions/${code}`),
+
+  getAdminSessions: (params: Record<string, string>) =>
+    request<StaffSession[]>(`/api/admin/sessions?${new URLSearchParams(params)}`),
+
+  getAdminSessionDetail: (code: string) =>
+    request<StaffSessionDetail>(`/api/admin/sessions/${code}`),
+
+  exportAdmin: () => fetch('/api/admin/sessions/export', { credentials: 'include' }),
 }

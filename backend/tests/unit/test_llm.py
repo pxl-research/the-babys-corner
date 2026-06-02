@@ -46,7 +46,8 @@ async def test_try_azure_uses_max_completion_tokens(monkeypatch):
     result = await llm._try_azure("prompt", "system", "gpt-5-nano")
 
     assert result == "ok"
-    assert captured_kwargs["max_completion_tokens"] == 1024
+    # Reasoning models require max_completion_tokens (not max_tokens).
+    assert captured_kwargs["max_completion_tokens"] == llm.AZURE_MAX_COMPLETION_TOKENS
     assert "max_tokens" not in captured_kwargs
 
 
@@ -93,7 +94,7 @@ async def test_try_openrouter_uses_max_completion_tokens(monkeypatch):
     result = await llm._try_openrouter("prompt", "system")
 
     assert result == "ok"
-    assert captured_kwargs["max_completion_tokens"] == 1024
+    assert captured_kwargs["max_completion_tokens"] == llm.OPENROUTER_MAX_COMPLETION_TOKENS
     assert "max_tokens" not in captured_kwargs
 
 
@@ -235,3 +236,87 @@ async def test_generate_talking_points_limits_to_top_three():
         result = await generate_talking_points({})
     assert result is not None
     assert len(result) <= 3
+
+
+async def test_rerank_by_note_sends_name_so_colour_is_visible():
+    from app.services.llm import rerank_by_note
+
+    captured = {}
+
+    async def fake_try_azure(prompt, system, model):
+        captured["prompt"] = prompt
+        captured["system"] = system
+        # Model favours the black stroller for a "zwart" note.
+        return '["ST_BLACK", "ST_BEIGE"]'
+
+    candidates = [
+        {"id": "ST_BEIGE", "name": "Kinderwagen Fox 5 - desert taupe", "brand": "bugaboo", "description": "Comfortabel."},
+        {"id": "ST_BLACK", "name": "Kinderwagen Fox 5 - rich black", "brand": "bugaboo", "description": "Comfortabel."},
+    ]
+
+    with patch("app.services.llm._try_azure", new=fake_try_azure):
+        result = await rerank_by_note(candidates, "Ik zoek een zwarte kinderwagen")
+
+    # Colour lives in the name — it must be in the payload, else the LLM is blind to it.
+    assert "rich black" in captured["prompt"]
+    assert "desert taupe" in captured["prompt"]
+    # LLM verdict is honoured verbatim (no keyword post-processing).
+    assert result == ["ST_BLACK", "ST_BEIGE"]
+
+
+async def test_format_description_markdown_strips_code_fences():
+    from app.services.llm import format_description_markdown
+
+    async def fake_complete(prompt, system):
+        return "```markdown\n## Specificaties\n- Gewicht: 6 kg\n```"
+
+    with patch("app.services.llm.complete", new=fake_complete):
+        out = await format_description_markdown("Buggy", "Specificaties:Gewicht: 6 kg")
+    assert out == "## Specificaties\n- Gewicht: 6 kg"
+
+
+async def test_format_description_markdown_none_without_provider():
+    from app.services.llm import format_description_markdown
+
+    with patch("app.services.llm.complete", new=AsyncMock(return_value=None)):
+        out = await format_description_markdown("Buggy", "desc")
+    assert out is None
+
+
+async def test_format_description_markdown_empty_input_returns_none():
+    from app.services.llm import format_description_markdown
+
+    out = await format_description_markdown("Buggy", "   ")
+    assert out is None
+
+
+async def test_rerank_by_note_accepts_subset_and_drops_unknown_ids():
+    from app.services.llm import rerank_by_note
+
+    async def fake_try_azure(prompt, system, model):
+        # Model returns only the matches (a subset), plus a hallucinated id + a dupe.
+        return '["ST_BLACK", "BOGUS", "ST_BLACK"]'
+
+    candidates = [
+        {"id": "ST_BLACK", "name": "Fox 5 rich black", "brand": "bugaboo", "description": "x"},
+        {"id": "ST_BEIGE", "name": "Fox 5 desert taupe", "brand": "bugaboo", "description": "x"},
+    ]
+    with patch("app.services.llm._try_azure", new=fake_try_azure):
+        result = await rerank_by_note(candidates, "zwart")
+
+    # Subset kept, unknown id dropped, de-duplicated. Caller front-loads the rest.
+    assert result == ["ST_BLACK"]
+
+
+async def test_rerank_by_note_returns_none_without_provider(caplog):
+    from app.services.llm import rerank_by_note
+
+    caplog.set_level(logging.WARNING)
+    with patch("app.services.llm._try_azure", new=AsyncMock(return_value=None)), patch(
+        "app.services.llm._try_openrouter", new=AsyncMock(return_value=None)
+    ):
+        result = await rerank_by_note(
+            [{"id": "ST1", "name": "A", "brand": "b", "description": "d"}],
+            "zwart",
+        )
+    assert result is None

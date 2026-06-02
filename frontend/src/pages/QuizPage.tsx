@@ -87,6 +87,7 @@ export default function QuizPage() {
       question_id: q.id,
       option_indices: answersMap[q.id] ?? [],
     }))
+    if (!import.meta.env.DEV) return
     api
       .tagQuizCount(answers)
       .then((c) =>
@@ -122,10 +123,12 @@ export default function QuizPage() {
         option_indices: tagAnswers[q.id] ?? [],
       }))
       const result = await api.submitTagQuiz(answers)
-      console.debug(
-        `[tag-quiz] submit | mode=${result.match_mode} strict(AND)=${result.strict_count} ` +
-          `dropped=${result.dropped_count} -> ${result.stroller_count} strollers`
-      )
+      if (import.meta.env.DEV) {
+        console.debug(
+          `[tag-quiz] submit | mode=${result.match_mode} strict(AND)=${result.strict_count} ` +
+            `dropped=${result.dropped_count} -> ${result.stroller_count} strollers`
+        )
+      }
       navigate(`/quiz/${NOTE_STEP}`)
     } finally {
       setSubmitting(false)

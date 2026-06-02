@@ -210,3 +210,41 @@ async def test_current_session_exposes_talking_points_after_handoff(client):
     resp = await client.get("/api/sessions/current")
     assert resp.status_code == 200
     assert resp.json()["talking_points"] == points
+
+
+async def test_favorite_items_resolve_from_catalog(client):
+    await client.post("/api/sessions?source=home")
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+
+    # Favorite an accessory by id without ever loading the batch that contains it.
+    await client.post(
+        "/api/sessions/current/favorites", json={"item_id": "6368", "item_type": "accessory"}
+    )
+
+    resp = await client.get("/api/sessions/current/favorites/items")
+    assert resp.status_code == 200
+    acc_ids = [a["id"] for a in resp.json()["accessories"]]
+    assert "6368" in acc_ids
+
+
+async def test_create_session_retries_on_code_collision(client):
+    codes = iter(["AAAAA1", "AAAAA1", "BBBBB2"])
+    with patch("app.routers.session.generate_session_code", side_effect=lambda: next(codes)):
+        r1 = await client.post("/api/sessions?source=home")
+        r2 = await client.post("/api/sessions?source=home")
+    assert r1.json()["session_code"] == "AAAAA1"
+    # Second insert collides on AAAAA1, retries, and lands a fresh code.
+    assert r2.json()["session_code"] == "BBBBB2"
+
+
+async def test_abandoned_session_cannot_be_handed_off(client):
+    await client.post("/api/sessions?source=home")
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+    await client.get("/api/sessions/current/recommendations?batch=1")
+
+    await client.post("/api/sessions/current/abandon")
+
+    resp = await client.post("/api/sessions/current/handoff")
+    assert resp.status_code == 409

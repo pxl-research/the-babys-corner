@@ -1,5 +1,3 @@
-import pytest
-from unittest.mock import AsyncMock, patch
 from app.services.recommendations import (
     compute_first_nine,
     compute_filtered_order,
@@ -38,6 +36,8 @@ def make_accessory(
     should: list[str] | None = None,
     nice: list[str] | None = None,
     available: bool = True,
+    collection: str | None = None,
+    compatible_collections: list[str] | None = None,
 ):
     return {
         "id": id_,
@@ -50,6 +50,8 @@ def make_accessory(
         "must_have_profiles": must or [],
         "should_have_profiles": should or [],
         "nice_to_have_profiles": nice or [],
+        "collection": collection,
+        "compatible_collections": compatible_collections or [],
     }
 
 
@@ -121,23 +123,11 @@ def test_first_nine_fills_with_unavailable_if_less_than_three_available():
     assert len(order) == 3
 
 
-def test_first_nine_skips_llm_when_note_absent():
+def test_first_nine_runs_without_llm():
     strollers = [make_stroller(f"ST{i:03}", "A") for i in range(5)]
     catalog = make_catalog(strollers)
-    # Should work synchronously without LLM
-    order = compute_first_nine("A", catalog, optional_note="")
+    order = compute_first_nine("A", catalog)
     assert isinstance(order, list)
-
-
-def test_first_nine_rejects_unknown_llm_ids():
-    strollers = [make_stroller(f"ST{i:03}", "A") for i in range(5)]
-    catalog = make_catalog(strollers)
-    valid_ids = [s["id"] for s in strollers[:5]]
-    # Inject a bad LLM response (contains unknown ID)
-    bad_llm_order = valid_ids[:4] + ["UNKNOWN_ID"]
-    from app.services.recommendations import _validate_llm_order
-    result = _validate_llm_order(bad_llm_order, valid_ids)
-    assert result is None
 
 
 def test_batch_rotation_returns_existing_batch_idempotently():
@@ -216,154 +206,88 @@ def test_diversify_llm_order_randomizes_non_contiguous_equal_rank(monkeypatch):
     assert diversified[3] == "M1"
 
 
-def test_cross_sell_visibility_by_profile():
-    accessories = [
-        {
-            "id": "ACC001",
-            "name": "Regenhoes",
-            "brand": "Brand",
-            "price": 49.0,
-            "description": "desc",
-            "image_url": "https://example.com/a.jpg",
-            "availability": "Op voorraad",
-        }
-    ]
-    stroller = {**make_stroller("ST001", "A"), "cross_sell_items": ["ACC001"]}
-    catalog = CatalogService(strollers=[stroller], accessories=accessories)
-    items_a = get_cross_sell_items(stroller, "A", catalog)
-    items_b = get_cross_sell_items(stroller, "B", catalog)
-    items_c = get_cross_sell_items(stroller, "C", catalog)
-    # All profiles get cross-sell items (A hides chips in card but still returns them for modal)
-    assert isinstance(items_a, list)
-    assert isinstance(items_b, list)
-    assert isinstance(items_c, list)
+def _stroller_in(collection: str, profile: str = "A", name: str = "Stroller") -> dict:
+    return {**make_stroller("ST001", profile), "collection": collection, "name": name}
 
 
-def test_cross_sell_minimalist_quota_and_tiers():
-    stroller = {**make_stroller("ST001", "A"), "brand": "bugaboo"}
+def test_cross_sell_only_returns_collection_compatible():
+    stroller = _stroller_in("Fox 5")
     accessories = [
-        make_accessory(f"AM{i}", f"Must {i}", "bugaboo", must=["A"]) for i in range(5)
-    ] + [
-        make_accessory(f"AS{i}", f"Should {i}", "bugaboo", should=["A"]) for i in range(3)
+        make_accessory("A1", "Adapter", "bugaboo", compatible_collections=["Fox 5"]),
+        make_accessory("A2", "Voetenzak", "bugaboo", collection="Fox 5"),
+        make_accessory("X1", "Other adapter", "joolz", compatible_collections=["Donkey"]),
+        make_accessory("X2", "Unrelated", "cybex"),
     ]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
-
     items = get_cross_sell_items(stroller, "A", catalog)
-    assert len(items) == 5
-    must_count = sum(1 for a in items if "A" in a.get("must_have_profiles", []))
-    should_count = sum(1 for a in items if "A" in a.get("should_have_profiles", []))
-    assert must_count == 4
-    assert should_count == 1
+    ids = {a["id"] for a in items}
+    assert ids == {"A1", "A2"}
 
 
-def test_cross_sell_ontdekker_quota_and_tiers():
-    stroller = {**make_stroller("ST001", "B"), "brand": "joolz"}
-    accessories = (
-        [make_accessory(f"BM{i}", f"Must {i}", "joolz", must=["B"]) for i in range(8)]
-        + [make_accessory(f"BS{i}", f"Should {i}", "joolz", should=["B"]) for i in range(6)]
-        + [make_accessory(f"BN{i}", f"Nice {i}", "joolz", nice=["B"]) for i in range(3)]
-    )
+def test_cross_sell_empty_when_no_compatible_accessory():
+    stroller = _stroller_in("Coya")
+    accessories = [make_accessory("X1", "Adapter", "joolz", compatible_collections=["Donkey"])]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
-
-    items = get_cross_sell_items(stroller, "B", catalog)
-    assert len(items) == 10
-    assert sum(1 for a in items if "B" in a.get("must_have_profiles", [])) == 6
-    assert sum(1 for a in items if "B" in a.get("should_have_profiles", [])) == 3
-    assert sum(1 for a in items if "B" in a.get("nice_to_have_profiles", [])) == 1
+    assert get_cross_sell_items(stroller, "B", catalog) == []
 
 
-def test_cross_sell_planner_quota_and_tiers():
-    stroller = {**make_stroller("ST001", "C"), "brand": "cybex"}
-    accessories = (
-        [make_accessory(f"CM{i}", f"Must {i}", "cybex", must=["C"]) for i in range(10)]
-        + [make_accessory(f"CS{i}", f"Should {i}", "cybex", should=["C"]) for i in range(8)]
-        + [make_accessory(f"CN{i}", f"Nice {i}", "cybex", nice=["C"]) for i in range(3)]
-    )
+def test_cross_sell_empty_when_stroller_has_no_collection():
+    stroller = {**make_stroller("ST001", "A"), "collection": None}
+    accessories = [make_accessory("A1", "Adapter", "bugaboo", compatible_collections=["Fox 5"])]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
-
-    items = get_cross_sell_items(stroller, "C", catalog)
-    assert len(items) == 15
-    assert sum(1 for a in items if "C" in a.get("must_have_profiles", [])) == 8
-    assert sum(1 for a in items if "C" in a.get("should_have_profiles", [])) == 6
-    assert sum(1 for a in items if "C" in a.get("nice_to_have_profiles", [])) == 1
+    assert get_cross_sell_items(stroller, "A", catalog) == []
 
 
-def test_cross_sell_prefers_same_brand_then_falls_back():
-    stroller = {**make_stroller("ST001", "B"), "brand": "bugaboo"}
-    accessories = (
-        [make_accessory(f"M{i}", f"Must {i}", "bugaboo", must=["B"]) for i in range(4)]
-        + [make_accessory(f"S{i}", f"Should {i}", "bugaboo", should=["B"]) for i in range(2)]
-        + [make_accessory(f"N{i}", f"Nice {i}", "bugaboo", nice=["B"]) for i in range(1)]
-        + [make_accessory(f"XM{i}", f"Other Must {i}", "joolz", must=["B"]) for i in range(6)]
-        + [make_accessory(f"XS{i}", f"Other Should {i}", "joolz", should=["B"]) for i in range(4)]
-        + [make_accessory(f"XN{i}", f"Other Nice {i}", "joolz", nice=["B"]) for i in range(2)]
-    )
-    catalog = CatalogService(strollers=[stroller], accessories=accessories)
-
-    items = get_cross_sell_items(stroller, "B", catalog)
-    assert len(items) == 10
-    same_brand = [a for a in items if a["brand"] == "bugaboo"]
-    # Uses all available same-brand quota candidates first.
-    assert len(same_brand) == 7
+def test_cross_sell_count_scales_by_profile():
+    stroller_a = _stroller_in("Fox 5", "A")
+    stroller_c = _stroller_in("Fox 5", "C")
+    accessories = [
+        make_accessory(f"A{i}", f"Item {i}", "bugaboo", compatible_collections=["Fox 5"])
+        for i in range(30)
+    ]
+    catalog = CatalogService(strollers=[stroller_a], accessories=accessories)
+    assert len(get_cross_sell_items(stroller_a, "A", catalog)) == 5
+    assert len(get_cross_sell_items(stroller_c, "C", catalog)) == 15
 
 
 def test_cross_sell_dedupes_by_normalized_name():
-    stroller = {**make_stroller("ST001", "A"), "brand": "bugaboo"}
+    stroller = _stroller_in("Fox 5")
     accessories = [
-        make_accessory("A1", "Regenhoes Bee", "bugaboo", must=["A"]),
-        make_accessory("A2", "regenhoes bee", "bugaboo", must=["A"]),
-        make_accessory("A3", "Regenhoes   Bee!!!", "bugaboo", must=["A"]),
-        make_accessory("A4", "Must Four", "bugaboo", must=["A"]),
-        make_accessory("A5", "Must Five", "bugaboo", must=["A"]),
-        make_accessory("A6", "Should One", "bugaboo", should=["A"]),
-        make_accessory("A7", "Should Two", "bugaboo", should=["A"]),
-        make_accessory("A8", "Should Three", "bugaboo", should=["A"]),
+        make_accessory("A1", "Regenhoes Bee", "bugaboo", compatible_collections=["Fox 5"]),
+        make_accessory("A2", "regenhoes bee", "bugaboo", compatible_collections=["Fox 5"]),
+        make_accessory("A3", "Regenhoes   Bee!!!", "bugaboo", compatible_collections=["Fox 5"]),
+        make_accessory("A4", "Voetenzak", "bugaboo", compatible_collections=["Fox 5"]),
     ]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
-
     items = get_cross_sell_items(stroller, "A", catalog)
-    normalized = {
-        "".join(ch for ch in a["name"].lower() if ch.isalnum())
-        for a in items
-    }
+    normalized = {"".join(ch for ch in a["name"].lower() if ch.isalnum()) for a in items}
     assert len(items) == len(normalized)
 
 
 def test_cross_sell_keeps_unavailable_items():
-    stroller = {**make_stroller("ST001", "A"), "brand": "thule"}
+    stroller = _stroller_in("Fox 5")
     accessories = [
-        make_accessory("A1", "Must 1", "thule", must=["A"], available=False),
-        make_accessory("A2", "Must 2", "thule", must=["A"], available=False),
-        make_accessory("A3", "Must 3", "thule", must=["A"], available=False),
-        make_accessory("A4", "Must 4", "thule", must=["A"], available=False),
-        make_accessory("A5", "Should 1", "thule", should=["A"], available=False),
+        make_accessory(f"A{i}", f"Item {i}", "bugaboo", compatible_collections=["Fox 5"], available=False)
+        for i in range(3)
     ]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
-
     items = get_cross_sell_items(stroller, "A", catalog)
-    assert len(items) == 5
-    assert all(not a["availability"] == "Op voorraad" for a in items)
+    assert len(items) == 3
+    assert all(a["availability"] != "Op voorraad" for a in items)
 
 
 def test_cross_sell_prefers_matching_color_in_titles():
-    stroller = {
-        **make_stroller("ST001", "A"),
-        "brand": "joolz",
-        "name": "Buggy ultracompact Aer2 - calming beige",
-    }
+    stroller = _stroller_in("Aer²", name="Buggy ultracompact Aer2 - calming beige")
     accessories = [
-        make_accessory("M1", "Voetenzak space black", "joolz", must=["A"]),
-        make_accessory("M2", "Voetenzak calming beige", "joolz", must=["A"]),
-        make_accessory("M3", "Regenhoes zwart", "joolz", must=["A"]),
-        make_accessory("M4", "Liner calming beige", "joolz", must=["A"]),
-        make_accessory("M5", "Organizer olive", "joolz", should=["A"]),
-        make_accessory("M6", "Adapter calming beige", "joolz", should=["A"]),
+        make_accessory("M1", "Voetenzak space black", "joolz", compatible_collections=["Aer²"]),
+        make_accessory("M2", "Voetenzak calming beige", "joolz", compatible_collections=["Aer²"]),
+        make_accessory("M3", "Regenhoes zwart", "joolz", compatible_collections=["Aer²"]),
+        make_accessory("M4", "Liner calming beige", "joolz", compatible_collections=["Aer²"]),
     ]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
     items = get_cross_sell_items(stroller, "A", catalog)
-    names = [a["name"].lower() for a in items]
-    # Should include beige options when available.
-    assert any("beige" in n for n in names)
+    # Capped at 5 for profile A; with beige stroller, beige accessories rank first.
+    assert any("beige" in a["name"].lower() for a in items[:2])
 
 
 # ── progressive tag-drop fallback ────────────────────────────────────────────

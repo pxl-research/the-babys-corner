@@ -161,7 +161,7 @@ async def test_note_endpoint_triggers_llm_rerank(client, reset_db):
     reco_before = json.loads(row["reco_order"])
     reversed_all = list(reversed(reco_before))
 
-    with patch("app.services.llm.rerank_by_note", new=AsyncMock(return_value=reversed_all)):
+    with patch("app.routers.session.rerank_by_note", new=AsyncMock(return_value=reversed_all)):
         resp = await client.post("/api/sessions/current/note", json={"note": "Iets sportiefs"})
 
     assert resp.status_code == 200

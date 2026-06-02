@@ -1,9 +1,38 @@
 import asyncio
 import json
 import logging
+import re
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+# Output-token caps. Azure reasoning models (gpt-5-*) need a generous cap because
+# reasoning tokens count toward it; OpenRouter chat models use a tighter one.
+AZURE_MAX_COMPLETION_TOKENS = 16384
+OPENROUTER_MAX_COMPLETION_TOKENS = 1024
+
+
+def _extract_json_array(raw: str):
+    """Parse a JSON array from a model reply, tolerating markdown fences / surrounding
+    prose. Returns the list, or None if no array can be recovered. Pure parsing — does
+    not interpret or score content."""
+    text = raw.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```[a-zA-Z]*\n?", "", text)
+        text = re.sub(r"\n?```$", "", text).strip()
+    try:
+        parsed = json.loads(text)
+        return parsed if isinstance(parsed, list) else None
+    except (json.JSONDecodeError, TypeError):
+        pass
+    match = re.search(r"\[.*\]", text, re.DOTALL)
+    if not match:
+        return None
+    try:
+        parsed = json.loads(match.group(0))
+        return parsed if isinstance(parsed, list) else None
+    except (json.JSONDecodeError, TypeError):
+        return None
 
 
 async def _try_azure(prompt: str, system: str, model: str) -> str | None:
@@ -19,7 +48,7 @@ async def _try_azure(prompt: str, system: str, model: str) -> str | None:
         resp = await client.chat.completions.create(
             model=model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-            max_completion_tokens=16384,
+            max_completion_tokens=AZURE_MAX_COMPLETION_TOKENS,
         )
         content = resp.choices[0].message.content
         if not content:
@@ -44,7 +73,7 @@ async def _try_openrouter(prompt: str, system: str) -> str | None:
             model=settings.openrouter_model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
             temperature=0.3,
-            max_completion_tokens=1024,
+            max_completion_tokens=OPENROUTER_MAX_COMPLETION_TOKENS,
         )
         return resp.choices[0].message.content
     except Exception as e:
@@ -52,7 +81,9 @@ async def _try_openrouter(prompt: str, system: str) -> str | None:
         return None
 
 
-async def complete(prompt: str, system: str, timeout_s: float = 20.0) -> str | None:
+async def complete(prompt: str, system: str) -> str | None:
+    # Timeout ownership is left to callers (via asyncio.wait_for), since complete()
+    # tries multiple providers in sequence.
     result = await _try_azure(prompt, system, settings.azure_openai_deployment_mini)
     if result is not None:
         return result
@@ -61,6 +92,51 @@ async def complete(prompt: str, system: str, timeout_s: float = 20.0) -> str | N
         return result
     result = await _try_openrouter(prompt, system)
     return result
+
+
+async def format_description_markdown(name: str, description: str) -> str | None:
+    """Reformat a glued product description into clean Markdown without changing facts.
+
+    The feed ships descriptions as delimiter-less walls of text; only an LLM can
+    recover the structure reliably. The prompt forbids inventing or dropping content,
+    so this is purely a reformat. Returns None if no provider is available.
+    """
+    if not description or not description.strip():
+        return None
+    system = (
+        "You are a copy editor for a Dutch baby-store catalog. Reformat the product "
+        "description into clean Markdown WITHOUT changing the wording or the facts.\n"
+        "Rules:\n"
+        "- Do NOT output the product title or name anywhere; it is shown separately.\n"
+        "- Do NOT repeat information: every fact appears exactly once.\n"
+        "- If the source opens with descriptive prose sentences, copy them VERBATIM as a "
+        "short intro paragraph — do not rewrite, paraphrase, summarise, or invent any "
+        "wording. The moment feature/spec items begin, switch to bullets. Never put a "
+        "feature or specification in the paragraph, and never write a generic intro: if "
+        "the source has no real prose before the features, omit the paragraph entirely "
+        "and start with the first '## ' heading.\n"
+        "- Turn section labels such as 'Specificaties', 'Afmetingen en gewicht', "
+        "'Onderhoud', 'Kenmerken' into '## ' headings. If an opening feature list has "
+        "no heading in the source, put it under '## Kenmerken'.\n"
+        "- Turn each listed item or spec into a '- ' bullet. Use a 'label: value' bullet "
+        "ONLY when the source line has a real, distinct label (e.g. 'Gewicht: 6,7 kg'). "
+        "Never invent a label and never prefix bullets with the section name — under an "
+        "'Eigenschappen' or 'Kenmerken' heading, write just the feature text, NOT "
+        "'Eigenschap: ...'.\n"
+        "- You MAY split glued-together words and fix HTML entities (e.g. '&amp;' -> '&').\n"
+        "- Do NOT invent, add, summarise away, or remove any information.\n"
+        "- Output Markdown only, in Dutch, with no code fences."
+    )
+    prompt = f"Title: {name}\n\nDescription:\n{description}\n\nReturn the reformatted Markdown."
+    raw = await complete(prompt, system)
+    if not raw:
+        logger.warning("LLM description formatting unavailable for %r; keeping raw text.", name)
+        return None
+    text = raw.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```[a-zA-Z]*\n?", "", text)
+        text = re.sub(r"\n?```$", "", text).strip()
+    return text or None
 
 
 async def rank_first_nine(
@@ -91,18 +167,15 @@ async def rank_first_nine(
         logger.warning("LLM ranking unavailable; using deterministic recommendation order.")
         return None
 
-    try:
-        ordered = json.loads(raw)
-        if not isinstance(ordered, list):
-            return None
-        candidate_set = set(candidates)
-        if any(id_ not in candidate_set for id_ in ordered):
-            return None
-        if set(ordered) != candidate_set:
-            return None
-        return ordered
-    except (json.JSONDecodeError, TypeError):
+    ordered = _extract_json_array(raw)
+    if ordered is None:
         return None
+    candidate_set = set(candidates)
+    if any(id_ not in candidate_set for id_ in ordered):
+        return None
+    if set(ordered) != candidate_set:
+        return None
+    return ordered
 
 
 async def generate_key_features(stroller: dict, profile: str) -> str | None:
@@ -150,25 +223,41 @@ async def rerank_by_note(
     note: str,
     timeout_s: float = 100.0,
 ) -> list[str] | None:
-    """Re-rank strollers by semantic match of note against their descriptions."""
+    """Pick the strollers matching the note, best-first, via the LLM.
+
+    Returns a subset of candidate IDs (the matches) for the caller to front-load,
+    not a full permutation — full ordering of a large pool is brittle and silently
+    fails validation. The product name carries colour/variant (e.g. "rich black");
+    the description carries features. Both are sent so notes like "zwart" work.
+    Returns None only on provider/parse failure; [] means no matches.
+    """
     if not candidates or not note.strip():
         return None
 
     system = (
         "You are a stroller advisor assistant. "
-        "Re-order the given strollers by how well they match the customer's note, "
-        "using the Dutch product descriptions to understand relevance. "
-        "Return ONLY a JSON array of ALL provided IDs in order from best to worst match. "
-        "Do not add, remove, or invent any IDs."
+        "From the given strollers, pick the ones that match the customer's note and "
+        "return their IDs ordered best match first. "
+        "The product name often encodes colour and variant (e.g. 'rich black', "
+        "'desert taupe', 'forest green'); the Dutch description covers features and use. "
+        "Use BOTH the name and the description to judge relevance. "
+        "Return ONLY a JSON array of matching IDs, best match first. Include only "
+        "strollers that genuinely match the note and omit the rest; if none match, "
+        "return an empty array []. Do not invent IDs."
     )
     items = [
-        {"id": c["id"], "desc": c.get("compact_description") or (c.get("description") or "")[:200]}
+        {
+            "id": c["id"],
+            "name": c.get("name") or "",
+            "brand": c.get("brand") or "",
+            "desc": c.get("compact_description") or (c.get("description") or "")[:200],
+        }
         for c in candidates
     ]
     prompt = (
         f"Customer note: {note}\n\n"
         f"Strollers:\n{json.dumps(items, ensure_ascii=False)}\n\n"
-        "Return JSON array of IDs only."
+        "Return a JSON array of matching IDs (best first); [] if none match."
     )
 
     async def _call() -> str | None:
@@ -191,16 +280,23 @@ async def rerank_by_note(
         logger.warning("LLM note rerank unavailable; keeping deterministic order.")
         return None
 
-    try:
-        ordered = json.loads(raw)
-        if not isinstance(ordered, list):
-            return None
-        candidate_ids = {c["id"] for c in candidates}
-        if set(ordered) != candidate_ids:
-            return None
-        return [str(id_) for id_ in ordered]
-    except (json.JSONDecodeError, TypeError):
+    ordered = _extract_json_array(raw)
+    if ordered is None:
+        logger.warning("LLM note rerank returned unparseable output; keeping deterministic order.")
         return None
+
+    # Accept a subset (the matches), best-first. Drop anything not in the pool and
+    # de-duplicate; the caller front-loads these and keeps the rest in place.
+    candidate_ids = {c["id"] for c in candidates}
+    seen: set[str] = set()
+    matches: list[str] = []
+    for id_ in ordered:
+        sid = str(id_)
+        if sid in candidate_ids and sid not in seen:
+            seen.add(sid)
+            matches.append(sid)
+    logger.info("LLM note rerank | note=%r | matched %d/%d strollers", note, len(matches), len(candidates))
+    return matches
 
 
 async def rank_similar_strollers(
@@ -228,16 +324,15 @@ async def rank_similar_strollers(
     if not raw:
         logger.warning("LLM similarity ranking unavailable; using normal recommendation order.")
         return None
-    try:
-        ordered = json.loads(raw)
-        pool_set = set(pool_ids)
-        if not isinstance(ordered, list) or any(id_ not in pool_set for id_ in ordered):
-            logger.warning("LLM similarity ranking invalid IDs; using normal recommendation order.")
-            return None
-        if set(ordered) != pool_set:
-            logger.warning("LLM similarity ranking incomplete list; using normal recommendation order.")
-            return None
-        return ordered
-    except (json.JSONDecodeError, TypeError):
+    ordered = _extract_json_array(raw)
+    if ordered is None:
         logger.warning("LLM similarity ranking unparseable; using normal recommendation order.")
         return None
+    pool_set = set(pool_ids)
+    if any(id_ not in pool_set for id_ in ordered):
+        logger.warning("LLM similarity ranking invalid IDs; using normal recommendation order.")
+        return None
+    if set(ordered) != pool_set:
+        logger.warning("LLM similarity ranking incomplete list; using normal recommendation order.")
+        return None
+    return ordered
