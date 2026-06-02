@@ -59,8 +59,10 @@ async def init_db():
     for col_def in _MIGRATION_COLUMNS:
         try:
             await db.execute(f"ALTER TABLE sessions ADD COLUMN {col_def}")
-        except Exception:
-            pass
+        except aiosqlite.OperationalError as e:
+            # Only "already added" is expected; surface any real migration failure.
+            if "duplicate column name" not in str(e):
+                raise
     # Enforce session-code uniqueness so staff lookups can never be ambiguous.
     await db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_sessions_session_code ON sessions(session_code)")
     await db.commit()
