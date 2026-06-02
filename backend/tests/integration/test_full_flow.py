@@ -210,3 +210,15 @@ async def test_current_session_exposes_talking_points_after_handoff(client):
     resp = await client.get("/api/sessions/current")
     assert resp.status_code == 200
     assert resp.json()["talking_points"] == points
+
+
+async def test_abandoned_session_cannot_be_handed_off(client):
+    await client.post("/api/sessions?source=home")
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+    await client.get("/api/sessions/current/recommendations?batch=1")
+
+    await client.post("/api/sessions/current/abandon")
+
+    resp = await client.post("/api/sessions/current/handoff")
+    assert resp.status_code == 409

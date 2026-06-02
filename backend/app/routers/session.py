@@ -811,6 +811,8 @@ async def handoff(
 
     if session["status"] == "handed_off":
         raise HTTPException(409, detail="Session already handed off.")
+    # Reject abandoned (and any non-active) sessions — handoff must start from active.
+    _require_active(session)
     if not session.get("quiz_submitted_at"):
         raise HTTPException(422, detail="Quiz not submitted yet.")
     if not session.get("first_reco_at"):
