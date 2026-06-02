@@ -152,18 +152,15 @@ async def rank_first_nine(
         logger.warning("LLM ranking unavailable; using deterministic recommendation order.")
         return None
 
-    try:
-        ordered = json.loads(raw)
-        if not isinstance(ordered, list):
-            return None
-        candidate_set = set(candidates)
-        if any(id_ not in candidate_set for id_ in ordered):
-            return None
-        if set(ordered) != candidate_set:
-            return None
-        return ordered
-    except (json.JSONDecodeError, TypeError):
+    ordered = _extract_json_array(raw)
+    if ordered is None:
         return None
+    candidate_set = set(candidates)
+    if any(id_ not in candidate_set for id_ in ordered):
+        return None
+    if set(ordered) != candidate_set:
+        return None
+    return ordered
 
 
 async def generate_key_features(stroller: dict, profile: str) -> str | None:
@@ -312,16 +309,15 @@ async def rank_similar_strollers(
     if not raw:
         logger.warning("LLM similarity ranking unavailable; using normal recommendation order.")
         return None
-    try:
-        ordered = json.loads(raw)
-        pool_set = set(pool_ids)
-        if not isinstance(ordered, list) or any(id_ not in pool_set for id_ in ordered):
-            logger.warning("LLM similarity ranking invalid IDs; using normal recommendation order.")
-            return None
-        if set(ordered) != pool_set:
-            logger.warning("LLM similarity ranking incomplete list; using normal recommendation order.")
-            return None
-        return ordered
-    except (json.JSONDecodeError, TypeError):
+    ordered = _extract_json_array(raw)
+    if ordered is None:
         logger.warning("LLM similarity ranking unparseable; using normal recommendation order.")
         return None
+    pool_set = set(pool_ids)
+    if any(id_ not in pool_set for id_ in ordered):
+        logger.warning("LLM similarity ranking invalid IDs; using normal recommendation order.")
+        return None
+    if set(ordered) != pool_set:
+        logger.warning("LLM similarity ranking incomplete list; using normal recommendation order.")
+        return None
+    return ordered
