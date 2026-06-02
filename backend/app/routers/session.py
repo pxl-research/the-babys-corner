@@ -47,6 +47,7 @@ from app.services.recommendations import (
     get_cross_sell_items,
 )
 from app.services.session_code import generate_session_code
+from app.services.session_service import parse_json_field
 from app.services.email import send_handoff_email
 from app.services.llm import generate_key_features, generate_talking_points
 
@@ -163,16 +164,16 @@ async def get_current(session_id: Optional[str] = Cookie(default=None)):
         started_at=session["started_at"],
         quiz_submitted_at=session.get("quiz_submitted_at"),
         handoff_at=session.get("handoff_at"),
-        quiz_answers=json.loads(session["quiz_answers"]) if session.get("quiz_answers") else [],
+        quiz_answers=parse_json_field(session.get("quiz_answers"), []),
         optional_note=session.get("optional_note"),
         profile=profile,
         transition_phrase=TRANSITION_PHRASES.get(profile) if profile else None,
-        shown_products=json.loads(session["shown_products"]) if session.get("shown_products") else [],
-        stroller_favorites=json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else [],
-        accessory_favorites=json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else [],
+        shown_products=parse_json_field(session.get("shown_products"), []),
+        stroller_favorites=parse_json_field(session.get("stroller_favorites"), []),
+        accessory_favorites=parse_json_field(session.get("accessory_favorites"), []),
         email_status=session.get("email_status", "not_sent"),
         favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
-        talking_points=json.loads(session["llm_talking_points"]) if session.get("llm_talking_points") else None,
+        talking_points=parse_json_field(session.get("llm_talking_points"), None),
     )
 
 
@@ -252,12 +253,12 @@ async def get_recommendations(
     if not session.get("quiz_submitted_at"):
         raise HTTPException(422, detail="Quiz not submitted yet.")
 
-    reco_order: list[str] = json.loads(session["reco_order"]) if session.get("reco_order") else []
-    shown_raw: list[list[str]] = json.loads(session["shown_products"]) if session.get("shown_products") else []
+    reco_order: list[str] = parse_json_field(session.get("reco_order"), [])
+    shown_raw: list[list[str]] = parse_json_field(session.get("shown_products"), [])
     shown_batches_count = len(shown_raw)
-    extra_reco_order: list[str] = json.loads(session["extra_reco_order"]) if session.get("extra_reco_order") else []
-    stroller_favs: list[str] = json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else []
-    accessory_favs: list[str] = json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else []
+    extra_reco_order: list[str] = parse_json_field(session.get("extra_reco_order"), [])
+    stroller_favs: list[str] = parse_json_field(session.get("stroller_favorites"), [])
+    accessory_favs: list[str] = parse_json_field(session.get("accessory_favorites"), [])
     profile = session.get("derived_profile", "B")
 
     # Lock check: if handed_off, only allow already-shown batches
@@ -330,7 +331,7 @@ async def get_recommendations(
         )
         await db.commit()
 
-    llm_kf = json.loads(session["llm_key_features"]) if session.get("llm_key_features") else {}
+    llm_kf = parse_json_field(session.get("llm_key_features"), {})
 
     products = _build_products(batch_ids, profile, catalog, llm_kf)
     missing_key_features = [id_ for id_ in batch_ids if id_ not in llm_kf]
@@ -483,7 +484,7 @@ def _pick_key_features(stroller: dict, llm_key_features: str | None) -> str:
 
 async def _generate_key_features_for_products(session_id: str, product_ids: list[str], profile: str):
     session = await _get_session(session_id)
-    cached = json.loads(session["llm_key_features"]) if session.get("llm_key_features") else {}
+    cached = parse_json_field(session.get("llm_key_features"), {})
     catalog = get_catalog()
 
     changed = False
@@ -515,11 +516,11 @@ async def _generate_talking_points_for_session(session_id: str):
     context = {
         "source": session.get("source"),
         "profile": session.get("derived_profile"),
-        "quiz_answers": json.loads(session["quiz_answers"]) if session.get("quiz_answers") else [],
+        "quiz_answers": parse_json_field(session.get("quiz_answers"), []),
         "optional_note": session.get("optional_note"),
-        "shown_products": json.loads(session["shown_products"]) if session.get("shown_products") else [],
-        "stroller_favorites": json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else [],
-        "accessory_favorites": json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else [],
+        "shown_products": parse_json_field(session.get("shown_products"), []),
+        "stroller_favorites": parse_json_field(session.get("stroller_favorites"), []),
+        "accessory_favorites": parse_json_field(session.get("accessory_favorites"), []),
     }
     points = await generate_talking_points(context)
     if not points:
@@ -596,8 +597,8 @@ async def save_filter_collections(
     if not session.get("quiz_submitted_at"):
         raise HTTPException(422, detail="Quiz not submitted yet.")
 
-    tags = json.loads(session["filter_tags"]) if session.get("filter_tags") else []
-    brands = json.loads(session["filter_brands"]) if session.get("filter_brands") else []
+    tags = parse_json_field(session.get("filter_tags"), [])
+    brands = parse_json_field(session.get("filter_brands"), [])
     selections = [s.model_dump() for s in body.selections]
 
     catalog = get_catalog()
@@ -742,7 +743,7 @@ async def save_note(
         raise HTTPException(422, detail="Quiz not submitted yet.")
 
     note = body.note[:1000] if body.note else None
-    reco_order: list[str] = json.loads(session["reco_order"]) if session.get("reco_order") else []
+    reco_order: list[str] = parse_json_field(session.get("reco_order"), [])
 
     if note and reco_order:
         from app.services.llm import rerank_by_note
@@ -775,8 +776,8 @@ async def toggle_favorite(
     _require_active(session)
 
     catalog = get_catalog()
-    stroller_favs: list[str] = json.loads(session["stroller_favorites"]) if session.get("stroller_favorites") else []
-    accessory_favs: list[str] = json.loads(session["accessory_favorites"]) if session.get("accessory_favorites") else []
+    stroller_favs: list[str] = parse_json_field(session.get("stroller_favorites"), [])
+    accessory_favs: list[str] = parse_json_field(session.get("accessory_favorites"), [])
 
     if body.item_type == "stroller":
         item = catalog.get_stroller(body.item_id)
