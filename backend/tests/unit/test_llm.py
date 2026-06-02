@@ -235,3 +235,43 @@ async def test_generate_talking_points_limits_to_top_three():
         result = await generate_talking_points({})
     assert result is not None
     assert len(result) <= 3
+
+
+async def test_rerank_by_note_sends_name_so_colour_is_visible():
+    from app.services.llm import rerank_by_note
+
+    captured = {}
+
+    async def fake_try_azure(prompt, system, model):
+        captured["prompt"] = prompt
+        captured["system"] = system
+        # Model favours the black stroller for a "zwart" note.
+        return '["ST_BLACK", "ST_BEIGE"]'
+
+    candidates = [
+        {"id": "ST_BEIGE", "name": "Kinderwagen Fox 5 - desert taupe", "brand": "bugaboo", "description": "Comfortabel."},
+        {"id": "ST_BLACK", "name": "Kinderwagen Fox 5 - rich black", "brand": "bugaboo", "description": "Comfortabel."},
+    ]
+
+    with patch("app.services.llm._try_azure", new=fake_try_azure):
+        result = await rerank_by_note(candidates, "Ik zoek een zwarte kinderwagen")
+
+    # Colour lives in the name — it must be in the payload, else the LLM is blind to it.
+    assert "rich black" in captured["prompt"]
+    assert "desert taupe" in captured["prompt"]
+    # LLM verdict is honoured verbatim (no keyword post-processing).
+    assert result == ["ST_BLACK", "ST_BEIGE"]
+
+
+async def test_rerank_by_note_returns_none_without_provider(caplog):
+    from app.services.llm import rerank_by_note
+
+    caplog.set_level(logging.WARNING)
+    with patch("app.services.llm._try_azure", new=AsyncMock(return_value=None)), patch(
+        "app.services.llm._try_openrouter", new=AsyncMock(return_value=None)
+    ):
+        result = await rerank_by_note(
+            [{"id": "ST1", "name": "A", "brand": "b", "description": "d"}],
+            "zwart",
+        )
+    assert result is None

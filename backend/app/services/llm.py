@@ -150,19 +150,30 @@ async def rerank_by_note(
     note: str,
     timeout_s: float = 100.0,
 ) -> list[str] | None:
-    """Re-rank strollers by semantic match of note against their descriptions."""
+    """Re-rank strollers by semantic match of the note against name + description.
+
+    The product name carries colour/variant (e.g. "rich black"); the description
+    carries features. Both are sent so the model can honour notes like "zwart".
+    """
     if not candidates or not note.strip():
         return None
 
     system = (
         "You are a stroller advisor assistant. "
-        "Re-order the given strollers by how well they match the customer's note, "
-        "using the Dutch product descriptions to understand relevance. "
+        "Re-order the given strollers by how well they match the customer's note. "
+        "The product name often encodes colour and variant (e.g. 'rich black', "
+        "'desert taupe', 'forest green'); the Dutch description covers features and use. "
+        "Use BOTH the name and the description to judge relevance. "
         "Return ONLY a JSON array of ALL provided IDs in order from best to worst match. "
         "Do not add, remove, or invent any IDs."
     )
     items = [
-        {"id": c["id"], "desc": c.get("compact_description") or (c.get("description") or "")[:200]}
+        {
+            "id": c["id"],
+            "name": c.get("name") or "",
+            "brand": c.get("brand") or "",
+            "desc": c.get("compact_description") or (c.get("description") or "")[:200],
+        }
         for c in candidates
     ]
     prompt = (
