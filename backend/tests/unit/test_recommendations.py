@@ -1,5 +1,3 @@
-import pytest
-from unittest.mock import AsyncMock, patch
 from app.services.recommendations import (
     compute_first_nine,
     compute_filtered_order,
@@ -121,23 +119,11 @@ def test_first_nine_fills_with_unavailable_if_less_than_three_available():
     assert len(order) == 3
 
 
-def test_first_nine_skips_llm_when_note_absent():
+def test_first_nine_runs_without_llm():
     strollers = [make_stroller(f"ST{i:03}", "A") for i in range(5)]
     catalog = make_catalog(strollers)
-    # Should work synchronously without LLM
-    order = compute_first_nine("A", catalog, optional_note="")
+    order = compute_first_nine("A", catalog)
     assert isinstance(order, list)
-
-
-def test_first_nine_rejects_unknown_llm_ids():
-    strollers = [make_stroller(f"ST{i:03}", "A") for i in range(5)]
-    catalog = make_catalog(strollers)
-    valid_ids = [s["id"] for s in strollers[:5]]
-    # Inject a bad LLM response (contains unknown ID)
-    bad_llm_order = valid_ids[:4] + ["UNKNOWN_ID"]
-    from app.services.recommendations import _validate_llm_order
-    result = _validate_llm_order(bad_llm_order, valid_ids)
-    assert result is None
 
 
 def test_batch_rotation_returns_existing_batch_idempotently():

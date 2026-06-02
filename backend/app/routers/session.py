@@ -214,7 +214,7 @@ async def submit_quiz(
 
     profile = compute_profile(enriched_answers)
     catalog = get_catalog()
-    first_nine = compute_first_nine(profile, catalog, optional_note=body.optional_note or "")
+    first_nine = compute_first_nine(profile, catalog)
     reco_order = [s["id"] for s in first_nine]
 
     if body.optional_note and body.optional_note.strip():

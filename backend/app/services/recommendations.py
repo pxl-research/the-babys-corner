@@ -52,29 +52,16 @@ def _tier(stroller: dict, profile: str) -> int:
     return 3
 
 
-def compute_first_nine(
-    profile: str,
-    catalog: CatalogService,
-    optional_note: str = "",
-    llm_order: list[str] | None = None,
-) -> list[dict]:
+def compute_first_nine(profile: str, catalog: CatalogService) -> list[dict]:
     strollers = catalog.get_all_strollers()
     strollers_sorted = sorted(
         strollers,
         key=lambda s: (_tier(s, profile), 0 if is_available(s) else 1),
     )
-    first_nine = _shuffle_within_equal_groups(
+    return _shuffle_within_equal_groups(
         strollers_sorted,
         key_fn=lambda s: (_tier(s, profile), 0 if is_available(s) else 1),
     )[:9]
-
-    if optional_note and llm_order:
-        validated = _validate_llm_order(llm_order, [s["id"] for s in first_nine])
-        if validated:
-            id_map = {s["id"]: s for s in first_nine}
-            return [id_map[id_] for id_ in validated]
-
-    return first_nine
 
 
 def _shuffle_within_equal_groups(items: list, key_fn) -> list:
@@ -120,15 +107,6 @@ def diversify_llm_order(
             diversified_tail[slot] = id_
 
     return prefix + diversified_tail
-
-
-def _validate_llm_order(llm_order: list[str], valid_ids: list[str]) -> list[str] | None:
-    valid_set = set(valid_ids)
-    if any(id_ not in valid_set for id_ in llm_order):
-        return None
-    if set(llm_order) != valid_set:
-        return None
-    return llm_order
 
 
 def compute_filtered_order(
