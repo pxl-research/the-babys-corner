@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import StaffAnswerList from '../components/StaffAnswerList'
+import LoginForm from '../components/LoginForm'
+import SessionList from '../components/SessionList'
 import { api } from '../api/client'
 import type { StaffSession, StaffSessionDetail } from '../api/client'
 
@@ -57,28 +59,15 @@ export default function StaffLookupPage() {
 
   if (!authed) {
     return (
-      <div className="min-h-screen bg-cream text-ink font-sans">
-        <Header />
-        <div className="max-w-sm mx-auto px-6 py-12">
-          <h1 className="font-display text-2xl font-bold mb-6">Sessie opzoeken</h1>
-          <form onSubmit={handleLogin} className="flex flex-col gap-4">
-            <input
-              type="text" placeholder="Gebruikersnaam" value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="border-2 border-muted rounded-card px-4 py-3 bg-white outline-none focus:border-brand"
-            />
-            <input
-              type="password" placeholder="Wachtwoord" value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="border-2 border-muted rounded-card px-4 py-3 bg-white outline-none focus:border-brand"
-            />
-            {authError && <p className="text-danger text-sm">Ongeldige inloggegevens.</p>}
-            <button type="submit" className="bg-brand text-white rounded-btn px-6 py-3 font-medium">
-              Inloggen
-            </button>
-          </form>
-        </div>
-      </div>
+      <LoginForm
+        title="Sessie opzoeken"
+        username={username}
+        password={password}
+        onUsername={setUsername}
+        onPassword={setPassword}
+        onSubmit={handleLogin}
+        error={authError}
+      />
     )
   }
 
@@ -144,26 +133,7 @@ export default function StaffLookupPage() {
           </select>
         </div>
         <h2 className="font-semibold text-ink mb-3">Recente sessies</h2>
-        <div className="space-y-2">
-          {sessions.map((s) => (
-            <button
-              key={s.session_id}
-              onClick={() => handleRowClick(s.session_code)}
-              className="w-full text-left bg-white rounded-card p-4 border border-muted hover:border-brand transition-colors"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-mono font-bold text-ink">{s.session_code}</p>
-                  <p className="text-sm text-ink/60">{s.source} · Profiel {s.profile} · {s.started_at.slice(0, 10)}</p>
-                </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${s.status === 'handed_off' ? 'bg-brand/20 text-brand' : 'bg-muted text-ink/60'}`}>
-                  {s.status}
-                </span>
-              </div>
-            </button>
-          ))}
-          {sessions.length === 0 && <p className="text-ink/50 text-sm">Geen sessies gevonden.</p>}
-        </div>
+        <SessionList sessions={sessions} onSelect={handleRowClick} />
       </div>
     </div>
   )
