@@ -76,7 +76,9 @@ async def _try_openrouter(prompt: str, system: str) -> str | None:
         return None
 
 
-async def complete(prompt: str, system: str, timeout_s: float = 20.0) -> str | None:
+async def complete(prompt: str, system: str) -> str | None:
+    # Timeout ownership is left to callers (via asyncio.wait_for), since complete()
+    # tries multiple providers in sequence.
     result = await _try_azure(prompt, system, settings.azure_openai_deployment_mini)
     if result is not None:
         return result

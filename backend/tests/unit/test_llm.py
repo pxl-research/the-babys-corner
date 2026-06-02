@@ -266,7 +266,7 @@ async def test_rerank_by_note_sends_name_so_colour_is_visible():
 async def test_format_description_markdown_strips_code_fences():
     from app.services.llm import format_description_markdown
 
-    async def fake_complete(prompt, system, timeout_s=20.0):
+    async def fake_complete(prompt, system):
         return "```markdown\n## Specificaties\n- Gewicht: 6 kg\n```"
 
     with patch("app.services.llm.complete", new=fake_complete):
