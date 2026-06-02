@@ -34,3 +34,8 @@ def test_runtime_config_accepts_openrouter_provider():
     )
 
     assert get_runtime_config_issues(settings) == []
+
+
+def test_cors_origin_list_parses_and_trims():
+    settings = Settings(_env_file=None, cors_origins=" https://a.com , http://localhost:5173 ,, ")
+    assert settings.cors_origin_list == ["https://a.com", "http://localhost:5173"]

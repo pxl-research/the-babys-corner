@@ -31,9 +31,16 @@ class Settings(BaseSettings):
     # App
     session_secret_key: str = "dev-secret-key"
     session_cookie_secure: bool = False
+    # Comma-separated allowed CORS origins. Explicit origins are required because the
+    # frontend sends credentialed requests (cookies), which forbid a "*" wildcard.
+    cors_origins: str = "http://localhost:5173,http://localhost:3000"
 
     # DB
     database_path: str = "/app/data/sessions.db"
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
 
 settings = Settings()
