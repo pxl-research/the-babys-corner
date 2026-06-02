@@ -4,12 +4,8 @@ import StaffAnswerList from '../components/StaffAnswerList'
 import { api } from '../api/client'
 import type { StaffSession, StaffSessionDetail } from '../api/client'
 
-function encodeBasic(user: string, pass: string) {
-  return btoa(`${user}:${pass}`)
-}
-
 export default function AdminPage() {
-  const [creds, setCreds] = useState<string | null>(null)
+  const [authed, setAuthed] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [authError, setAuthError] = useState(false)
@@ -19,23 +15,22 @@ export default function AdminPage() {
   const [codeFilter, setCodeFilter] = useState('')
   const [exporting, setExporting] = useState(false)
 
+  // Detect an existing auth cookie on mount; no credentials are stored client-side.
   useEffect(() => {
-    const stored = sessionStorage.getItem('admin_creds')
-    if (stored) setCreds(stored)
+    api.authMe().then(() => setAuthed(true)).catch(() => setAuthed(false))
   }, [])
 
   useEffect(() => {
-    if (!creds) return
+    if (!authed) return
     fetchSessions()
-  }, [creds, profileFilter, codeFilter])
+  }, [authed, profileFilter, codeFilter])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
-    const encoded = encodeBasic(username, password)
     try {
-      await api.getAdminSessions({}, encoded)
-      sessionStorage.setItem('admin_creds', encoded)
-      setCreds(encoded)
+      await api.login(username, password)
+      setPassword('')
+      setAuthed(true)
       setAuthError(false)
     } catch {
       setAuthError(true)
@@ -43,29 +38,26 @@ export default function AdminPage() {
   }
 
   async function fetchSessions() {
-    if (!creds) return
     const params: Record<string, string> = {}
     if (profileFilter) params.profile = profileFilter
     if (codeFilter) params.code = codeFilter
     try {
-      const data = await api.getAdminSessions(params, creds)
+      const data = await api.getAdminSessions(params)
       setSessions(data)
     } catch (err: any) {
-      if (err.status === 401) { setCreds(null); sessionStorage.removeItem('admin_creds') }
+      if (err.status === 401) setAuthed(false)
     }
   }
 
   async function handleRowClick(code: string) {
-    if (!creds) return
-    const d = await api.getAdminSessionDetail(code, creds)
+    const d = await api.getAdminSessionDetail(code)
     setDetail(d)
   }
 
   async function handleExport() {
-    if (!creds) return
     setExporting(true)
     try {
-      const resp = await api.exportAdmin(creds)
+      const resp = await api.exportAdmin()
       const blob = await resp.blob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -78,7 +70,7 @@ export default function AdminPage() {
     }
   }
 
-  if (!creds) {
+  if (!authed) {
     return (
       <div className="min-h-screen bg-cream text-ink font-sans">
         <Header />

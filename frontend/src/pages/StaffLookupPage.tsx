@@ -4,12 +4,8 @@ import StaffAnswerList from '../components/StaffAnswerList'
 import { api } from '../api/client'
 import type { StaffSession, StaffSessionDetail } from '../api/client'
 
-function encodeBasic(user: string, pass: string) {
-  return btoa(`${user}:${pass}`)
-}
-
 export default function StaffLookupPage() {
-  const [creds, setCreds] = useState<string | null>(null)
+  const [authed, setAuthed] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [authError, setAuthError] = useState(false)
@@ -19,23 +15,22 @@ export default function StaffLookupPage() {
   const [dateFilter, setDateFilter] = useState('')
   const [sourceFilter, setSourceFilter] = useState('')
 
+  // Detect an existing auth cookie on mount; no credentials are stored client-side.
   useEffect(() => {
-    const stored = sessionStorage.getItem('staff_creds')
-    if (stored) setCreds(stored)
+    api.authMe().then(() => setAuthed(true)).catch(() => setAuthed(false))
   }, [])
 
   useEffect(() => {
-    if (!creds) return
+    if (!authed) return
     fetchSessions()
-  }, [creds, codeFilter, dateFilter, sourceFilter])
+  }, [authed, codeFilter, dateFilter, sourceFilter])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
-    const encoded = encodeBasic(username, password)
     try {
-      await api.getStaffSessions({}, encoded)
-      sessionStorage.setItem('staff_creds', encoded)
-      setCreds(encoded)
+      await api.login(username, password)
+      setPassword('')
+      setAuthed(true)
       setAuthError(false)
     } catch {
       setAuthError(true)
@@ -43,26 +38,24 @@ export default function StaffLookupPage() {
   }
 
   async function fetchSessions() {
-    if (!creds) return
     const params: Record<string, string> = {}
     if (codeFilter) params.code = codeFilter
     if (dateFilter) params.date = dateFilter
     if (sourceFilter) params.source = sourceFilter
     try {
-      const data = await api.getStaffSessions(params, creds)
+      const data = await api.getStaffSessions(params)
       setSessions(data)
     } catch (err: any) {
-      if (err.status === 401) { setCreds(null); sessionStorage.removeItem('staff_creds') }
+      if (err.status === 401) setAuthed(false)
     }
   }
 
   async function handleRowClick(code: string) {
-    if (!creds) return
-    const d = await api.getStaffSessionDetail(code, creds)
+    const d = await api.getStaffSessionDetail(code)
     setDetail(d)
   }
 
-  if (!creds) {
+  if (!authed) {
     return (
       <div className="min-h-screen bg-cream text-ink font-sans">
         <Header />

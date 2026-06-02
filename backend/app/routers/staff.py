@@ -2,25 +2,33 @@ import json
 import secrets
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Cookie, Depends, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from app.config import settings
 from app.database import get_db
 from app.schemas import StaffSessionItem, StaffSessionDetail
+from app.services.auth import verify_token
 
 router = APIRouter(prefix="/api/staff", tags=["staff"])
-security = HTTPBasic()
+security = HTTPBasic(auto_error=False)
 
 
-def verify_staff(credentials: HTTPBasicCredentials = Depends(security)):
-    ok = (
-        secrets.compare_digest(credentials.username, settings.staff_admin_username)
+def verify_staff(
+    auth_token: Optional[str] = Cookie(default=None),
+    credentials: Optional[HTTPBasicCredentials] = Depends(security),
+):
+    # Cookie session (preferred) — the admin role also satisfies staff access.
+    if verify_token(auth_token) in ("staff", "admin"):
+        return
+    # Backwards-compatible HTTP Basic.
+    if (
+        credentials
+        and secrets.compare_digest(credentials.username, settings.staff_admin_username)
         and secrets.compare_digest(credentials.password, settings.staff_admin_password)
-    )
-    if not ok:
-        raise HTTPException(401, headers={"WWW-Authenticate": "Basic"})
-    return credentials
+    ):
+        return
+    raise HTTPException(401, headers={"WWW-Authenticate": "Basic"})
 
 
 def _parse_json_field(value, default):

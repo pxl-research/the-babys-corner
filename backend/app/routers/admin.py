@@ -1,27 +1,35 @@
 import secrets
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Cookie, Depends, HTTPException
 from fastapi.responses import Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from app.config import settings
 from app.database import get_db
 from app.schemas import StaffSessionItem, StaffSessionDetail
+from app.services.auth import verify_token
 from app.services.export import build_xlsx
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
-security = HTTPBasic()
+security = HTTPBasic(auto_error=False)
 
 
-def verify_admin(credentials: HTTPBasicCredentials = Depends(security)):
-    ok = (
-        secrets.compare_digest(credentials.username, settings.pxl_admin_username)
+def verify_admin(
+    auth_token: Optional[str] = Cookie(default=None),
+    credentials: Optional[HTTPBasicCredentials] = Depends(security),
+):
+    # Cookie session (preferred) — admin only.
+    if verify_token(auth_token) == "admin":
+        return
+    # Backwards-compatible HTTP Basic.
+    if (
+        credentials
+        and secrets.compare_digest(credentials.username, settings.pxl_admin_username)
         and secrets.compare_digest(credentials.password, settings.pxl_admin_password)
-    )
-    if not ok:
-        raise HTTPException(401, headers={"WWW-Authenticate": "Basic"})
-    return credentials
+    ):
+        return
+    raise HTTPException(401, headers={"WWW-Authenticate": "Basic"})
 
 
 @router.get("/sessions", response_model=list[StaffSessionItem])
