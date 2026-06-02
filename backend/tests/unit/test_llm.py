@@ -263,6 +263,24 @@ async def test_rerank_by_note_sends_name_so_colour_is_visible():
     assert result == ["ST_BLACK", "ST_BEIGE"]
 
 
+async def test_rerank_by_note_accepts_subset_and_drops_unknown_ids():
+    from app.services.llm import rerank_by_note
+
+    async def fake_try_azure(prompt, system, model):
+        # Model returns only the matches (a subset), plus a hallucinated id + a dupe.
+        return '["ST_BLACK", "BOGUS", "ST_BLACK"]'
+
+    candidates = [
+        {"id": "ST_BLACK", "name": "Fox 5 rich black", "brand": "bugaboo", "description": "x"},
+        {"id": "ST_BEIGE", "name": "Fox 5 desert taupe", "brand": "bugaboo", "description": "x"},
+    ]
+    with patch("app.services.llm._try_azure", new=fake_try_azure):
+        result = await rerank_by_note(candidates, "zwart")
+
+    # Subset kept, unknown id dropped, de-duplicated. Caller front-loads the rest.
+    assert result == ["ST_BLACK"]
+
+
 async def test_rerank_by_note_returns_none_without_provider(caplog):
     from app.services.llm import rerank_by_note
 
