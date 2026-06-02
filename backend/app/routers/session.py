@@ -3,6 +3,7 @@ import uuid
 import logging
 import re
 from datetime import datetime, timezone
+from sqlite3 import IntegrityError
 from typing import Optional
 
 from fastapi import APIRouter, Cookie, HTTPException, BackgroundTasks, Query
@@ -97,17 +98,23 @@ def _require_active(session: dict):
 @router.post("", response_model=SessionCreateResponse)
 async def create_session(source: str = Query(default="home")):
     session_id = str(uuid.uuid4())
-    session_code = generate_session_code()
     now = _now()
     db = await get_db()
-    await db.execute(
-        """INSERT INTO sessions (session_id, session_code, source, status, started_at,
-            stroller_favorites, accessory_favorites, shown_products)
-           VALUES (?, ?, ?, 'active', ?, '[]', '[]', '[]')""",
-        (session_id, session_code, source, now),
-    )
-    await db.commit()
-    return _make_session_cookie_response(session_id, session_code)
+    # Retry on the rare session_code collision (UNIQUE index enforces uniqueness).
+    for attempt in range(5):
+        session_code = generate_session_code()
+        try:
+            await db.execute(
+                """INSERT INTO sessions (session_id, session_code, source, status, started_at,
+                    stroller_favorites, accessory_favorites, shown_products)
+                   VALUES (?, ?, ?, 'active', ?, '[]', '[]', '[]')""",
+                (session_id, session_code, source, now),
+            )
+            await db.commit()
+            return _make_session_cookie_response(session_id, session_code)
+        except IntegrityError:
+            await db.rollback()
+    raise HTTPException(500, detail="Could not allocate a unique session code.")
 
 
 @router.get("/quiz-config")

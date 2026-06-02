@@ -1,7 +1,9 @@
-import random
+import secrets
 
 _CHARSET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
 
 
 def generate_session_code() -> str:
-    return "".join(random.choices(_CHARSET, k=6))
+    # Cryptographically secure: codes are used by staff to look up sessions, so
+    # predictability/enumeration matter.
+    return "".join(secrets.choice(_CHARSET) for _ in range(6))

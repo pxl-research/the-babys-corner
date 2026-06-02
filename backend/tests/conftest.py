@@ -11,6 +11,9 @@ async def reset_db(tmp_path):
     conn = await aiosqlite.connect(db_path)
     conn.row_factory = aiosqlite.Row
     await conn.execute(CREATE_SESSIONS_SQL)
+    await conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_sessions_session_code ON sessions(session_code)"
+    )
     await conn.commit()
 
     async def mock_get_db():

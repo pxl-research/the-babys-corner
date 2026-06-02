@@ -212,6 +212,16 @@ async def test_current_session_exposes_talking_points_after_handoff(client):
     assert resp.json()["talking_points"] == points
 
 
+async def test_create_session_retries_on_code_collision(client):
+    codes = iter(["AAAAA1", "AAAAA1", "BBBBB2"])
+    with patch("app.routers.session.generate_session_code", side_effect=lambda: next(codes)):
+        r1 = await client.post("/api/sessions?source=home")
+        r2 = await client.post("/api/sessions?source=home")
+    assert r1.json()["session_code"] == "AAAAA1"
+    # Second insert collides on AAAAA1, retries, and lands a fresh code.
+    assert r2.json()["session_code"] == "BBBBB2"
+
+
 async def test_abandoned_session_cannot_be_handed_off(client):
     await client.post("/api/sessions?source=home")
     answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]

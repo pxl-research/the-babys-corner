@@ -61,4 +61,6 @@ async def init_db():
             await db.execute(f"ALTER TABLE sessions ADD COLUMN {col_def}")
         except Exception:
             pass
+    # Enforce session-code uniqueness so staff lookups can never be ambiguous.
+    await db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_sessions_session_code ON sessions(session_code)")
     await db.commit()
