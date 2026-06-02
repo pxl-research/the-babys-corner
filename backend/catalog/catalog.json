@@ -16,6 +16,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Mondo",
+      "compatible_collections": [
+        "Mondo"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -40,6 +43,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Mondo",
+      "compatible_collections": [
+        "Mondo"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -65,6 +71,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Spring",
+      "compatible_collections": [
+        "Spring"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -85,6 +94,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -105,6 +115,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -130,6 +141,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Metro+",
+      "compatible_collections": [
+        "Metro+"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -157,6 +171,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey5",
+      "compatible_collections": [
+        "Donkey5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -184,6 +201,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey5",
+      "compatible_collections": [
+        "Donkey5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -211,6 +231,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey5",
+      "compatible_collections": [
+        "Donkey5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -238,6 +261,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo³",
+      "compatible_collections": [
+        "Geo³"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -265,6 +291,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo³",
+      "compatible_collections": [
+        "Geo³"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -290,6 +319,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -315,6 +347,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -340,6 +375,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -365,6 +403,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Metro+",
+      "compatible_collections": [
+        "Metro+"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -390,6 +431,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Metro+",
+      "compatible_collections": [
+        "Metro+"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -414,6 +458,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Coya",
+      "compatible_collections": [
+        "Coya"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -438,6 +485,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Coya",
+      "compatible_collections": [
+        "Coya"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -462,6 +512,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Mondo",
+      "compatible_collections": [
+        "Mondo"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -486,6 +539,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Mondo",
+      "compatible_collections": [
+        "Mondo"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -510,6 +566,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Coya",
+      "compatible_collections": [
+        "Coya"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -534,6 +593,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Coya",
+      "compatible_collections": [
+        "Coya"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -558,6 +620,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Coya",
+      "compatible_collections": [
+        "Coya"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -584,6 +649,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Dragonfly",
+      "compatible_collections": [
+        "Dragonfly"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -610,6 +678,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Dragonfly",
+      "compatible_collections": [
+        "Dragonfly"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -630,6 +701,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -655,6 +727,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Casual",
+      "compatible_collections": [
+        "Casual"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -680,6 +755,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -705,6 +783,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -730,6 +811,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -755,6 +839,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -780,6 +867,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Spring",
+      "compatible_collections": [
+        "Spring"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -805,6 +895,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Spring",
+      "compatible_collections": [
+        "Spring"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -830,6 +923,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Spring",
+      "compatible_collections": [
+        "Spring"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -854,6 +950,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Doona i",
+      "compatible_collections": [
+        "Doona i"
+      ],
       "must_have_profiles": [
         "A"
       ],
@@ -880,6 +979,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Doona i",
+      "compatible_collections": [
+        "Doona i"
+      ],
       "must_have_profiles": [
         "A"
       ],
@@ -906,6 +1008,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Doona i",
+      "compatible_collections": [
+        "Doona i"
+      ],
       "must_have_profiles": [
         "A"
       ],
@@ -934,6 +1039,9 @@
         "Luchtwielen"
       ],
       "collection": "Urban Glide 4",
+      "compatible_collections": [
+        "Urban Glide 4"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -960,6 +1068,9 @@
         "Luchtwielen"
       ],
       "collection": "Urban Glide 4",
+      "compatible_collections": [
+        "Urban Glide 4"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -984,6 +1095,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Libelle",
+      "compatible_collections": [
+        "Libelle"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1008,6 +1122,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Libelle",
+      "compatible_collections": [
+        "Libelle"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1032,6 +1149,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Libelle",
+      "compatible_collections": [
+        "Libelle"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1056,6 +1176,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Libelle",
+      "compatible_collections": [
+        "Libelle"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1081,6 +1204,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Orfeo",
+      "compatible_collections": [
+        "Orfeo"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1105,6 +1231,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Beezy",
+      "compatible_collections": [
+        "Beezy"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1129,6 +1258,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Beezy",
+      "compatible_collections": [
+        "Beezy"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1153,6 +1285,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Beezy",
+      "compatible_collections": [
+        "Beezy"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1179,6 +1314,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox",
+      "compatible_collections": [
+        "Fox"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1204,6 +1342,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Spring",
+      "compatible_collections": [
+        "Spring"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1229,6 +1370,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Spring",
+      "compatible_collections": [
+        "Spring"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1256,6 +1400,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5",
+      "compatible_collections": [
+        "Fox 5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1281,6 +1428,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1301,6 +1451,9 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": "Donkey6",
+      "compatible_collections": [
+        "Donkey6"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1328,6 +1481,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1355,6 +1511,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1380,6 +1539,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Sleek 2",
+      "compatible_collections": [
+        "Sleek 2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1405,6 +1567,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Sleek 2",
+      "compatible_collections": [
+        "Sleek 2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1430,6 +1595,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1455,6 +1623,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1480,6 +1651,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1503,6 +1677,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Air",
+      "compatible_collections": [
+        "Air"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1529,6 +1706,10 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Gazelle",
+      "compatible_collections": [
+        "Gazelle S2",
+        "e-Gazelle"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1555,6 +1736,10 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Gazelle",
+      "compatible_collections": [
+        "Gazelle S2",
+        "e-Gazelle"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1580,6 +1765,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1607,6 +1795,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1634,6 +1825,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1661,6 +1855,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1688,6 +1885,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1713,6 +1913,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1738,6 +1941,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1763,6 +1969,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1788,6 +1997,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1813,6 +2025,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1838,6 +2055,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1863,6 +2085,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1888,6 +2115,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Priam 5",
+      "compatible_collections": [
+        "e-Priam 5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1913,6 +2143,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Priam 5",
+      "compatible_collections": [
+        "e-Priam 5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1938,6 +2171,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Priam 5",
+      "compatible_collections": [
+        "e-Priam 5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1963,6 +2199,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "First Class Edition",
+      "compatible_collections": [
+        "First Class Edition"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -1988,6 +2227,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "First Class Edition",
+      "compatible_collections": [
+        "First Class Edition"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2015,6 +2257,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2042,6 +2287,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2069,6 +2317,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2096,6 +2347,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2123,6 +2377,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2150,6 +2407,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2177,6 +2437,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2204,6 +2467,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2231,6 +2497,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2258,6 +2527,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2285,6 +2557,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2312,6 +2587,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2339,6 +2617,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2366,6 +2647,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2393,6 +2677,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2420,6 +2707,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2447,6 +2737,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2474,6 +2767,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo5",
+      "compatible_collections": [
+        "Geo5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2499,6 +2795,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2524,6 +2823,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2549,6 +2851,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2574,6 +2879,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2599,6 +2907,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2624,6 +2935,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2649,6 +2963,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2674,6 +2991,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2699,6 +3019,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2724,6 +3047,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Metro 3",
+      "compatible_collections": [
+        "Metro 3"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2749,6 +3075,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next",
+      "compatible_collections": [
+        "mixx™ next"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2774,6 +3103,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next",
+      "compatible_collections": [
+        "mixx™ next"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2799,6 +3131,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next",
+      "compatible_collections": [
+        "mixx™ next"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2823,6 +3158,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Trvl",
+      "compatible_collections": [
+        "Trvl"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2847,6 +3185,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Trvl LX",
+      "compatible_collections": [
+        "Trvl LX"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2871,6 +3212,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Trvl LX",
+      "compatible_collections": [
+        "Trvl LX"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2895,6 +3239,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Trvl LX",
+      "compatible_collections": [
+        "Trvl LX"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2919,6 +3266,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Swiv",
+      "compatible_collections": [
+        "Swiv"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2943,6 +3293,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "trvl™ lx bmw",
+      "compatible_collections": [
+        "trvl™ lx bmw"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2967,6 +3320,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Swiv",
+      "compatible_collections": [
+        "Swiv"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -2991,6 +3347,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Easyfold",
+      "compatible_collections": [
+        "Easyfold"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3015,6 +3374,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Easyfold",
+      "compatible_collections": [
+        "Easyfold"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3039,6 +3401,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Easyfold",
+      "compatible_collections": [
+        "Easyfold"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3064,6 +3429,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next bmw",
+      "compatible_collections": [
+        "mixx™ next bmw"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3090,6 +3458,9 @@
         "Luchtwielen"
       ],
       "collection": "Urban Glide 3",
+      "compatible_collections": [
+        "Urban Glide 3"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3116,6 +3487,9 @@
         "Luchtwielen"
       ],
       "collection": "Urban Glide 3",
+      "compatible_collections": [
+        "Urban Glide 3"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3142,6 +3516,9 @@
         "Luchtwielen"
       ],
       "collection": "Urban Glide 3",
+      "compatible_collections": [
+        "Urban Glide 3"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3168,6 +3545,9 @@
         "Luchtwielen"
       ],
       "collection": "Urban Glide 3",
+      "compatible_collections": [
+        "Urban Glide 3"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3193,6 +3573,9 @@
         "Luchtwielen"
       ],
       "collection": "Glide 3",
+      "compatible_collections": [
+        "Glide 3"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3218,6 +3601,9 @@
         "Luchtwielen"
       ],
       "collection": "Urban Glide 4",
+      "compatible_collections": [
+        "Urban Glide 4"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3244,6 +3630,9 @@
         "Luchtwielen"
       ],
       "collection": "Urban Glide 3",
+      "compatible_collections": [
+        "Urban Glide 3"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3268,6 +3657,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Charm",
+      "compatible_collections": [
+        "Charm"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3292,6 +3684,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Charm",
+      "compatible_collections": [
+        "Charm"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3316,6 +3711,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Charm",
+      "compatible_collections": [
+        "Charm"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3341,6 +3739,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Casual",
+      "compatible_collections": [
+        "Casual"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3366,6 +3767,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -3388,6 +3792,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -3408,6 +3813,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3428,6 +3834,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3448,6 +3855,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3468,6 +3876,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3488,6 +3897,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3508,6 +3918,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3528,6 +3939,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3548,6 +3960,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3568,6 +3981,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -3588,6 +4002,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -3608,6 +4023,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3628,6 +4044,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3648,6 +4065,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -3669,6 +4087,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -3690,6 +4109,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -3710,6 +4130,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -3730,6 +4151,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -3750,6 +4172,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -3770,6 +4193,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -3788,6 +4212,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -3809,6 +4234,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -3827,6 +4253,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -3845,6 +4272,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -3873,6 +4301,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey",
+      "compatible_collections": [
+        "Donkey"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -3901,6 +4332,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey",
+      "compatible_collections": [
+        "Donkey"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -3922,6 +4356,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -3943,6 +4378,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -3963,6 +4399,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -3984,6 +4421,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4004,6 +4442,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4024,6 +4463,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4044,6 +4484,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4064,6 +4505,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4084,6 +4526,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4104,6 +4547,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4124,6 +4568,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -4144,6 +4589,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -4165,6 +4611,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -4186,6 +4633,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -4206,6 +4654,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -4224,6 +4673,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -4245,6 +4695,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4265,6 +4716,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4285,6 +4737,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4305,6 +4758,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -4325,6 +4779,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -4346,6 +4801,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -4362,6 +4818,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4382,6 +4839,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -4403,6 +4861,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -4424,6 +4883,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -4444,6 +4904,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4469,6 +4930,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Sleek",
+      "compatible_collections": [
+        "Sleek"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -4494,6 +4958,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Sleek",
+      "compatible_collections": [
+        "Sleek"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -4519,6 +4986,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Sleek",
+      "compatible_collections": [
+        "Sleek"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -4539,6 +5009,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4559,6 +5030,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4579,6 +5051,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4599,6 +5072,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4619,6 +5093,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -4640,6 +5115,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -4656,6 +5132,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -4676,6 +5153,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4696,6 +5174,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -4714,6 +5193,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -4734,6 +5214,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4754,6 +5235,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -4775,6 +5257,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4795,6 +5278,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -4811,6 +5295,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -4831,6 +5316,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -4851,6 +5337,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4871,6 +5358,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4891,6 +5379,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4911,6 +5400,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -4932,6 +5422,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -4952,6 +5443,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -4972,6 +5464,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -4990,6 +5483,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -5010,6 +5504,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -5030,6 +5525,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -5051,6 +5547,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -5072,6 +5569,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -5098,6 +5596,9 @@
         "Luchtwielen"
       ],
       "collection": "Urban Glide 2",
+      "compatible_collections": [
+        "Urban Glide 2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -5118,6 +5619,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -5138,6 +5640,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -5158,6 +5661,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -5178,6 +5682,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -5198,6 +5703,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5218,6 +5724,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5238,6 +5745,9 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": "Limited Edition",
+      "compatible_collections": [
+        "Limited Edition"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -5258,6 +5768,9 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": "Limited Edition",
+      "compatible_collections": [
+        "Limited Edition"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5274,6 +5787,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -5294,6 +5808,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5314,6 +5829,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -5335,6 +5851,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5355,6 +5872,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5375,6 +5893,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -5395,6 +5914,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -5415,6 +5935,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5435,6 +5956,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5455,6 +5977,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5475,6 +5998,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5500,6 +6024,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5521,6 +6051,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5542,6 +6078,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5563,6 +6105,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5583,6 +6131,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Mios",
+      "compatible_collections": [
+        "Mios"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5604,6 +6155,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Priam 4",
+      "compatible_collections": [
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5625,6 +6179,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Priam 4",
+      "compatible_collections": [
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5641,6 +6198,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5661,6 +6219,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5688,6 +6247,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey5",
+      "compatible_collections": [
+        "Donkey5"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -5715,6 +6277,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey5",
+      "compatible_collections": [
+        "Donkey5"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -5742,6 +6307,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey5",
+      "compatible_collections": [
+        "Donkey5"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -5767,6 +6335,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Classic Edition",
+      "compatible_collections": [
+        "Classic Edition"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5788,6 +6359,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Classic Edition",
+      "compatible_collections": [
+        "Classic Edition"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -5808,6 +6382,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -5828,6 +6403,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Mondo",
+      "compatible_collections": [
+        "Mondo"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -5853,6 +6431,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next",
+      "compatible_collections": [
+        "mixx™ next"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -5878,6 +6459,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next",
+      "compatible_collections": [
+        "mixx™ next"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -5898,6 +6482,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -5918,6 +6503,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -5938,6 +6524,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -5959,6 +6546,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -5979,6 +6567,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -5999,6 +6588,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -6027,6 +6617,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo³",
+      "compatible_collections": [
+        "Geo³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -6043,6 +6636,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -6064,6 +6658,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6084,6 +6679,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -6105,6 +6701,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -6132,6 +6729,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey",
+      "compatible_collections": [
+        "Donkey"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6159,6 +6759,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey5",
+      "compatible_collections": [
+        "Donkey5"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6186,6 +6789,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Donkey",
+      "compatible_collections": [
+        "Donkey"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6206,6 +6812,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -6226,6 +6833,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -6247,6 +6855,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6267,6 +6876,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6292,6 +6902,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -6308,6 +6923,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -6328,6 +6944,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -6348,6 +6965,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -6373,6 +6991,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO²",
+      "compatible_collections": [
+        "YOYO²"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -6394,6 +7015,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6419,6 +7045,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6444,6 +7075,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6469,6 +7105,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6494,6 +7135,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6519,6 +7165,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6544,6 +7195,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6569,6 +7225,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6594,6 +7255,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6619,6 +7285,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6644,6 +7315,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6669,6 +7345,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6694,6 +7375,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6719,6 +7405,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -6744,6 +7435,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6769,6 +7463,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6794,6 +7491,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6819,6 +7521,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6844,6 +7551,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6869,6 +7581,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6894,6 +7611,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6919,6 +7641,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6944,6 +7671,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO",
+      "compatible_collections": [
+        "YOYO²",
+        "YOYO³",
+        "YOYO"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6964,6 +7696,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -6984,6 +7717,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7004,6 +7738,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7024,6 +7759,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7044,6 +7780,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7064,6 +7801,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7084,6 +7822,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7104,6 +7843,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7124,6 +7864,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -7144,6 +7885,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -7164,6 +7906,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -7184,6 +7927,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -7204,6 +7948,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -7224,6 +7969,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -7244,6 +7990,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -7264,6 +8011,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -7284,6 +8032,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -7304,6 +8053,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7324,6 +8074,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -7342,6 +8093,9 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": "natuurlijk",
+      "compatible_collections": [
+        "natuurlijk"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7362,6 +8116,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -7385,6 +8140,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7410,6 +8168,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7435,6 +8196,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7460,6 +8224,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7480,6 +8247,9 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": "Bliss Beige",
+      "compatible_collections": [
+        "Bliss Beige"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -7500,6 +8270,9 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": "breeze sand",
+      "compatible_collections": [
+        "breeze sand"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -7525,6 +8298,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+",
+      "compatible_collections": [
+        "Aer+"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7552,6 +8328,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5",
+      "compatible_collections": [
+        "Fox 5"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7572,6 +8351,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -7592,6 +8372,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7612,6 +8393,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7638,6 +8420,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Balios S Lux",
+      "compatible_collections": [
+        "Balios S Lux"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7658,6 +8443,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7678,6 +8464,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -7696,6 +8483,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7721,6 +8509,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7746,6 +8540,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7771,6 +8571,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7796,6 +8602,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7821,6 +8633,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7846,6 +8664,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -7871,6 +8695,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7896,6 +8726,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7921,6 +8757,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7946,6 +8788,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7971,6 +8819,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -7991,6 +8845,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -8016,6 +8871,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Signature",
+      "compatible_collections": [
+        "Signature"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -8032,6 +8890,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -8060,6 +8919,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Geo3/Day5",
+      "compatible_collections": [
+        "Geo³",
+        "Day5",
+        "Geo3/Day5"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -8088,6 +8952,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Geo3/Day5",
+      "compatible_collections": [
+        "Geo³",
+        "Day5",
+        "Geo3/Day5"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8113,6 +8982,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -8134,6 +9006,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -8155,6 +9028,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8175,6 +9049,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -8195,6 +9070,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -8223,6 +9099,13 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Aer+/2/Day5/Hub2",
+      "compatible_collections": [
+        "Aer²",
+        "Hub²",
+        "Aer+",
+        "Day5",
+        "Aer+/2/Day5/Hub2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -8250,6 +9133,15 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Urban Glide 3 en 4, Sleek 2, Spring 2",
+      "compatible_collections": [
+        "Sleek 2",
+        "Urban Glide 3",
+        "Urban Glide 3 en 4",
+        "Sleek 2",
+        "Spring 2",
+        "Urban Glide 4",
+        "Spring 2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8281,6 +9173,15 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Urban Glide 3 en 4, Sleek 2, Spring 2",
+      "compatible_collections": [
+        "Sleek 2",
+        "Urban Glide 3",
+        "Urban Glide 3 en 4",
+        "Sleek 2",
+        "Spring 2",
+        "Urban Glide 4",
+        "Spring 2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8312,6 +9213,15 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Urban Glide 3 en 4, Sleek 2, Spring 2",
+      "compatible_collections": [
+        "Sleek 2",
+        "Urban Glide 3",
+        "Urban Glide 3 en 4",
+        "Sleek 2",
+        "Spring 2",
+        "Urban Glide 4",
+        "Spring 2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8337,6 +9247,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Demi Next",
+      "compatible_collections": [
+        "Demi Next"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8362,6 +9275,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Demi Next",
+      "compatible_collections": [
+        "Demi Next"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8386,6 +9302,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Mios",
+      "compatible_collections": [
+        "Mios"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8406,6 +9325,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -8426,6 +9346,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -8446,6 +9367,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8466,6 +9388,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -8482,6 +9405,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -8502,6 +9426,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -8527,6 +9452,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+",
+      "compatible_collections": [
+        "Aer+"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8552,6 +9480,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+",
+      "compatible_collections": [
+        "Aer+"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8577,6 +9508,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+",
+      "compatible_collections": [
+        "Aer+"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8597,6 +9531,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -8617,6 +9552,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -8637,6 +9573,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -8660,6 +9597,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo³",
+      "compatible_collections": [
+        "Geo³"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -8686,6 +9626,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8706,6 +9649,9 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": "Donkey6",
+      "compatible_collections": [
+        "Donkey6"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8733,6 +9679,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8760,6 +9709,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8780,6 +9732,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8800,6 +9753,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -8820,6 +9774,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8840,6 +9795,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8860,6 +9816,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8880,6 +9837,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -8905,6 +9863,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+",
+      "compatible_collections": [
+        "Aer+"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8930,6 +9891,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+",
+      "compatible_collections": [
+        "Aer+"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8955,6 +9919,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+",
+      "compatible_collections": [
+        "Aer+"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -8982,6 +9949,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -9003,6 +9973,9 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": "bliss sage",
+      "compatible_collections": [
+        "bliss sage"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -9027,6 +10000,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Beezy",
+      "compatible_collections": [
+        "Beezy"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -9048,6 +10024,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -9068,6 +10045,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -9093,6 +10071,12 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 4",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4",
+        "Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -9113,6 +10097,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -9133,6 +10118,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9153,6 +10139,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -9173,6 +10160,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -9199,6 +10187,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9224,6 +10215,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -9249,6 +10243,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -9274,6 +10271,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -9295,6 +10295,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9315,6 +10318,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -9335,6 +10339,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -9360,6 +10365,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Gazelle S2",
+      "compatible_collections": [
+        "Gazelle S2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -9385,6 +10393,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -9408,6 +10419,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Day5",
+      "compatible_collections": [
+        "Day5"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -9428,6 +10442,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9453,6 +10468,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -9474,6 +10492,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -9490,6 +10511,9 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": "breeze clay",
+      "compatible_collections": [
+        "breeze clay"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -9510,6 +10534,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9530,6 +10555,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9550,6 +10576,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9570,6 +10597,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9590,6 +10618,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9610,6 +10639,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9630,6 +10660,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9650,6 +10681,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9670,6 +10702,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9690,6 +10723,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9710,6 +10744,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9730,6 +10765,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9750,6 +10786,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9770,6 +10807,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9790,6 +10828,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9810,6 +10849,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9830,6 +10870,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9850,6 +10891,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9870,6 +10912,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9897,6 +10940,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5",
+      "compatible_collections": [
+        "Fox 5"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -9924,6 +10970,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -9951,6 +11000,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -9978,6 +11030,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10005,6 +11060,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10032,6 +11090,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10059,6 +11120,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10086,6 +11150,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5 Renew",
+      "compatible_collections": [
+        "Fox 5 Renew"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10113,6 +11180,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5",
+      "compatible_collections": [
+        "Fox 5"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -10140,6 +11210,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Fox 5",
+      "compatible_collections": [
+        "Fox 5"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -10160,6 +11233,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -10183,6 +11257,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -10208,6 +11285,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10233,6 +11313,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10259,6 +11342,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Dragonfly",
+      "compatible_collections": [
+        "Dragonfly"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -10285,6 +11371,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Butterfly 2",
+      "compatible_collections": [
+        "Butterfly 2"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -10306,6 +11395,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -10326,6 +11416,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -10346,6 +11437,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -10371,6 +11463,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -10392,6 +11489,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -10413,6 +11515,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -10434,6 +11541,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Priam 5",
+      "compatible_collections": [
+        "e-Priam 5"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -10455,6 +11565,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Priam 5",
+      "compatible_collections": [
+        "e-Priam 5"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -10476,6 +11589,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "e-Priam 5",
+      "compatible_collections": [
+        "e-Priam 5"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -10497,6 +11613,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -10522,6 +11643,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -10547,6 +11673,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -10572,6 +11703,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -10597,6 +11733,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -10622,6 +11763,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10647,6 +11793,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10672,6 +11823,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10697,6 +11853,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10722,6 +11883,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10747,6 +11913,11 @@
         "Elektrische ondersteuning"
       ],
       "collection": "Priam 5",
+      "compatible_collections": [
+        "Priam 5",
+        "e-Priam 5",
+        "e-Priam 4"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10772,6 +11943,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next bmw",
+      "compatible_collections": [
+        "mixx™ next bmw"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10792,6 +11966,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -10813,6 +11988,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -10839,6 +12015,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "First Class Edition",
+      "compatible_collections": [
+        "First Class Edition"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10864,6 +12043,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "First Class Edition",
+      "compatible_collections": [
+        "First Class Edition"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -10889,6 +12071,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "First Class Edition",
+      "compatible_collections": [
+        "First Class Edition"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -10910,6 +12095,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "First Class Edition",
+      "compatible_collections": [
+        "First Class Edition"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -10937,6 +12125,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo³",
+      "compatible_collections": [
+        "Geo³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -10964,6 +12155,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo³",
+      "compatible_collections": [
+        "Geo³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -10984,6 +12178,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11011,6 +12206,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo³",
+      "compatible_collections": [
+        "Geo³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11038,6 +12236,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo³",
+      "compatible_collections": [
+        "Geo³"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -11066,6 +12267,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Geo³",
+      "compatible_collections": [
+        "Geo³"
+      ],
       "must_have_profiles": [
         "B",
         "C"
@@ -11092,6 +12296,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+",
+      "compatible_collections": [
+        "Aer+"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11117,6 +12324,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+",
+      "compatible_collections": [
+        "Aer+"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11142,6 +12352,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+/2",
+      "compatible_collections": [
+        "Aer²",
+        "Aer+",
+        "Aer+/2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -11167,6 +12382,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11192,6 +12410,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11217,6 +12438,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11242,6 +12466,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11267,6 +12494,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11292,6 +12522,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11317,6 +12550,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11342,6 +12578,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11367,6 +12606,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11392,6 +12634,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11412,6 +12657,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11432,6 +12678,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11452,6 +12699,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -11475,6 +12723,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11495,6 +12746,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -11520,6 +12772,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+/2",
+      "compatible_collections": [
+        "Aer²",
+        "Aer+",
+        "Aer+/2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -11545,6 +12802,11 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer+/2",
+      "compatible_collections": [
+        "Aer²",
+        "Aer+",
+        "Aer+/2"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -11570,6 +12832,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Aer²",
+      "compatible_collections": [
+        "Aer²"
+      ],
       "must_have_profiles": [
         "A",
         "B",
@@ -11590,6 +12855,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11610,6 +12876,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11630,6 +12897,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11650,6 +12918,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -11670,6 +12939,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -11690,6 +12960,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -11710,6 +12981,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -11730,6 +13002,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -11750,6 +13023,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -11778,6 +13052,12 @@
         "Met één hand inklapbaar"
       ],
       "collection": "Geo³/Day5/Hub²",
+      "compatible_collections": [
+        "Hub²",
+        "Geo³",
+        "Day5",
+        "Geo³/Day5/Hub²"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -11805,6 +13085,13 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Aer/+/Day5/Hub2",
+      "compatible_collections": [
+        "Aer²",
+        "Hub²",
+        "Aer+",
+        "Day5",
+        "Aer/+/Day5/Hub2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11832,6 +13119,13 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Aer/+/Day5/Hub2",
+      "compatible_collections": [
+        "Aer²",
+        "Hub²",
+        "Aer+",
+        "Day5",
+        "Aer/+/Day5/Hub2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11859,6 +13153,13 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "Aer/+/Day5/Hub2",
+      "compatible_collections": [
+        "Aer²",
+        "Hub²",
+        "Aer+",
+        "Day5",
+        "Aer/+/Day5/Hub2"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -11879,6 +13180,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -11899,6 +13201,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -11919,6 +13222,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -11939,6 +13243,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -11959,6 +13264,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -11979,6 +13285,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -11999,6 +13306,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -12019,6 +13327,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12039,6 +13348,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12059,6 +13369,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -12079,6 +13390,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -12099,6 +13411,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -12115,6 +13428,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -12131,6 +13445,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -12147,6 +13462,9 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": "Newborn naturals",
+      "compatible_collections": [
+        "Newborn naturals"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12167,6 +13485,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -12187,6 +13506,9 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": "Forest Friends",
+      "compatible_collections": [
+        "Forest Friends"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12207,6 +13529,9 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": "Fairy Garden",
+      "compatible_collections": [
+        "Fairy Garden"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12232,6 +13557,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next",
+      "compatible_collections": [
+        "mixx™ next"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12257,6 +13585,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next",
+      "compatible_collections": [
+        "mixx™ next"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12282,6 +13613,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next",
+      "compatible_collections": [
+        "mixx™ next"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12302,6 +13636,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12322,6 +13657,9 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": "Lucky Blossom",
+      "compatible_collections": [
+        "Lucky Blossom"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12342,6 +13680,9 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": "Lucky Leaves",
+      "compatible_collections": [
+        "Lucky Leaves"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12367,6 +13708,9 @@
         "Naar ouder én vooruitkijken"
       ],
       "collection": "mixx™ next",
+      "compatible_collections": [
+        "mixx™ next"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12387,6 +13731,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12407,6 +13752,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12432,6 +13778,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -12453,6 +13802,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [],
@@ -12474,6 +13826,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12499,6 +13854,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12524,6 +13882,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12549,6 +13910,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12574,6 +13938,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12599,6 +13966,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12624,6 +13994,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12649,6 +14022,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12674,6 +14050,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12699,6 +14078,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12724,6 +14106,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12749,6 +14134,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12774,6 +14162,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12799,6 +14190,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12824,6 +14218,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12849,6 +14246,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [
         "C"
       ],
@@ -12874,6 +14274,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12899,6 +14302,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12924,6 +14330,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12949,6 +14358,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12974,6 +14386,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -12999,6 +14414,9 @@
         "Met één hand inklapbaar"
       ],
       "collection": "YOYO³",
+      "compatible_collections": [
+        "YOYO³"
+      ],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -13019,6 +14437,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -13037,6 +14456,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -13057,6 +14477,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -13077,6 +14498,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -13097,6 +14519,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -13117,6 +14540,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -13137,6 +14561,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -13157,6 +14582,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "B",
         "C"
@@ -13178,6 +14604,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -13198,6 +14625,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -13218,6 +14646,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",
@@ -13238,6 +14667,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -13258,6 +14688,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "C"
       ],
@@ -13278,6 +14709,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -13298,6 +14730,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -13318,6 +14751,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [
         "C"
@@ -13338,6 +14772,7 @@
       "availability": "Op voorraad",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [],
       "should_have_profiles": [],
       "nice_to_have_profiles": [
@@ -13356,6 +14791,7 @@
       "availability": "Op bestelling",
       "tags": [],
       "collection": null,
+      "compatible_collections": [],
       "must_have_profiles": [
         "A",
         "B",

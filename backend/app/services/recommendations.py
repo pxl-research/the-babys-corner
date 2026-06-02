@@ -198,99 +198,64 @@ def get_batch(
     return [s for id_ in batch_ids if (s := catalog.get_stroller(id_))]
 
 
+# How many cross-sell accessories to surface, scaled by profile appetite.
+_CROSS_SELL_TARGET = {"A": 5, "B": 10, "C": 15}
+
+
+def _accessory_collections(accessory: dict) -> set[str]:
+    colls = {c for c in (accessory.get("compatible_collections") or []) if c}
+    own = (accessory.get("collection") or "").strip()
+    if own:
+        colls.add(own)
+    return colls
+
+
 def get_cross_sell_items(
     stroller: dict,
     profile: str,
     catalog: CatalogService,
 ) -> list[dict]:
-    quotas = {
-        "A": {"must_have_profiles": 4, "should_have_profiles": 1},
-        "B": {"must_have_profiles": 6, "should_have_profiles": 3, "nice_to_have_profiles": 1},
-        "C": {"must_have_profiles": 8, "should_have_profiles": 6, "nice_to_have_profiles": 1},
-    }
-    profile_quota = quotas.get(profile, quotas["B"])
-    target_total = sum(profile_quota.values())
+    """Accessories compatible with the stroller's collection only.
 
-    rng = random.Random()
-    stroller_brand = (stroller.get("brand") or "").strip().lower()
-    all_accessories = catalog.get_all_accessories()
+    An accessory matches when the stroller's collection appears in its
+    `compatible_collections` (or equals its own collection). Strollers whose
+    collection has no compatible accessory show none — this is intentional;
+    cross-sell is strictly collection-scoped, not a heuristic.
+    """
+    collection = (stroller.get("collection") or "").strip()
+    if not collection:
+        return []
 
-    selected: list[dict] = []
-    selected_ids: set[str] = set()
-    selected_names: set[str] = set()
+    pool = [a for a in catalog.get_all_accessories() if collection in _accessory_collections(a)]
+    if not pool:
+        return []
+
+    target_total = _CROSS_SELL_TARGET.get(profile, _CROSS_SELL_TARGET["B"])
     stroller_colors = _extract_colors(stroller.get("name", ""))
 
     def normalize_name(name: str) -> str:
         return re.sub(r"[^a-z0-9]+", "", (name or "").lower())
 
-    def pick_from_pool(pool: list[dict], count: int) -> list[dict]:
-        available = [
-            a for a in pool
-            if a.get("id") not in selected_ids and normalize_name(a.get("name", "")) not in selected_names
-        ]
-        if not available or count <= 0:
-            return []
-        rng.shuffle(available)
-        picked: list[dict] = []
-        picked_names: set[str] = set()
-        for acc in available:
-            norm = normalize_name(acc.get("name", ""))
-            if norm in picked_names:
-                continue
-            picked.append(acc)
-            picked_names.add(norm)
-            if len(picked) == count:
-                break
-        return picked
-
-    def pick_with_color_priority(pool: list[dict], count: int) -> list[dict]:
-        if count <= 0:
-            return []
-        if not stroller_colors:
-            return pick_from_pool(pool, count)
+    # Colour-matching accessories first, then the rest; shuffle within each group.
+    rng = random.Random()
+    if stroller_colors:
         color_matches = [a for a in pool if _extract_colors(a.get("name", "")) & stroller_colors]
-        non_matches = [a for a in pool if a not in color_matches]
-        first = pick_from_pool(color_matches, count)
-        if len(first) >= count:
-            return first
-        return first + pick_from_pool(non_matches, count - len(first))
+        rest = [a for a in pool if a not in color_matches]
+    else:
+        color_matches, rest = [], pool[:]
+    rng.shuffle(color_matches)
+    rng.shuffle(rest)
 
-    for tier_field, count in profile_quota.items():
-        tier_pool = [a for a in all_accessories if profile in a.get(tier_field, [])]
-        same_brand = [a for a in tier_pool if (a.get("brand") or "").strip().lower() == stroller_brand]
-        other_brand = [a for a in tier_pool if (a.get("brand") or "").strip().lower() != stroller_brand]
-
-        picked_same = pick_with_color_priority(same_brand, count)
-        for acc in picked_same:
-            selected.append(acc)
-            selected_ids.add(acc["id"])
-            selected_names.add(normalize_name(acc.get("name", "")))
-
-        remaining = count - len(picked_same)
-        if remaining > 0:
-            picked_other = pick_with_color_priority(other_brand, remaining)
-            for acc in picked_other:
-                selected.append(acc)
-                selected_ids.add(acc["id"])
-                selected_names.add(normalize_name(acc.get("name", "")))
-
-    if len(selected) < target_total:
-        tier_fields = list(profile_quota.keys())
-        remainder_pool = [a for a in all_accessories if any(profile in a.get(t, []) for t in tier_fields)]
-        same_brand = [a for a in remainder_pool if (a.get("brand") or "").strip().lower() == stroller_brand]
-        other_brand = [a for a in remainder_pool if (a.get("brand") or "").strip().lower() != stroller_brand]
-
-        for pool in (same_brand, other_brand):
-            needed = target_total - len(selected)
-            if needed <= 0:
-                break
-            extra = pick_with_color_priority(pool, needed)
-            for acc in extra:
-                selected.append(acc)
-                selected_ids.add(acc["id"])
-                selected_names.add(normalize_name(acc.get("name", "")))
-
-    rng.shuffle(selected)
+    selected: list[dict] = []
+    seen_names: set[str] = set()
+    for acc in color_matches + rest:
+        norm = normalize_name(acc.get("name", ""))
+        if norm in seen_names:
+            continue
+        seen_names.add(norm)
+        selected.append(acc)
+        if len(selected) == target_total:
+            break
     return selected
 
 

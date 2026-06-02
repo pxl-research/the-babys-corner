@@ -71,6 +71,11 @@ def convert_row(row: dict, is_stroller: bool) -> dict:
     must, should, nice = build_profiles(row)
     tags = [t.strip() for t in row.get("Product tags", "").split(",") if t.strip()]
     collection = row.get("Collection", "").strip() or None
+    compatible_collections = [
+        c.strip()
+        for c in row.get("Compatibel met collectie", "").replace(";", ",").split(",")
+        if c.strip()
+    ]
 
     item = {
         "id": item_id,
@@ -82,6 +87,7 @@ def convert_row(row: dict, is_stroller: bool) -> dict:
         "availability": AVAILABILITY_MAP.get(row["availability"].strip(), row["availability"].strip()),
         "tags": tags,
         "collection": collection,
+        "compatible_collections": compatible_collections,
         "must_have_profiles": must,
         "should_have_profiles": should,
         "nice_to_have_profiles": nice,
@@ -94,7 +100,23 @@ def convert_row(row: dict, is_stroller: bool) -> dict:
     return item
 
 
+def _existing_formatted_descriptions() -> dict:
+    """Carry over LLM-generated formatted_description from a previous catalog.json
+    so a feed refresh does not require re-running format_descriptions.py."""
+    if not os.path.exists(OUT_PATH):
+        return {}
+    with open(OUT_PATH, encoding="utf-8") as f:
+        prev = json.load(f)
+    return {
+        s["id"]: s["formatted_description"]
+        for s in prev.get("strollers", [])
+        if s.get("formatted_description")
+    }
+
+
 def main() -> None:
+    formatted = _existing_formatted_descriptions()
+
     with open(CSV_PATH, encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
 
@@ -104,6 +126,8 @@ def main() -> None:
     for row in rows:
         is_stroller = row["Categorie"] in STROLLER_CATEGORIES
         item = convert_row(row, is_stroller)
+        if is_stroller and item["id"] in formatted:
+            item["formatted_description"] = formatted[item["id"]]
         if is_stroller:
             strollers.append(item)
         else:
