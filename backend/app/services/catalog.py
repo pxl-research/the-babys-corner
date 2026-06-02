@@ -90,9 +90,15 @@ class CatalogService:
         tags: list[str],
         brands: list[str],
         collections: list[dict],
+        tag_match: str = "any",
     ) -> bool:
-        if tags and not any(t in item.get("tags", []) for t in tags):
-            return False
+        if tags:
+            item_tags = item.get("tags", [])
+            if tag_match == "all":
+                if not all(t in item_tags for t in tags):
+                    return False
+            elif not any(t in item_tags for t in tags):
+                return False
         if brands and item.get("brand", "").lower() not in {b.lower() for b in brands}:
             return False
         if collections:
@@ -111,22 +117,24 @@ class CatalogService:
         tags: list[str] | None = None,
         brands: list[str] | None = None,
         collections: list[dict] | None = None,
+        tag_match: str = "any",
     ) -> list[dict]:
         t, b, c = tags or [], brands or [], collections or []
         if not t and not b and not c:
             return self.get_all_strollers()
-        return [s for s in self._strollers.values() if self._matches_filter(s, t, b, c)]
+        return [s for s in self._strollers.values() if self._matches_filter(s, t, b, c, tag_match)]
 
     def get_filtered_accessories(
         self,
         tags: list[str] | None = None,
         brands: list[str] | None = None,
         collections: list[dict] | None = None,
+        tag_match: str = "any",
     ) -> list[dict]:
         t, b, c = tags or [], brands or [], collections or []
         if not t and not b and not c:
             return self.get_all_accessories()
-        return [a for a in self._accessories.values() if self._matches_filter(a, t, b, c)]
+        return [a for a in self._accessories.values() if self._matches_filter(a, t, b, c, tag_match)]
 
 
 _catalog: CatalogService | None = None

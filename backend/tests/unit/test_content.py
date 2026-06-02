@@ -4,7 +4,7 @@ from app.content import load_quiz_config
 
 def test_quiz_config_has_exact_prd_shape():
     config = load_quiz_config()
-    assert len(config["questions"]) == 5
+    assert len(config["questions"]) == 3
     for q in config["questions"]:
         assert len(q["options"]) == 3
         for opt in q["options"]:

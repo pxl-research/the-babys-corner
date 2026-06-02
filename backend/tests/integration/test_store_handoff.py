@@ -13,7 +13,7 @@ async def test_instore_handoff_returns_staff_context(client):
     resp = await client.post("/api/sessions?source=store")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 2} for i in range(5)]
+    answers = [{"question_id": i + 1, "option_index": 2} for i in range(3)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
 
@@ -28,7 +28,7 @@ async def test_instore_inactivity_abandon_marks_abandoned_without_email(client):
     resp = await client.post("/api/sessions?source=store")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 0} for i in range(5)]
+    answers = [{"question_id": i + 1, "option_index": 0} for i in range(3)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
 
     resp = await client.post("/api/sessions/current/abandon")

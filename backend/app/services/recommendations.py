@@ -137,9 +137,10 @@ def compute_filtered_order(
     tags: list[str] | None = None,
     brands: list[str] | None = None,
     collections: list[dict] | None = None,
+    tag_match: str = "any",
 ) -> list[str]:
     """Return filtered stroller IDs, diversified within equal-rank groups."""
-    strollers = catalog.get_filtered_strollers(tags, brands, collections)
+    strollers = catalog.get_filtered_strollers(tags, brands, collections, tag_match)
     if profile:
         strollers_sorted = sorted(
             strollers,
@@ -159,6 +160,38 @@ def compute_filtered_order(
             key_fn=lambda s: (0 if is_available(s) else 1),
         )
     return [s["id"] for s in diversified]
+
+
+def compute_progressive_tag_order(
+    catalog: CatalogService,
+    profile: str | None,
+    tags: list[str],
+) -> tuple[list[str], list[str], list[str]]:
+    """AND across all selected tags; if that yields zero strollers, drop tags one at a
+    time until matches remain (progressive relaxation).
+
+    Each drop removes the single tag whose removal recovers the most matches (greedy).
+    Ties keep the earlier tag, so higher-priority wishes (asked first) survive longest.
+    Returns (reco_order, kept_tags, dropped_tags). If every tag is dropped, falls back to
+    the profile-ranked full assortment.
+    """
+    remaining = list(tags)
+    dropped: list[str] = []
+    while remaining:
+        order = compute_filtered_order(catalog, profile, remaining, tag_match="all")
+        if order:
+            return order, remaining, dropped
+        best_tag = remaining[0]
+        best_count = -1
+        for t in remaining:
+            subset = [x for x in remaining if x != t]
+            count = len(catalog.get_filtered_strollers(subset or None, tag_match="all"))
+            if count > best_count:
+                best_count = count
+                best_tag = t
+        dropped.append(best_tag)
+        remaining.remove(best_tag)
+    return compute_filtered_order(catalog, profile), [], dropped
 
 
 def get_batch(

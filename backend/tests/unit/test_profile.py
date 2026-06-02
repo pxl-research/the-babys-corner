@@ -31,3 +31,21 @@ def test_compute_profile_three_way_tie_returns_b():
 
 def test_compute_profile_all_five_answered():
     assert compute_profile(_answers(["C", "C", "C", "C", "C"])) == "C"
+
+
+# ── 3-question profile (current flow) ────────────────────────────────────────
+
+
+def test_compute_profile_three_q_two_b_one_a():
+    # Doc example: B-B-A → Ontdekker
+    assert compute_profile(_answers(["B", "B", "A"])) == "B"
+
+
+def test_compute_profile_three_q_perfect_spread_returns_b():
+    # Doc: "Perfecte spreiding = ontdekker"
+    assert compute_profile(_answers(["A", "B", "C"])) == "B"
+
+
+def test_compute_profile_three_q_clean_win():
+    assert compute_profile(_answers(["A", "A", "B"])) == "A"
+    assert compute_profile(_answers(["C", "C", "A"])) == "C"
