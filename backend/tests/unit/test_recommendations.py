@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, patch
 from app.services.recommendations import (
     compute_first_nine,
     compute_filtered_order,
+    compute_progressive_tag_order,
     diversify_llm_order,
     get_batch,
     get_cross_sell_items,
@@ -363,3 +364,40 @@ def test_cross_sell_prefers_matching_color_in_titles():
     names = [a["name"].lower() for a in items]
     # Should include beige options when available.
     assert any("beige" in n for n in names)
+
+
+# ── progressive tag-drop fallback ────────────────────────────────────────────
+
+
+def _tagged(id_, tags):
+    return {**make_stroller(id_, "A"), "tags": tags}
+
+
+def test_progressive_tag_order_keeps_all_when_match_exists():
+    cat = make_catalog([_tagged("s1", ["X", "Y"]), _tagged("s2", ["X"])])
+    order, kept, dropped = compute_progressive_tag_order(cat, "A", ["X", "Y"])
+    assert dropped == []
+    assert kept == ["X", "Y"]
+    assert order == ["s1"]
+
+
+def test_progressive_tag_order_drops_minimum_tags():
+    # No stroller has X+Y+Z. Dropping X leaves {Y,Z} → s3 matches; dropping Y leaves
+    # {X,Z} → none. Greedy keeps the most matches, dropping exactly one tag.
+    cat = make_catalog([
+        _tagged("s1", ["X", "Y"]),
+        _tagged("s2", ["X"]),
+        _tagged("s3", ["Y", "Z"]),
+    ])
+    order, kept, dropped = compute_progressive_tag_order(cat, "A", ["X", "Y", "Z"])
+    assert dropped == ["X"]
+    assert set(kept) == {"Y", "Z"}
+    assert order == ["s3"]
+
+
+def test_progressive_tag_order_all_dropped_falls_back_to_full_set():
+    cat = make_catalog([_tagged("s1", ["X"]), _tagged("s2", ["X"])])
+    order, kept, dropped = compute_progressive_tag_order(cat, "A", ["NOPE"])
+    assert kept == []
+    assert dropped == ["NOPE"]
+    assert set(order) == {"s1", "s2"}

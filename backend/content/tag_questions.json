@@ -1,0 +1,56 @@
+{
+  "questions": [
+    {
+      "id": "usage",
+      "text": "Hoe ga je je kinderwagen vooral gebruiken?",
+      "subtitle": "Meerdere antwoorden mogelijk.",
+      "multi": true,
+      "options": [
+        {"index": 0, "text": "Vooral in de stad — op verharde paden", "tags": []},
+        {"index": 1, "text": "Voor wandelingen op onverhard terrein (bos, veld, strand)", "tags": ["All terrain"]},
+        {"index": 2, "text": "Voor reizen — vliegtuig of verre uitstapjes", "tags": ["Compact"]},
+        {"index": 3, "text": "Om mee te joggen of sportief te wandelen", "tags": ["Sportief"]},
+        {"index": 4, "text": "Voor twee of meer kinderen tegelijk", "tags": ["Twee kinderen (Duo / Tweeling)"]},
+        {"index": 5, "text": "Hou geen rekening met deze vraag", "tags": [], "ignore": true}
+      ]
+    },
+    {
+      "id": "start_age",
+      "text": "Vanaf welke leeftijd ga je hem gebruiken?",
+      "subtitle": "Eén antwoord.",
+      "multi": false,
+      "options": [
+        {"index": 0, "text": "Vanaf de geboorte", "tags": ["0m+"]},
+        {"index": 1, "text": "Vanaf ongeveer 6 maanden", "tags": []},
+        {"index": 2, "text": "Hou geen rekening met deze vraag", "tags": [], "ignore": true}
+      ]
+    },
+    {
+      "id": "fold",
+      "text": "Hoe vaak moet je de kinderwagen opvouwen, optillen of wegbergen?",
+      "subtitle": "Meerdere antwoorden mogelijk.",
+      "multi": true,
+      "options": [
+        {"index": 0, "text": "Dagelijks thuis — kleine woning, smalle gang, trap", "tags": ["Lichtgewicht", "Compact"]},
+        {"index": 1, "text": "Vaak in/uit de auto — kofferbak openen en optillen", "tags": ["Lichtgewicht"]},
+        {"index": 2, "text": "Voor vliegreizen of treinreizen", "tags": ["Compact"]},
+        {"index": 3, "text": "Zelden — staat meestal klaar in een ruime gang of garage", "tags": []},
+        {"index": 4, "text": "Hou geen rekening met deze vraag", "tags": [], "ignore": true}
+      ]
+    },
+    {
+      "id": "comfort",
+      "text": "Welke aspecten van comfort en gemak zijn belangrijk voor jou?",
+      "subtitle": "Meerdere antwoorden mogelijk.",
+      "multi": true,
+      "options": [
+        {"index": 0, "text": "Ik wil de kinderwagen eenhandig kunnen plooien (handig met baby in de andere arm)", "tags": ["Met één hand inklapbaar"]},
+        {"index": 1, "text": "Ik wil elektrische ondersteuning bij het duwen (heuvels, lange wandelingen, dubbele lading)", "tags": ["Elektrische ondersteuning"]},
+        {"index": 2, "text": "Een soepele rit voor mijn kindje is belangrijk — premium vering", "tags": ["Premium vering"]},
+        {"index": 3, "text": "Luchtwielen voor een zachte rit op kasseien of bospaden", "tags": ["Luchtwielen"]},
+        {"index": 4, "text": "Reversibele zit zodat mijn baby mij kan aankijken tijdens het wandelen", "tags": ["Naar ouder én vooruitkijken"]},
+        {"index": 5, "text": "Hou geen rekening met deze vraag", "tags": [], "ignore": true}
+      ]
+    }
+  ]
+}

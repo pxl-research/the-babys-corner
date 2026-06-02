@@ -9,7 +9,7 @@ from fastapi import APIRouter, Cookie, HTTPException, BackgroundTasks, Query
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.content import load_quiz_config
+from app.content import load_quiz_config, load_tag_questions
 from app.database import get_db
 from app.schemas import (
     SessionCreateResponse,
@@ -29,6 +29,10 @@ from app.schemas import (
     BrandCollections,
     FilterCollectionsRequest,
     FilterCollectionsResponse,
+    TagConfigResponse,
+    TagQuizRequest,
+    TagQuizResponse,
+    TagCountResponse,
     NoteRequest,
 )
 from app.services.catalog import get_catalog, is_available
@@ -36,6 +40,7 @@ from app.services.profile import compute_profile
 from app.services.recommendations import (
     compute_first_nine,
     compute_filtered_order,
+    compute_progressive_tag_order,
     diversify_llm_order,
     get_batch,
     get_cross_sell_items,
@@ -119,6 +124,23 @@ async def quiz_config():
     return {"questions": questions, "optional_note": config["optional_note"]}
 
 
+@router.get("/tag-config", response_model=TagConfigResponse)
+async def tag_config():
+    config = load_tag_questions()
+    # Strip internal tag mappings — tags must never reach the customer.
+    questions = [
+        {
+            "id": q["id"],
+            "text": q["text"],
+            "subtitle": q.get("subtitle"),
+            "multi": q["multi"],
+            "options": [{"index": o["index"], "text": o["text"]} for o in q["options"]],
+        }
+        for q in config["questions"]
+    ]
+    return TagConfigResponse(questions=questions)
+
+
 @router.get("/current", response_model=SessionCurrentResponse)
 async def get_current(session_id: Optional[str] = Cookie(default=None)):
     if not session_id:
@@ -163,8 +185,8 @@ async def submit_quiz(
     config = load_quiz_config()
     question_map = {q["id"]: q for q in config["questions"]}
 
-    if len(body.answers) != 5:
-        raise HTTPException(422, detail="Exactly 5 answers required.")
+    if len(body.answers) != 3:
+        raise HTTPException(422, detail="Exactly 3 answers required.")
 
     enriched_answers = []
     for ans in body.answers:
@@ -590,6 +612,114 @@ async def save_filter_collections(
     await db.commit()
 
     return FilterCollectionsResponse(stroller_count=stroller_count, accessory_count=accessory_count)
+
+
+def _tags_from_answers(body: TagQuizRequest) -> list[str]:
+    """Map answer indices to catalog tags server-side; tags never travel to the client."""
+    config = load_tag_questions()
+    question_map = {q["id"]: q for q in config["questions"]}
+
+    tags: list[str] = []
+    seen: set[str] = set()
+    for ans in body.answers:
+        q = question_map.get(ans.question_id)
+        if not q:
+            raise HTTPException(422, detail=f"Unknown question_id: {ans.question_id}")
+        if not q["multi"] and len(ans.option_indices) > 1:
+            raise HTTPException(422, detail=f"Question {ans.question_id} accepts one answer.")
+        opt_map = {o["index"]: o for o in q["options"]}
+        for idx in ans.option_indices:
+            opt = opt_map.get(idx)
+            if opt is None:
+                raise HTTPException(422, detail=f"Invalid option_index {idx} for {ans.question_id}.")
+            for tag in opt.get("tags", []):
+                if tag not in seen:
+                    seen.add(tag)
+                    tags.append(tag)
+    return tags
+
+
+@router.post("/current/tag-quiz/count", response_model=TagCountResponse)
+async def tag_quiz_count(
+    body: TagQuizRequest,
+    session_id: Optional[str] = Cookie(default=None),
+):
+    """Preview match counts for the currently-selected tags. Does not mutate the session.
+
+    Test/debug aid: lets us watch how many strollers remain after each selection.
+    """
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    await _get_session(session_id)
+
+    tags = _tags_from_answers(body)
+    catalog = get_catalog()
+    total_count = len(catalog.get_all_strollers())
+    strict_count = len(catalog.get_filtered_strollers(tags or None, tag_match="all"))
+    relaxed_count = len(catalog.get_filtered_strollers(tags or None, tag_match="any"))
+
+    logger.info(
+        "tag-quiz count | tags=%s | strict(AND)=%d relaxed(OR)=%d total=%d",
+        tags, strict_count, relaxed_count, total_count,
+    )
+    return TagCountResponse(
+        strict_count=strict_count,
+        relaxed_count=relaxed_count,
+        total_count=total_count,
+    )
+
+
+@router.post("/current/tag-quiz", response_model=TagQuizResponse)
+async def submit_tag_quiz(
+    body: TagQuizRequest,
+    session_id: Optional[str] = Cookie(default=None),
+):
+    if not session_id:
+        raise HTTPException(401, detail="No session cookie.")
+    session = await _get_session(session_id)
+    _require_active(session)
+    if not session.get("quiz_submitted_at"):
+        raise HTTPException(422, detail="Quiz not submitted yet.")
+
+    tags = _tags_from_answers(body)
+    catalog = get_catalog()
+    profile = session.get("derived_profile")
+
+    # Strict AND, with progressive tag-drop fallback so a combination never dead-ends.
+    strict_count = len(catalog.get_filtered_strollers(tags or None, tag_match="all"))
+    reco_order, kept, dropped = compute_progressive_tag_order(catalog, profile, tags)
+
+    if not dropped:
+        match_mode = "all"
+    elif kept:
+        match_mode = "partial"
+    else:
+        match_mode = "none"
+
+    stroller_count = len(reco_order)
+    accessory_count = len(catalog.get_filtered_accessories(kept or None, tag_match="all"))
+
+    logger.info(
+        "tag-quiz submit | session=%s selected=%s kept=%s dropped=%s | strict(AND)=%d used=%d mode=%s",
+        session_id, tags, kept, dropped, strict_count, stroller_count, match_mode,
+    )
+
+    # Store the effective (kept) tags so reco_order and filter_tags stay consistent.
+    db = await get_db()
+    await db.execute(
+        """UPDATE sessions SET filter_tags=?, filter_brands=NULL, filter_collections=NULL,
+           reco_order=?, extra_reco_order=NULL WHERE session_id=?""",
+        (json.dumps(kept), json.dumps(reco_order), session_id),
+    )
+    await db.commit()
+
+    return TagQuizResponse(
+        stroller_count=stroller_count,
+        accessory_count=accessory_count,
+        match_mode=match_mode,
+        strict_count=strict_count,
+        dropped_count=len(dropped),
+    )
 
 
 @router.post("/current/note")

@@ -21,6 +21,37 @@ export interface QuizConfig {
   optional_note: OptionalNoteConfig
 }
 
+export interface TagQuestion {
+  id: string
+  text: string
+  subtitle: string | null
+  multi: boolean
+  options: QuizOption[]
+}
+
+export interface TagConfig {
+  questions: TagQuestion[]
+}
+
+export interface TagAnswer {
+  question_id: string
+  option_indices: number[]
+}
+
+export interface TagQuizResponse {
+  stroller_count: number
+  accessory_count: number
+  match_mode: string
+  strict_count: number
+  dropped_count: number
+}
+
+export interface TagCountResponse {
+  strict_count: number
+  relaxed_count: number
+  total_count: number
+}
+
 export interface AccessoryItem {
   id: string
   name: string
@@ -71,29 +102,6 @@ export interface SessionState {
   email_status: string
   favorites_adaptation_active: boolean
   talking_points: string[] | null
-}
-
-export interface BrandCollections {
-  brand: string
-  collections: string[]
-}
-
-export interface FilterTagsResponse {
-  brands: string[]
-}
-
-export interface FilterBrandsResponse {
-  brands: BrandCollections[]
-}
-
-export interface FilterCollectionsResponse {
-  stroller_count: number
-  accessory_count: number
-}
-
-export interface CollectionSelection {
-  brand: string
-  collection: string | null
 }
 
 export interface HandoffResponse {
@@ -150,24 +158,18 @@ export const api = {
       body: JSON.stringify({ answers, optional_note: '' }),
     }),
 
-  getTags: () => request<{ tags: string[] }>('/api/filters/tags'),
+  getTagConfig: () => request<TagConfig>('/api/sessions/tag-config'),
 
-  filterTags: (tags: string[]) =>
-    request<FilterTagsResponse>('/api/sessions/current/filters/tags', {
+  submitTagQuiz: (answers: TagAnswer[]) =>
+    request<TagQuizResponse>('/api/sessions/current/tag-quiz', {
       method: 'POST',
-      body: JSON.stringify({ tags }),
+      body: JSON.stringify({ answers }),
     }),
 
-  filterBrands: (brands: string[]) =>
-    request<FilterBrandsResponse>('/api/sessions/current/filters/brands', {
+  tagQuizCount: (answers: TagAnswer[]) =>
+    request<TagCountResponse>('/api/sessions/current/tag-quiz/count', {
       method: 'POST',
-      body: JSON.stringify({ brands }),
-    }),
-
-  filterCollections: (selections: CollectionSelection[]) =>
-    request<FilterCollectionsResponse>('/api/sessions/current/filters/collections', {
-      method: 'POST',
-      body: JSON.stringify({ selections }),
+      body: JSON.stringify({ answers }),
     }),
 
   saveNote: (note: string) =>

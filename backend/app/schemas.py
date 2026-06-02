@@ -44,6 +44,46 @@ class QuizConfigResponse(BaseModel):
     optional_note: OptionalNoteConfig
 
 
+class TagQuestionOption(BaseModel):
+    index: int
+    text: str
+
+
+class TagQuestion(BaseModel):
+    id: str
+    text: str
+    subtitle: Optional[str] = None
+    multi: bool
+    options: list[TagQuestionOption]
+
+
+class TagConfigResponse(BaseModel):
+    questions: list[TagQuestion]
+
+
+class TagAnswerIn(BaseModel):
+    question_id: str
+    option_indices: list[int] = []
+
+
+class TagQuizRequest(BaseModel):
+    answers: list[TagAnswerIn] = []
+
+
+class TagQuizResponse(BaseModel):
+    stroller_count: int
+    accessory_count: int
+    match_mode: str  # "all" | "partial" (some tags dropped) | "none" (all dropped)
+    strict_count: int  # AND of all selected tags, before any relaxation
+    dropped_count: int  # number of tags relaxed away to find matches
+
+
+class TagCountResponse(BaseModel):
+    strict_count: int  # AND across selected tags
+    relaxed_count: int  # OR across selected tags
+    total_count: int  # all strollers (no tag filter)
+
+
 class QuizAnswerIn(BaseModel):
     question_id: int
     option_index: int

@@ -2,47 +2,29 @@
   "questions": [
     {
       "id": 1,
-      "text": "Welke sfeer zien jullie voor de babyuitzet?",
+      "text": "Hoe groot zien jullie de uitzet?",
       "options": [
-        {"index": 0, "text": "Strak, rustig, enkel het nodige.", "profile": "A"},
-        {"index": 1, "text": "Een mix van comfort en bewezen kwaliteit.", "profile": "B"},
-        {"index": 2, "text": "Tot in de puntjes gestyled, met accessoires.", "profile": "C"}
+        {"index": 0, "text": "Compact", "profile": "A"},
+        {"index": 1, "text": "Goed gevuld", "profile": "B"},
+        {"index": 2, "text": "Volledig", "profile": "C"}
       ]
     },
     {
       "id": 2,
-      "text": "Hoe belangrijk is het voor jullie dat de kinderwagen opvalt?",
+      "text": "Wat is jullie voorkeur qua stijl en sfeer?",
       "options": [
-        {"index": 0, "text": "Helemaal niet — discreet en functioneel is prima.", "profile": "A"},
-        {"index": 1, "text": "Een beetje stijl mag, maar functie primeert.", "profile": "B"},
-        {"index": 2, "text": "Heel belangrijk — het is een verlengstuk van onze stijl.", "profile": "C"}
+        {"index": 0, "text": "Strak en sober: eenvoud werkt", "profile": "A"},
+        {"index": 1, "text": "Functioneel: comfort en gebruiksgemak primeren", "profile": "B"},
+        {"index": 2, "text": "Doordacht: kleuren, materialen en details matchen", "profile": "C"}
       ]
     },
     {
       "id": 3,
-      "text": "Wat is jullie prioriteit bij het kiezen van een kinderwagen?",
+      "text": "Hoe pakken jullie de voorbereiding aan?",
       "options": [
-        {"index": 0, "text": "Compact en licht — makkelijk te hanteren.", "profile": "A"},
-        {"index": 1, "text": "Veelzijdig en betrouwbaar voor dagelijks gebruik.", "profile": "B"},
-        {"index": 2, "text": "Volledig uitgerust met alles erbij.", "profile": "C"}
-      ]
-    },
-    {
-      "id": 4,
-      "text": "Hoe gaan jullie de kinderwagen hoofdzakelijk gebruiken?",
-      "options": [
-        {"index": 0, "text": "Korte ritten, openbaar vervoer, stedelijk.", "profile": "A"},
-        {"index": 1, "text": "Mix van stad en natuur, regelmatig gebruik.", "profile": "B"},
-        {"index": 2, "text": "Uitgebreide wandelingen, ook op oneven terreinen.", "profile": "C"}
-      ]
-    },
-    {
-      "id": 5,
-      "text": "Hoe kijken jullie naar accessoires en extra's?",
-      "options": [
-        {"index": 0, "text": "Zo min mogelijk — het essentiële volstaat.", "profile": "A"},
-        {"index": 1, "text": "Nuttige toevoegingen die het leven makkelijker maken.", "profile": "B"},
-        {"index": 2, "text": "Graag alles matchen en aanvullen met passende items.", "profile": "C"}
+        {"index": 0, "text": "Snel en pragmatisch: beslissingen mogen vlot vallen", "profile": "A"},
+        {"index": 1, "text": "Begeleid: wijs ons de bestsellers", "profile": "B"},
+        {"index": 2, "text": "Geleidelijk: we willen zelf elk detail bepalen", "profile": "C"}
       ]
     }
   ],

@@ -22,10 +22,7 @@ OUT_PATH = os.path.join(os.path.dirname(__file__), "catalog.json")
 
 STROLLER_CATEGORIES = {
     "op stap / 2-in-1 reissysteem: autostoel kinderwagen buggy",
-    "op stap / buggy's / buggy's",
-    "op stap / kinderwagens / kinderwagens",
-    "op stap / kinderwagens en buggy's / kinderwagens en buggy's vr 2",
-    "op stap / kinderwagens en buggy's / kinderkar",
+    "op stap / kinderwagens en buggy's / complete sets",
 }
 
 AVAILABILITY_MAP = {
@@ -66,7 +63,7 @@ def build_profiles(row: dict) -> tuple[list[str], list[str], list[str]]:
 
 
 def convert_row(row: dict, is_stroller: bool) -> dict:
-    item_id = extract_id(row["link"])
+    item_id = (row.get("id") or "").strip() or extract_id(row["link"])
     must, should, nice = build_profiles(row)
     tags = [t.strip() for t in row.get("Product tags", "").split(",") if t.strip()]
     collection = row.get("Collection", "").strip() or None
