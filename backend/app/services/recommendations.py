@@ -119,24 +119,16 @@ def compute_filtered_order(
 ) -> list[str]:
     """Return filtered stroller IDs, diversified within equal-rank groups."""
     strollers = catalog.get_filtered_strollers(tags, brands, collections, tag_match)
+
+    # Rank by profile tier (when known) then availability; only the key differs.
     if profile:
-        strollers_sorted = sorted(
-            strollers,
-            key=lambda s: (_tier(s, profile), 0 if is_available(s) else 1),
-        )
-        diversified = _shuffle_within_equal_groups(
-            strollers_sorted,
-            key_fn=lambda s: (_tier(s, profile), 0 if is_available(s) else 1),
-        )
+        def key_fn(s):
+            return (_tier(s, profile), 0 if is_available(s) else 1)
     else:
-        strollers_sorted = sorted(
-            strollers,
-            key=lambda s: (0 if is_available(s) else 1),
-        )
-        diversified = _shuffle_within_equal_groups(
-            strollers_sorted,
-            key_fn=lambda s: (0 if is_available(s) else 1),
-        )
+        def key_fn(s):
+            return (0 if is_available(s) else 1)
+
+    diversified = _shuffle_within_equal_groups(sorted(strollers, key=key_fn), key_fn=key_fn)
     return [s["id"] for s in diversified]
 
 
