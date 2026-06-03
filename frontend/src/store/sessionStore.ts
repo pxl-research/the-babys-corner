@@ -32,6 +32,8 @@ interface SessionStore {
   quizConfig: { questions: QuizQuestion[]; optional_note: OptionalNoteConfig } | null
   tagConfig: TagConfig | null
   tagAnswers: Record<string, number[]>
+  tagMatchMode: string | null
+  droppedTagCount: number
 
   setSource: (source: 'store' | 'home') => void
   setSession: (id: string, code: string) => void
@@ -47,6 +49,7 @@ interface SessionStore {
   setQuizConfig: (config: { questions: QuizQuestion[]; optional_note: OptionalNoteConfig }) => void
   setTagConfig: (config: TagConfig) => void
   setTagAnswer: (questionId: string, indices: number[]) => void
+  setTagOutcome: (matchMode: string, droppedCount: number) => void
   reset: () => void
 }
 
@@ -69,6 +72,8 @@ const initial = {
   quizConfig: null,
   tagConfig: null,
   tagAnswers: {} as Record<string, number[]>,
+  tagMatchMode: null,
+  droppedTagCount: 0,
 }
 
 export const useSessionStore = create<SessionStore>()(
@@ -101,6 +106,7 @@ export const useSessionStore = create<SessionStore>()(
       setTagConfig: (tagConfig) => set({ tagConfig }),
       setTagAnswer: (questionId, indices) =>
         set((s) => ({ tagAnswers: { ...s.tagAnswers, [questionId]: indices } })),
+      setTagOutcome: (tagMatchMode, droppedTagCount) => set({ tagMatchMode, droppedTagCount }),
       reset: () => set(initial),
     }),
     { name: 'babys-corner-session' }

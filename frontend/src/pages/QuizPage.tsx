@@ -24,7 +24,7 @@ export default function QuizPage() {
     transitionPhrase,
     quizConfig, setQuizConfig,
     tagConfig, setTagConfig,
-    tagAnswers, setTagAnswer,
+    tagAnswers, setTagAnswer, setTagOutcome,
   } = useSessionStore()
 
   const [submitting, setSubmitting] = useState(false)
@@ -128,6 +128,7 @@ export default function QuizPage() {
         option_indices: tagAnswers[q.id] ?? [],
       }))
       const result = await api.submitTagQuiz(answers)
+      setTagOutcome(result.match_mode, result.dropped_count)
       if (import.meta.env.DEV) {
         console.debug(
           `[tag-quiz] submit | mode=${result.match_mode} strict(AND)=${result.strict_count} ` +
