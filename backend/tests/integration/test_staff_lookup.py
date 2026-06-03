@@ -74,6 +74,20 @@ async def test_staff_filters_by_source(client):
     assert all(s["source"] == "store" for s in data)
 
 
+async def test_staff_detail_resolves_product_names(client):
+    session_data = await _create_and_handoff_session(client, source="store")
+    code = session_data["session_code"]
+
+    resp = await client.get(f"/api/staff/sessions/{code}", headers=STAFF_CREDS)
+    assert resp.status_code == 200
+    detail = resp.json()
+    # Shown products are resolved to {id, name, brand}, not bare IDs.
+    assert detail["shown_products_named"]
+    first = detail["shown_products_named"][0][0]
+    assert set(first.keys()) == {"id", "name", "brand"}
+    assert first["name"]
+
+
 async def test_staff_home_email_failed_warning_only_for_home(client):
     from app.database import get_db
     session_data = await _create_and_handoff_session(client, source="home")

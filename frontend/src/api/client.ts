@@ -78,6 +78,12 @@ export interface StrollerItem {
   show_cross_sell_chips: boolean
 }
 
+export interface NamedItem {
+  id: string
+  name: string
+  brand: string
+}
+
 export interface ShortlistItem {
   id: string
   name: string
@@ -114,6 +120,9 @@ export interface SessionState {
   shown_products: string[][]
   stroller_favorites: string[]
   accessory_favorites: string[]
+  shown_products_named: NamedItem[][]
+  stroller_favorites_named: NamedItem[]
+  accessory_favorites_named: NamedItem[]
   email_status: string
   favorites_adaptation_active: boolean
   talking_points: string[] | null
@@ -142,6 +151,9 @@ export interface StaffSessionDetail extends StaffSession {
   shown_products: string[][]
   stroller_favorites: string[]
   accessory_favorites: string[]
+  shown_products_named: NamedItem[][]
+  stroller_favorites_named: NamedItem[]
+  accessory_favorites_named: NamedItem[]
   talking_points: string[] | null
   email_failed_warning: boolean
 }

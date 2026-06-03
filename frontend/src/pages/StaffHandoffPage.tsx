@@ -11,6 +11,10 @@ const PROFILE_LABELS: Record<string, string> = {
   C: 'Planner',
 }
 
+function namedLine(items: { name: string; brand: string }[]): string {
+  return items.map((i) => `${i.name} — ${i.brand}`).join(', ') || '—'
+}
+
 export default function StaffHandoffPage() {
   const { reset } = useSessionStore()
   const [detail, setDetail] = useState<SessionState | null>(null)
@@ -66,21 +70,21 @@ export default function StaffHandoffPage() {
 
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-2">Bekeken producten</h2>
-              <p className="text-ink/60 text-sm">{detail.shown_products.flat().join(', ') || '—'}</p>
+              <p className="text-ink/60 text-sm">{namedLine(detail.shown_products_named.flat())}</p>
             </section>
 
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-2">Favorieten</h2>
-              {detail.stroller_favorites.length > 0 && (
+              {detail.stroller_favorites_named.length > 0 && (
                 <>
                   <h3 className="text-sm font-medium text-ink/70 mb-1">Kinderwagens</h3>
-                  <p className="text-sm text-ink/60">{detail.stroller_favorites.join(', ')}</p>
+                  <p className="text-sm text-ink/60">{namedLine(detail.stroller_favorites_named)}</p>
                 </>
               )}
-              {detail.accessory_favorites.length > 0 && (
+              {detail.accessory_favorites_named.length > 0 && (
                 <>
                   <h3 className="text-sm font-medium text-ink/70 mt-2 mb-1">Accessoires</h3>
-                  <p className="text-sm text-ink/60">{detail.accessory_favorites.join(', ')}</p>
+                  <p className="text-sm text-ink/60">{namedLine(detail.accessory_favorites_named)}</p>
                 </>
               )}
             </section>
