@@ -99,10 +99,16 @@ export interface FavoriteItemsResponse {
   accessories: ShortlistItem[]
 }
 
+export interface RecommendationTier {
+  label: string
+  start_index: number
+}
+
 export interface RecommendationBatch {
   batch: number
   favorites_adaptation_active: boolean
   products: StrollerItem[]
+  tiers: RecommendationTier[]
 }
 
 export interface SessionState {

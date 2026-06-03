@@ -57,7 +57,9 @@ async def test_tag_quiz_maps_answers_to_tags(client, reset_db):
         row = await cur.fetchone()
     tags = json.loads(row["filter_tags"])
     assert tags == ["All terrain", "Twee kinderen (Duo / Tweeling)"]
-    assert len(json.loads(row["reco_order"])) == resp.json()["stroller_count"]
+    # reco_order now spans every tier (exact → relaxed → full), so it is at least as
+    # large as the headline (top-tier) match count reported by stroller_count.
+    assert len(json.loads(row["reco_order"])) >= resp.json()["stroller_count"] > 0
 
 
 async def test_tag_quiz_ignore_option_yields_no_tags(client, reset_db):

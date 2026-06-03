@@ -173,6 +173,101 @@ def compute_progressive_tag_order(
     return compute_filtered_order(catalog, profile), [], dropped
 
 
+def _greedy_drop_tag(catalog: CatalogService, remaining: list[str]) -> str:
+    """Pick the next tag to relax: a non-priority tag if any remain, else a priority one.
+    Among candidates, drop the one whose removal recovers the most matches (greedy)."""
+    droppable = [t for t in remaining if t not in PRIORITY_TAGS] or remaining
+    best_tag, best_count = droppable[0], -1
+    for t in droppable:
+        subset = [x for x in remaining if x != t]
+        count = len(catalog.get_filtered_strollers(subset or None, tag_match="all"))
+        if count > best_count:
+            best_count = count
+            best_tag = t
+    return best_tag
+
+
+def _tier_label(displayed_index: int, exact_present: bool, no_tags: bool) -> str:
+    """Generic, customer-safe heading per tier (never names the hidden tags)."""
+    if no_tags:
+        return "Onze aanbevelingen"
+    if displayed_index == 0:
+        return "Exacte matches" if exact_present else "Beste matches"
+    if displayed_index == 1:
+        return "Ruimere selectie die goed bij jullie past"
+    return "Nog ruimere opties"
+
+
+def compute_tiered_tag_order(
+    catalog: CatalogService,
+    profile: str | None,
+    tags: list[str],
+) -> tuple[list[str], list[dict], list[str]]:
+    """Layer strollers from exact match to progressively relaxed selections.
+
+    Tier 0 is the strict AND of all selected tags. Each later tier relaxes one more
+    tag (priority tags last, greedy by recovery) and contains only the strollers it
+    newly unlocks. Tiers that unlock nothing are skipped. Relaxation continues until
+    every tag is dropped, so the deepest tier mops up the rest of the assortment.
+
+    Returns (reco_order, tiers, primary_kept):
+      - reco_order: flat list of stroller IDs, tier 0 first.
+      - tiers: list of {label, start, count} segmenting reco_order for headings.
+      - primary_kept: the tag set of the first non-empty tier (for accessory filtering).
+    """
+    remaining = list(tags)
+    dropped: list[str] = []
+    seen: set[str] = set()
+    reco_order: list[str] = []
+    raw_tiers: list[dict] = []
+    primary_kept: list[str] | None = None
+
+    while True:
+        order = compute_filtered_order(catalog, profile, remaining or None, tag_match="all")
+        new_ids = [i for i in order if i not in seen]
+        if new_ids:
+            if primary_kept is None:
+                primary_kept = list(remaining)
+            start = len(reco_order)
+            reco_order.extend(new_ids)
+            seen.update(new_ids)
+            raw_tiers.append({"dropped": list(dropped), "start": start, "count": len(new_ids)})
+        if not remaining:
+            break
+        tag = _greedy_drop_tag(catalog, remaining)
+        dropped.append(tag)
+        remaining.remove(tag)
+
+    no_tags = not tags
+    exact_present = bool(raw_tiers) and not raw_tiers[0]["dropped"]
+    tiers = [
+        {"label": _tier_label(d, exact_present, no_tags), "start": t["start"], "count": t["count"]}
+        for d, t in enumerate(raw_tiers)
+    ]
+    return reco_order, tiers, (primary_kept or [])
+
+
+def reorder_within_tiers(
+    reco_order: list[str], tiers: list[dict], new_order: list[str]
+) -> tuple[list[str], list[dict]]:
+    """After a global reorder (e.g. note rerank), re-segment so tier boundaries hold.
+
+    `new_order` is a permutation of `reco_order`. Each ID keeps its original tier and
+    the tiers' sizes are unchanged, so IDs are stably regrouped by tier and only the
+    start indices are recomputed. Returns (ordered_ids, rebuilt_tiers).
+    """
+    rank_of: dict[str, int] = {}
+    for rank, tier in enumerate(tiers):
+        for id_ in reco_order[tier["start"]:tier["start"] + tier["count"]]:
+            rank_of[id_] = rank
+    ordered = sorted(new_order, key=lambda id_: rank_of.get(id_, len(tiers)))
+    rebuilt, cursor = [], 0
+    for tier in tiers:
+        rebuilt.append({"label": tier["label"], "start": cursor, "count": tier["count"]})
+        cursor += tier["count"]
+    return ordered, rebuilt
+
+
 def get_batch(
     batch_num: int,
     reco_order: list[str],
