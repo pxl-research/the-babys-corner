@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import ProductCard from '../components/ProductCard'
@@ -6,9 +6,8 @@ import ProductModal from '../components/ProductModal'
 import AccessoryModal from '../components/AccessoryModal'
 import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
+import { useInactivityReset } from '../hooks/useInactivityReset'
 import type { StrollerItem, AccessoryItem } from '../api/client'
-
-const INACTIVITY_TIMEOUT_MS = 10 * 60 * 1000
 
 const PROFILE_LABELS: Record<string, string> = {
   A: 'Minimalist',
@@ -30,28 +29,13 @@ export default function RecommendationsPage() {
   const [selectedStroller, setSelectedStroller] = useState<StrollerItem | null>(null)
   const [selectedAccessory, setSelectedAccessory] = useState<AccessoryItem | null>(null)
   const [returnToStroller, setReturnToStroller] = useState<StrollerItem | null>(null)
-  const inactivityRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useInactivityReset(source)
 
   // Load batch 1 on mount
   useEffect(() => {
     if (recommendations.length === 0) loadNextBatch()
   }, [])
-
-  // In-store inactivity timer
-  useEffect(() => {
-    if (source !== 'store') return
-    const reset = () => {
-      if (inactivityRef.current) clearTimeout(inactivityRef.current)
-      inactivityRef.current = setTimeout(handleAbandon, INACTIVITY_TIMEOUT_MS)
-    }
-    const events = ['click', 'touchstart', 'keydown']
-    events.forEach((e) => window.addEventListener(e, reset))
-    reset()
-    return () => {
-      events.forEach((e) => window.removeEventListener(e, reset))
-      if (inactivityRef.current) clearTimeout(inactivityRef.current)
-    }
-  }, [source])
 
   async function loadNextBatch() {
     if (loading || exhausted) return
@@ -74,11 +58,6 @@ export default function RecommendationsPage() {
   async function handleToggleFavorite(id: string, type: 'stroller' | 'accessory') {
     const result = await api.toggleFavorite(id, type)
     setFavorites(result.stroller_favorites, result.accessory_favorites)
-  }
-
-  async function handleAbandon() {
-    await api.abandon().catch(() => {})
-    window.location.href = '/'
   }
 
   const allProducts = recommendations.flat()

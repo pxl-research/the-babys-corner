@@ -18,6 +18,7 @@ function namedLine(items: { name: string; brand: string }[]): string {
 export default function StaffHandoffPage() {
   const { reset } = useSessionStore()
   const [detail, setDetail] = useState<SessionState | null>(null)
+  const [pointsExhausted, setPointsExhausted] = useState(false)
 
   useEffect(() => {
     let attempts = 0
@@ -27,7 +28,11 @@ export default function StaffHandoffPage() {
       try {
         const session = await api.getSession()
         if (!cancelled) setDetail(session)
-        if (session.talking_points?.length || attempts >= 3) return
+        if (session.talking_points?.length) return
+        if (attempts >= 3) {
+          if (!cancelled) setPointsExhausted(true)
+          return
+        }
         attempts += 1
         window.setTimeout(load, 5000)
       } catch {
@@ -89,16 +94,20 @@ export default function StaffHandoffPage() {
               )}
             </section>
 
-            {detail.talking_points && detail.talking_points.length > 0 && (
-              <section className="mb-6">
+            <section className="mb-6">
               <h2 className="font-semibold text-ink mb-2">Gespreksopeners</h2>
-              <ul className="space-y-1">
+              {detail.talking_points && detail.talking_points.length > 0 ? (
+                <ul className="space-y-1">
                   {detail.talking_points.map((tp, i) => (
                     <li key={i} className="text-sm text-ink/80">• {tp}</li>
                   ))}
-              </ul>
-              </section>
-            )}
+                </ul>
+              ) : pointsExhausted ? (
+                <p className="text-sm text-ink/50">Gespreksopeners nog niet beschikbaar.</p>
+              ) : (
+                <p className="text-sm text-ink/50">Gespreksopeners worden gegenereerd…</p>
+              )}
+            </section>
           </>
         ) : (
           <p className="text-ink/50">Sessiedetails laden…</p>
