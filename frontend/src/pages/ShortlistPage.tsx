@@ -14,6 +14,7 @@ export default function ShortlistPage() {
   const [busyId, setBusyId] = useState<string | null>(null)
   const [favStrollers, setFavStrollers] = useState<ShortlistItem[]>([])
   const [favAccessories, setFavAccessories] = useState<ShortlistItem[]>([])
+  const hasFavorites = strollerFavorites.length + accessoryFavorites.length > 0
 
   // Resolve favorites server-side so the shortlist never depends on which
   // recommendation batches happen to be loaded.
@@ -114,9 +115,13 @@ export default function ShortlistPage() {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4 flex flex-col gap-3 max-w-lg mx-auto">
+        {!hasFavorites && (
+          <p className="text-center text-sm text-ink/60">Bewaar minstens één favoriet om te delen.</p>
+        )}
         <button
           onClick={handleConfirm}
-          className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium"
+          disabled={!hasFavorites}
+          className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
         >
           Deel met medewerker
         </button>
