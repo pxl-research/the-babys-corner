@@ -132,6 +132,11 @@ def compute_filtered_order(
     return [s["id"] for s in diversified]
 
 
+# Wishes we protect during relaxation: these are dropped only when no other tag is
+# left to drop, so a duo/twin or from-birth requirement survives above all others.
+PRIORITY_TAGS = frozenset({"Twee kinderen (Duo / Tweeling)", "0m+"})
+
+
 def compute_progressive_tag_order(
     catalog: CatalogService,
     profile: str | None,
@@ -141,6 +146,8 @@ def compute_progressive_tag_order(
     time until matches remain (progressive relaxation).
 
     Each drop removes the single tag whose removal recovers the most matches (greedy).
+    Priority tags (PRIORITY_TAGS) are held back: a priority tag is only dropped once no
+    non-priority tag remains, so requirements like duo/twin or from-birth survive longest.
     Ties keep the earlier tag, so higher-priority wishes (asked first) survive longest.
     Returns (reco_order, kept_tags, dropped_tags). If every tag is dropped, falls back to
     the profile-ranked full assortment.
@@ -151,9 +158,11 @@ def compute_progressive_tag_order(
         order = compute_filtered_order(catalog, profile, remaining, tag_match="all")
         if order:
             return order, remaining, dropped
-        best_tag = remaining[0]
+        # Relax non-priority tags first; only touch priority tags when nothing else is left.
+        droppable = [t for t in remaining if t not in PRIORITY_TAGS] or remaining
+        best_tag = droppable[0]
         best_count = -1
-        for t in remaining:
+        for t in droppable:
             subset = [x for x in remaining if x != t]
             count = len(catalog.get_filtered_strollers(subset or None, tag_match="all"))
             if count > best_count:

@@ -325,3 +325,41 @@ def test_progressive_tag_order_all_dropped_falls_back_to_full_set():
     assert kept == []
     assert dropped == ["NOPE"]
     assert set(order) == {"s1", "s2"}
+
+
+def test_progressive_tag_order_protects_priority_tag_over_higher_recovery():
+    # No stroller has both "0m+" and "X". Dropping "0m+" would recover the most matches
+    # (s2, s3), but "0m+" is a priority tag — so "X" is dropped instead and "0m+" survives.
+    cat = make_catalog([
+        _tagged("s1", ["X"]),
+        _tagged("s2", ["0m+"]),
+        _tagged("s3", ["0m+"]),
+    ])
+    order, kept, dropped = compute_progressive_tag_order(cat, "A", ["0m+", "X"])
+    assert dropped == ["X"]
+    assert kept == ["0m+"]
+    assert set(order) == {"s2", "s3"}
+
+
+def test_progressive_tag_order_drops_priority_only_when_nothing_else_left():
+    # "0m+" matches nothing; once the non-priority tag "X" is dropped, the only remaining
+    # tag is the priority one, which must then be dropped too.
+    cat = make_catalog([_tagged("s1", ["X"]), _tagged("s2", ["Y"])])
+    order, kept, dropped = compute_progressive_tag_order(cat, "A", ["0m+", "X"])
+    assert dropped == ["X", "0m+"]
+    assert kept == []
+    assert set(order) == {"s1", "s2"}
+
+
+def test_progressive_tag_order_keeps_both_priority_tags_longest():
+    # Two priority tags + one normal tag, no full match. The normal tag goes first.
+    cat = make_catalog([
+        _tagged("s1", ["0m+", "Twee kinderen (Duo / Tweeling)"]),
+        _tagged("s2", ["Compact"]),
+    ])
+    order, kept, dropped = compute_progressive_tag_order(
+        cat, "A", ["0m+", "Twee kinderen (Duo / Tweeling)", "Compact"]
+    )
+    assert dropped == ["Compact"]
+    assert set(kept) == {"0m+", "Twee kinderen (Duo / Tweeling)"}
+    assert order == ["s1"]
