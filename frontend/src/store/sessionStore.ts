@@ -25,6 +25,8 @@ interface SessionStore {
   accessoryFavorites: string[]
   status: AppStatus
   handoffAt: string | null
+  // Email is deferred: the backend still tracks status, but no client UI surfaces it.
+  // Do not wire new UI to emailStatus — see UX_IMPLEMENTATION_PLAN.md Phase A.
   emailStatus: 'not_sent' | 'pending' | 'sent' | 'failed'
   favoritesAdaptationActive: boolean
   quizConfig: { questions: QuizQuestion[]; optional_note: OptionalNoteConfig } | null

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 export default function ShortlistPage() {
   const navigate = useNavigate()
   const {
-    source, strollerFavorites, accessoryFavorites, setHandoff, setEmailStatus, setStatus,
+    source, strollerFavorites, accessoryFavorites, setHandoff, setStatus,
     setFavorites,
   } = useSessionStore()
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -30,7 +30,6 @@ export default function ShortlistPage() {
   async function handleConfirm() {
     const result = await api.handoff()
     setHandoff(result.session_code, result.handoff_at)
-    setEmailStatus(result.email_status as 'pending')
     setStatus('handoff')
     if (source === 'store') navigate('/handoff')
     else navigate('/complete')

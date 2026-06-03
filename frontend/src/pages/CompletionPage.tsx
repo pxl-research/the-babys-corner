@@ -1,33 +1,11 @@
-import { useEffect } from 'react'
 import Header from '../components/Header'
-import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
-
-const EMAIL_COPY: Record<string, string> = {
-  pending: 'Bezig met delen…',
-  sent: 'Gedeeld met medewerker',
-  failed: 'Vraag de medewerker om je sessiecode te gebruiken.',
-}
 
 export default function CompletionPage() {
   const {
-    sessionCode, handoffAt, emailStatus, setEmailStatus,
+    sessionCode, handoffAt,
     recommendations, strollerFavorites, accessoryFavorites, optionalNote,
   } = useSessionStore()
-
-  useEffect(() => {
-    if (emailStatus !== 'pending') return
-    const interval = setInterval(async () => {
-      try {
-        const session = await api.getSession()
-        if (session.email_status !== 'pending') {
-          setEmailStatus(session.email_status as 'sent' | 'failed')
-          clearInterval(interval)
-        }
-      } catch {}
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [emailStatus, setEmailStatus])
 
   const allProducts = recommendations.flat()
   const accessoryMap = new Map(
@@ -53,9 +31,6 @@ export default function CompletionPage() {
               Aangemaakt op {new Date(handoffAt).toLocaleString('nl-BE')}
             </p>
           )}
-          <p className={`text-sm font-medium ${emailStatus === 'failed' ? 'text-danger' : 'text-ink/60'}`}>
-            {EMAIL_COPY[emailStatus] || ''}
-          </p>
         </div>
 
         <div className="mt-10 space-y-8 text-left">
