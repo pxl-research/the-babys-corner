@@ -1,4 +1,3 @@
-import pytest
 from app.content import load_quiz_config
 
 
