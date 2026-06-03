@@ -9,6 +9,7 @@ from app.config import settings
 from app.database import get_db
 from app.schemas import StaffSessionItem, StaffSessionDetail
 from app.services.auth import verify_token
+from app.services.catalog import get_catalog
 from app.services.export import build_xlsx
 from app.services.session_service import (
     fetch_session_by_code,
@@ -86,4 +87,4 @@ async def get_admin_session_detail(
     row = await fetch_session_by_code(db, session_code)
     if not row:
         raise HTTPException(404, detail="Session not found.")
-    return session_detail_from_row(row)
+    return session_detail_from_row(row, get_catalog())

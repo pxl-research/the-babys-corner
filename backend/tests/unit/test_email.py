@@ -1,5 +1,4 @@
-import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import patch
 
 
 async def test_email_retry_marks_failed_after_three_attempts():

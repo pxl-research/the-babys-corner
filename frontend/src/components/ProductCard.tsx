@@ -28,14 +28,15 @@ export default function ProductCard({
           )}
         </div>
       </button>
-      <div className="px-4 pb-4 flex items-center justify-between mt-auto">
-        <div />
+      <div className="px-4 pb-4 flex items-center justify-end mt-auto">
         <button
           onClick={onToggleFavorite}
           disabled={locked}
-          className="text-2xl disabled:opacity-40 ml-2"
+          aria-label={isFavorited ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}
+          className="flex items-center gap-1 text-sm text-ink/70 disabled:opacity-40"
         >
-          {isFavorited ? '♥' : '♡'}
+          <span className="text-2xl leading-none">{isFavorited ? '♥' : '♡'}</span>
+          <span>{isFavorited ? 'Bewaard' : 'Bewaar'}</span>
         </button>
       </div>
     </div>

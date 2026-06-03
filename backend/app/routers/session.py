@@ -49,7 +49,12 @@ from app.services.recommendations import (
     get_cross_sell_items,
 )
 from app.services.session_code import generate_session_code
-from app.services.session_service import parse_json_field
+from app.services.session_service import (
+    parse_json_field,
+    resolve_strollers,
+    resolve_accessories,
+    resolve_stroller_batches,
+)
 from app.services.email import send_handoff_email
 from app.services.llm import (
     generate_key_features,
@@ -164,6 +169,10 @@ async def get_current(session_id: Optional[str] = Cookie(default=None)):
     session = await _get_session(session_id)
 
     profile = session.get("derived_profile")
+    shown = parse_json_field(session.get("shown_products"), [])
+    stroller_favs = parse_json_field(session.get("stroller_favorites"), [])
+    accessory_favs = parse_json_field(session.get("accessory_favorites"), [])
+    catalog = get_catalog()
     return SessionCurrentResponse(
         session_id=session["session_id"],
         session_code=session["session_code"],
@@ -176,9 +185,12 @@ async def get_current(session_id: Optional[str] = Cookie(default=None)):
         optional_note=session.get("optional_note"),
         profile=profile,
         transition_phrase=TRANSITION_PHRASES.get(profile) if profile else None,
-        shown_products=parse_json_field(session.get("shown_products"), []),
-        stroller_favorites=parse_json_field(session.get("stroller_favorites"), []),
-        accessory_favorites=parse_json_field(session.get("accessory_favorites"), []),
+        shown_products=shown,
+        stroller_favorites=stroller_favs,
+        accessory_favorites=accessory_favs,
+        shown_products_named=resolve_stroller_batches(shown, catalog),
+        stroller_favorites_named=resolve_strollers(stroller_favs, catalog),
+        accessory_favorites_named=resolve_accessories(accessory_favs, catalog),
         email_status=session.get("email_status", "not_sent"),
         favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
         talking_points=parse_json_field(session.get("llm_talking_points"), None),

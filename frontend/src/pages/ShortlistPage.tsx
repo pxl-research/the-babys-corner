@@ -3,17 +3,21 @@ import Header from '../components/Header'
 import { api } from '../api/client'
 import type { ShortlistItem } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
+import { useInactivityReset } from '../hooks/useInactivityReset'
 import { useEffect, useState } from 'react'
 
 export default function ShortlistPage() {
   const navigate = useNavigate()
   const {
-    source, strollerFavorites, accessoryFavorites, setHandoff, setEmailStatus, setStatus,
+    source, strollerFavorites, accessoryFavorites, setHandoff, setStatus,
     setFavorites,
   } = useSessionStore()
   const [busyId, setBusyId] = useState<string | null>(null)
   const [favStrollers, setFavStrollers] = useState<ShortlistItem[]>([])
   const [favAccessories, setFavAccessories] = useState<ShortlistItem[]>([])
+  const hasFavorites = strollerFavorites.length + accessoryFavorites.length > 0
+
+  useInactivityReset(source)
 
   // Resolve favorites server-side so the shortlist never depends on which
   // recommendation batches happen to be loaded.
@@ -30,7 +34,6 @@ export default function ShortlistPage() {
   async function handleConfirm() {
     const result = await api.handoff()
     setHandoff(result.session_code, result.handoff_at)
-    setEmailStatus(result.email_status as 'pending')
     setStatus('handoff')
     if (source === 'store') navigate('/handoff')
     else navigate('/complete')
@@ -115,9 +118,13 @@ export default function ShortlistPage() {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4 flex flex-col gap-3 max-w-lg mx-auto">
+        {!hasFavorites && (
+          <p className="text-center text-sm text-ink/60">Bewaar minstens één favoriet om te delen.</p>
+        )}
         <button
           onClick={handleConfirm}
-          className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium"
+          disabled={!hasFavorites}
+          className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
         >
           Deel met medewerker
         </button>

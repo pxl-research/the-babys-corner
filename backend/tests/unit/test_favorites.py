@@ -1,4 +1,3 @@
-import pytest
 from app.services.catalog import CatalogService, is_available
 
 UNAVAILABLE_STROLLER = {

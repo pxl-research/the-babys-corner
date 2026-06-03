@@ -98,8 +98,12 @@ export default function StaffLookupPage() {
           )}
           <section className="mb-4">
             <h3 className="font-semibold text-ink mb-1">Favorieten</h3>
-            <p className="text-sm text-ink/60">Kinderwagens: {detail.stroller_favorites.join(', ') || '—'}</p>
-            <p className="text-sm text-ink/60">Accessoires: {detail.accessory_favorites.join(', ') || '—'}</p>
+            <p className="text-sm text-ink/60">
+              Kinderwagens: {detail.stroller_favorites_named.map((i) => `${i.name} — ${i.brand}`).join(', ') || '—'}
+            </p>
+            <p className="text-sm text-ink/60">
+              Accessoires: {detail.accessory_favorites_named.map((i) => `${i.name} — ${i.brand}`).join(', ') || '—'}
+            </p>
           </section>
         </div>
       </div>

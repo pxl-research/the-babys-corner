@@ -141,6 +141,13 @@ class FavoriteToggleResponse(BaseModel):
     accessory_favorites: list[str]
 
 
+class NamedItem(BaseModel):
+    """Minimal product identity for staff-facing views: an ID plus a human label."""
+    id: str
+    name: str
+    brand: str
+
+
 class ShortlistItem(BaseModel):
     id: str
     name: str
@@ -176,6 +183,9 @@ class SessionCurrentResponse(BaseModel):
     shown_products: list[list[str]] = []
     stroller_favorites: list[str] = []
     accessory_favorites: list[str] = []
+    shown_products_named: list[list[NamedItem]] = []
+    stroller_favorites_named: list[NamedItem] = []
+    accessory_favorites_named: list[NamedItem] = []
     email_status: str = "not_sent"
     favorites_adaptation_active: bool = False
     talking_points: Optional[list[str]] = None
@@ -254,6 +264,9 @@ class StaffSessionDetail(BaseModel):
     shown_products: list[list[str]] = []
     stroller_favorites: list[str] = []
     accessory_favorites: list[str] = []
+    shown_products_named: list[list[NamedItem]] = []
+    stroller_favorites_named: list[NamedItem] = []
+    accessory_favorites_named: list[NamedItem] = []
     talking_points: Optional[list[str]] = None
     email_status: Optional[str] = None
     email_failed_warning: bool = False

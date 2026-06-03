@@ -4,6 +4,7 @@ import Header from '../components/Header'
 import ProgressDots from '../components/ProgressDots'
 import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
+import { useInactivityReset } from '../hooks/useInactivityReset'
 
 const PROFILE_STEPS = 3
 const TAG_STEPS = 4
@@ -24,11 +25,19 @@ export default function QuizPage() {
     transitionPhrase,
     quizConfig, setQuizConfig,
     tagConfig, setTagConfig,
-    tagAnswers, setTagAnswer,
+    tagAnswers, setTagAnswer, setTagOutcome,
+    source,
   } = useSessionStore()
 
+  useInactivityReset(source)
+
   const [submitting, setSubmitting] = useState(false)
-  const filledDots = quizAnswers.filter((a) => a !== undefined).length
+  // Fill a dot per answered profile question, per answered tag question, and once the
+  // note step is reached — so progress never appears stuck on the back half of the quiz.
+  const answeredProfile = quizAnswers.filter((a) => a !== undefined).length
+  const answeredTags = Object.values(tagAnswers).filter((a) => a.length > 0).length
+  const noteReached = stepNum >= NOTE_STEP ? 1 : 0
+  const filledDots = answeredProfile + answeredTags + noteReached
 
   const isTagStep = stepNum >= FIRST_TAG_STEP && stepNum <= LAST_TAG_STEP
 
@@ -123,6 +132,7 @@ export default function QuizPage() {
         option_indices: tagAnswers[q.id] ?? [],
       }))
       const result = await api.submitTagQuiz(answers)
+      setTagOutcome(result.match_mode, result.dropped_count)
       if (import.meta.env.DEV) {
         console.debug(
           `[tag-quiz] submit | mode=${result.match_mode} strict(AND)=${result.strict_count} ` +
@@ -142,7 +152,7 @@ export default function QuizPage() {
     setSubmitting(true)
     try {
       await api.saveNote(note)
-      navigate('/recommendations')
+      navigate('/transition')
     } finally {
       setSubmitting(false)
     }
@@ -194,7 +204,10 @@ export default function QuizPage() {
         <Header />
         <div className="max-w-lg mx-auto px-6 py-8">
           <ProgressDots total={TOTAL_STEPS} current={NOTE_STEP} filled={filledDots} />
-          <p className="font-display text-xl font-bold text-ink mt-6 mb-4">{noteConfig.text}</p>
+          <p className="font-display text-xl font-bold text-ink mt-6 mb-1">
+            {noteConfig.text} <span className="text-ink/50 font-normal text-base">(optioneel)</span>
+          </p>
+          <p className="text-sm text-ink/60 mb-4">Geen extra info? Sla deze stap gerust over.</p>
           <textarea
             value={optionalNote}
             onChange={(e) => setOptionalNote(e.target.value)}
@@ -209,6 +222,12 @@ export default function QuizPage() {
               className="bg-brand text-white rounded-btn px-6 py-3 font-medium"
             >
               {noteConfig.continue_label}
+            </button>
+            <button
+              onClick={() => handleNoteSubmit('')}
+              className="text-ink/60 underline underline-offset-2 px-6 py-2 font-medium"
+            >
+              {noteConfig.skip_label}
             </button>
             <button onClick={() => navigate(`/quiz/${LAST_TAG_STEP}`)} className="border border-brand text-brand rounded-btn px-6 py-3 font-medium">
               Terug
@@ -236,7 +255,10 @@ export default function QuizPage() {
         <div className="max-w-lg mx-auto px-6 py-8">
           <ProgressDots total={TOTAL_STEPS} current={stepNum} filled={filledDots} />
           <p className="font-display text-xl font-bold text-ink mt-6 mb-2">{tagQuestion.text}</p>
-          {tagQuestion.subtitle && <p className="text-sm text-ink/60 mb-6">{tagQuestion.subtitle}</p>}
+          {tagQuestion.subtitle && <p className="text-sm text-ink/60 mb-1">{tagQuestion.subtitle}</p>}
+          <p className="text-xs text-ink/50 mb-6">
+            {tagQuestion.multi ? 'Meerdere antwoorden mogelijk' : 'Kies één antwoord'} — of sla over
+          </p>
           <div className="flex flex-col gap-2">
             {tagQuestion.options.map((opt) => {
               const isSelected = selected.includes(opt.index)
@@ -303,7 +325,7 @@ export default function QuizPage() {
             disabled={selectedOption === -1 || submitting}
             className="bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
           >
-            {submitting ? 'Bezig…' : stepNum === PROFILE_STEPS ? 'Bevestig' : 'Volgende'}
+            {submitting ? 'Bezig…' : 'Volgende'}
           </button>
           {stepNum > 1 && (
             <button onClick={handleBack} className="border border-brand text-brand rounded-btn px-6 py-3 font-medium">

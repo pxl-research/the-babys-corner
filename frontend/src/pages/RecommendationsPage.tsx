@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import ProductCard from '../components/ProductCard'
@@ -6,9 +6,14 @@ import ProductModal from '../components/ProductModal'
 import AccessoryModal from '../components/AccessoryModal'
 import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
+import { useInactivityReset } from '../hooks/useInactivityReset'
 import type { StrollerItem, AccessoryItem } from '../api/client'
 
-const INACTIVITY_TIMEOUT_MS = 10 * 60 * 1000
+const PROFILE_LABELS: Record<string, string> = {
+  A: 'Minimalist',
+  B: 'Ontdekker',
+  C: 'Planner',
+}
 
 export default function RecommendationsPage() {
   const navigate = useNavigate()
@@ -16,42 +21,35 @@ export default function RecommendationsPage() {
     source, recommendations, addBatch, currentBatch,
     strollerFavorites, accessoryFavorites, setFavorites,
     favoritesAdaptationActive, setFavoritesAdaptation,
+    profile, droppedTagCount,
   } = useSessionStore()
 
   const [loading, setLoading] = useState(false)
+  const [exhausted, setExhausted] = useState(false)
   const [selectedStroller, setSelectedStroller] = useState<StrollerItem | null>(null)
   const [selectedAccessory, setSelectedAccessory] = useState<AccessoryItem | null>(null)
   const [returnToStroller, setReturnToStroller] = useState<StrollerItem | null>(null)
-  const inactivityRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useInactivityReset(source)
 
   // Load batch 1 on mount
   useEffect(() => {
     if (recommendations.length === 0) loadNextBatch()
   }, [])
 
-  // In-store inactivity timer
-  useEffect(() => {
-    if (source !== 'store') return
-    const reset = () => {
-      if (inactivityRef.current) clearTimeout(inactivityRef.current)
-      inactivityRef.current = setTimeout(handleAbandon, INACTIVITY_TIMEOUT_MS)
-    }
-    const events = ['click', 'touchstart', 'keydown']
-    events.forEach((e) => window.addEventListener(e, reset))
-    reset()
-    return () => {
-      events.forEach((e) => window.removeEventListener(e, reset))
-      if (inactivityRef.current) clearTimeout(inactivityRef.current)
-    }
-  }, [source])
-
   async function loadNextBatch() {
-    if (loading) return
+    if (loading || exhausted) return
     setLoading(true)
     try {
       const batch = await api.getRecommendations(currentBatch + 1)
+      if (batch.products.length === 0) {
+        setExhausted(true)
+        return
+      }
       addBatch(batch.products)
       if (batch.favorites_adaptation_active) setFavoritesAdaptation(true)
+      // A short batch means the assortment is spent — no more pages after this one.
+      if (batch.products.length < 3) setExhausted(true)
     } finally {
       setLoading(false)
     }
@@ -62,18 +60,21 @@ export default function RecommendationsPage() {
     setFavorites(result.stroller_favorites, result.accessory_favorites)
   }
 
-  async function handleAbandon() {
-    await api.abandon().catch(() => {})
-    window.location.href = '/'
-  }
-
   const allProducts = recommendations.flat()
 
   return (
     <div className="min-h-screen bg-cream text-ink font-sans pb-24">
       <Header />
       <div className="max-w-4xl mx-auto px-4 py-6">
-        <h1 className="font-display text-2xl font-bold text-ink mb-2">Onze aanbevelingen voor jullie</h1>
+        <h1 className="font-display text-2xl font-bold text-ink mb-1">Onze aanbevelingen voor jullie</h1>
+        {profile && PROFILE_LABELS[profile] && (
+          <p className="text-ink/60 text-sm mb-2">Afgestemd op jullie profiel: {PROFILE_LABELS[profile]}.</p>
+        )}
+        {droppedTagCount > 0 && (
+          <p className="text-ink/70 text-sm mb-2 rounded-card bg-brand/10 px-3 py-2">
+            We verruimden de selectie om genoeg opties te tonen — niet alle wensen konden samen ingevuld worden.
+          </p>
+        )}
         {favoritesAdaptationActive && (
           <p className="text-brand text-sm mb-4">We houden rekening met jullie favorieten.</p>
         )}
@@ -88,7 +89,7 @@ export default function RecommendationsPage() {
             />
           ))}
         </div>
-        {!loading && (
+        {!loading && !exhausted && (
           <div className="mt-6 text-center">
             <button
               onClick={loadNextBatch}
@@ -97,6 +98,9 @@ export default function RecommendationsPage() {
               Bekijk meer opties
             </button>
           </div>
+        )}
+        {!loading && exhausted && (
+          <p className="text-center text-ink/50 mt-6">Alle opties getoond.</p>
         )}
         {loading && <p className="text-center text-ink/50 mt-6">Laden…</p>}
       </div>

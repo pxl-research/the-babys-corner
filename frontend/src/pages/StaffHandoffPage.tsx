@@ -11,9 +11,14 @@ const PROFILE_LABELS: Record<string, string> = {
   C: 'Planner',
 }
 
+function namedLine(items: { name: string; brand: string }[]): string {
+  return items.map((i) => `${i.name} — ${i.brand}`).join(', ') || '—'
+}
+
 export default function StaffHandoffPage() {
   const { reset } = useSessionStore()
   const [detail, setDetail] = useState<SessionState | null>(null)
+  const [pointsExhausted, setPointsExhausted] = useState(false)
 
   useEffect(() => {
     let attempts = 0
@@ -23,7 +28,11 @@ export default function StaffHandoffPage() {
       try {
         const session = await api.getSession()
         if (!cancelled) setDetail(session)
-        if (session.talking_points?.length || attempts >= 3) return
+        if (session.talking_points?.length) return
+        if (attempts >= 3) {
+          if (!cancelled) setPointsExhausted(true)
+          return
+        }
         attempts += 1
         window.setTimeout(load, 5000)
       } catch {
@@ -66,35 +75,39 @@ export default function StaffHandoffPage() {
 
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-2">Bekeken producten</h2>
-              <p className="text-ink/60 text-sm">{detail.shown_products.flat().join(', ') || '—'}</p>
+              <p className="text-ink/60 text-sm">{namedLine(detail.shown_products_named.flat())}</p>
             </section>
 
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-2">Favorieten</h2>
-              {detail.stroller_favorites.length > 0 && (
+              {detail.stroller_favorites_named.length > 0 && (
                 <>
                   <h3 className="text-sm font-medium text-ink/70 mb-1">Kinderwagens</h3>
-                  <p className="text-sm text-ink/60">{detail.stroller_favorites.join(', ')}</p>
+                  <p className="text-sm text-ink/60">{namedLine(detail.stroller_favorites_named)}</p>
                 </>
               )}
-              {detail.accessory_favorites.length > 0 && (
+              {detail.accessory_favorites_named.length > 0 && (
                 <>
                   <h3 className="text-sm font-medium text-ink/70 mt-2 mb-1">Accessoires</h3>
-                  <p className="text-sm text-ink/60">{detail.accessory_favorites.join(', ')}</p>
+                  <p className="text-sm text-ink/60">{namedLine(detail.accessory_favorites_named)}</p>
                 </>
               )}
             </section>
 
-            {detail.talking_points && detail.talking_points.length > 0 && (
-              <section className="mb-6">
+            <section className="mb-6">
               <h2 className="font-semibold text-ink mb-2">Gespreksopeners</h2>
-              <ul className="space-y-1">
+              {detail.talking_points && detail.talking_points.length > 0 ? (
+                <ul className="space-y-1">
                   {detail.talking_points.map((tp, i) => (
                     <li key={i} className="text-sm text-ink/80">• {tp}</li>
                   ))}
-              </ul>
-              </section>
-            )}
+                </ul>
+              ) : pointsExhausted ? (
+                <p className="text-sm text-ink/50">Gespreksopeners nog niet beschikbaar.</p>
+              ) : (
+                <p className="text-sm text-ink/50">Gespreksopeners worden gegenereerd…</p>
+              )}
+            </section>
           </>
         ) : (
           <p className="text-ink/50">Sessiedetails laden…</p>
