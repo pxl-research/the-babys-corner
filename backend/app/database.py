@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     stroller_favorites TEXT,
     accessory_favorites TEXT,
     reco_order       TEXT,
+    reco_tiers       TEXT,
     extra_reco_order TEXT,
     favorites_adaptation_active INTEGER DEFAULT 0,
     email_status     TEXT DEFAULT 'not_sent',
@@ -50,6 +51,7 @@ _MIGRATION_COLUMNS = [
     "filter_tags TEXT",
     "filter_brands TEXT",
     "filter_collections TEXT",
+    "reco_tiers TEXT",
 ]
 
 

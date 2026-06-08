@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { StrollerItem, QuizQuestion, OptionalNoteConfig, TagConfig } from '../api/client'
+import type { StrollerItem, QuizQuestion, OptionalNoteConfig, TagConfig, RecommendationTier } from '../api/client'
 
 export type AppStatus =
   | 'idle'
@@ -20,6 +20,7 @@ interface SessionStore {
   profile: 'A' | 'B' | 'C' | null
   transitionPhrase: string | null
   recommendations: StrollerItem[][]
+  recoTiers: RecommendationTier[]
   currentBatch: number
   strollerFavorites: string[]
   accessoryFavorites: string[]
@@ -41,6 +42,7 @@ interface SessionStore {
   setOptionalNote: (note: string) => void
   setProfile: (profile: 'A' | 'B' | 'C', phrase: string) => void
   addBatch: (products: StrollerItem[]) => void
+  setRecoTiers: (tiers: RecommendationTier[]) => void
   setFavorites: (strollers: string[], accessories: string[]) => void
   setStatus: (status: AppStatus) => void
   setHandoff: (code: string, at: string) => void
@@ -62,6 +64,7 @@ const initial = {
   profile: null,
   transitionPhrase: null,
   recommendations: [],
+  recoTiers: [],
   currentBatch: 0,
   strollerFavorites: [],
   accessoryFavorites: [],
@@ -96,6 +99,7 @@ export const useSessionStore = create<SessionStore>()(
           recommendations: [...s.recommendations, products],
           currentBatch: s.currentBatch + 1,
         })),
+      setRecoTiers: (recoTiers) => set({ recoTiers }),
       setFavorites: (strollerFavorites, accessoryFavorites) =>
         set({ strollerFavorites, accessoryFavorites }),
       setStatus: (status) => set({ status }),

@@ -21,7 +21,7 @@ export default function RecommendationsPage() {
     source, recommendations, addBatch, currentBatch,
     strollerFavorites, accessoryFavorites, setFavorites,
     favoritesAdaptationActive, setFavoritesAdaptation,
-    profile, droppedTagCount,
+    profile, recoTiers, setRecoTiers,
   } = useSessionStore()
 
   const [loading, setLoading] = useState(false)
@@ -47,6 +47,7 @@ export default function RecommendationsPage() {
         return
       }
       addBatch(batch.products)
+      if (batch.tiers?.length) setRecoTiers(batch.tiers)
       if (batch.favorites_adaptation_active) setFavoritesAdaptation(true)
       // A short batch means the assortment is spent — no more pages after this one.
       if (batch.products.length < 3) setExhausted(true)
@@ -62,6 +63,21 @@ export default function RecommendationsPage() {
 
   const allProducts = recommendations.flat()
 
+  // Segment the flat product list into exact→relaxed tiers using the boundaries from the
+  // backend. Without tiers (profile-only flow), render a single unlabeled section.
+  const sections =
+    recoTiers.length > 0
+      ? recoTiers
+          .map((tier, i) => ({
+            label: tier.label,
+            products: allProducts.slice(
+              tier.start_index,
+              recoTiers[i + 1]?.start_index ?? allProducts.length
+            ),
+          }))
+          .filter((section) => section.products.length > 0)
+      : [{ label: '', products: allProducts }]
+
   return (
     <div className="min-h-screen bg-cream text-ink font-sans pb-24">
       <Header />
@@ -70,25 +86,27 @@ export default function RecommendationsPage() {
         {profile && PROFILE_LABELS[profile] && (
           <p className="text-ink/60 text-sm mb-2">Afgestemd op jullie profiel: {PROFILE_LABELS[profile]}.</p>
         )}
-        {droppedTagCount > 0 && (
-          <p className="text-ink/70 text-sm mb-2 rounded-card bg-brand/10 px-3 py-2">
-            We verruimden de selectie om genoeg opties te tonen — niet alle wensen konden samen ingevuld worden.
-          </p>
-        )}
         {favoritesAdaptationActive && (
           <p className="text-brand text-sm mb-4">We houden rekening met jullie favorieten.</p>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          {allProducts.map((stroller) => (
-            <ProductCard
-              key={stroller.id}
-              stroller={stroller}
-              isFavorited={strollerFavorites.includes(stroller.id)}
-              onToggleFavorite={() => handleToggleFavorite(stroller.id, 'stroller')}
-              onClick={() => setSelectedStroller(stroller)}
-            />
-          ))}
-        </div>
+        {sections.map((section, i) => (
+          <section key={section.label || i} className="mt-6">
+            {section.label && (
+              <h2 className="font-display text-lg font-bold text-ink mb-3">{section.label}</h2>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {section.products.map((stroller) => (
+                <ProductCard
+                  key={stroller.id}
+                  stroller={stroller}
+                  isFavorited={strollerFavorites.includes(stroller.id)}
+                  onToggleFavorite={() => handleToggleFavorite(stroller.id, 'stroller')}
+                  onClick={() => setSelectedStroller(stroller)}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
         {!loading && !exhausted && (
           <div className="mt-6 text-center">
             <button

@@ -125,10 +125,16 @@ class StrollerItem(BaseModel):
     show_cross_sell_chips: bool = False
 
 
+class TierInfo(BaseModel):
+    label: str  # customer-facing heading; never names a hidden tag
+    start_index: int  # index into the flat product order where this tier begins
+
+
 class RecommendationBatchResponse(BaseModel):
     batch: int
     favorites_adaptation_active: bool
     products: list[StrollerItem]
+    tiers: list[TierInfo] = []
 
 
 class FavoriteToggleRequest(BaseModel):

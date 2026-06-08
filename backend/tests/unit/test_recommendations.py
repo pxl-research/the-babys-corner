@@ -2,6 +2,8 @@ from app.services.recommendations import (
     compute_first_nine,
     compute_filtered_order,
     compute_progressive_tag_order,
+    compute_tiered_tag_order,
+    reorder_within_tiers,
     diversify_llm_order,
     get_batch,
     get_cross_sell_items,
@@ -363,3 +365,57 @@ def test_progressive_tag_order_keeps_both_priority_tags_longest():
     assert dropped == ["Compact"]
     assert set(kept) == {"0m+", "Twee kinderen (Duo / Tweeling)"}
     assert order == ["s1"]
+
+
+# ── tiered relaxed recommendations ───────────────────────────────────────────
+
+
+def test_tiered_order_exact_first_then_relaxed_tiers():
+    # s1 matches X+Y (exact); s2 matches X only; s3 matches neither tag.
+    cat = make_catalog([
+        _tagged("s1", ["X", "Y"]),
+        _tagged("s2", ["X"]),
+        _tagged("s3", ["Z"]),
+    ])
+    reco, tiers, primary = compute_tiered_tag_order(cat, "A", ["X", "Y"])
+    # Tier 0 exact = s1; later tiers unlock s2 then s3, each only the NEW ids.
+    assert reco[0] == "s1"
+    assert set(reco) == {"s1", "s2", "s3"}
+    assert tiers[0]["label"] == "Exacte matches"
+    assert tiers[0]["start"] == 0 and tiers[0]["count"] == 1
+    # Tiers segment the flat list without overlap, covering every id.
+    assert sum(t["count"] for t in tiers) == len(reco)
+    assert primary == ["X", "Y"]
+
+
+def test_tiered_order_best_matches_first_when_no_exact():
+    # No stroller has both X and Y → tier 0 (exact) is empty, first shown is "Beste matches".
+    cat = make_catalog([_tagged("s1", ["X"]), _tagged("s2", ["Y"])])
+    reco, tiers, primary = compute_tiered_tag_order(cat, "A", ["X", "Y"])
+    assert tiers[0]["label"] == "Beste matches"
+    assert set(reco) == {"s1", "s2"}
+
+
+def test_tiered_order_protects_priority_tag_to_deepest_tier():
+    # s_duo has only the priority tag; s_other has only the normal tag X.
+    DUO = "Twee kinderen (Duo / Tweeling)"
+    cat = make_catalog([_tagged("s_duo", [DUO]), _tagged("s_other", ["X"])])
+    reco, tiers, _ = compute_tiered_tag_order(cat, "A", [DUO, "X"])
+    # Relaxing X (non-priority) comes before relaxing the priority duo tag, so the
+    # duo stroller is unlocked in an earlier tier than the non-duo one.
+    assert reco.index("s_duo") < reco.index("s_other")
+
+
+def test_reorder_within_tiers_preserves_boundaries():
+    reco = ["a", "b", "c", "d"]
+    tiers = [
+        {"label": "Exacte matches", "start": 0, "count": 2},
+        {"label": "Ruimere selectie", "start": 2, "count": 2},
+    ]
+    # A note rerank floats "d" (tier 1) and "b" (tier 0) to the front globally.
+    new_order = ["d", "b", "a", "c"]
+    ordered, rebuilt = reorder_within_tiers(reco, tiers, new_order)
+    # Each id stays in its tier; within-tier note order is honoured (b before a).
+    assert ordered == ["b", "a", "d", "c"]
+    assert [t["start"] for t in rebuilt] == [0, 2]
+    assert [t["count"] for t in rebuilt] == [2, 2]

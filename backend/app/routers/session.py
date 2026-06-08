@@ -36,6 +36,7 @@ from app.schemas import (
     TagQuizRequest,
     TagQuizResponse,
     TagCountResponse,
+    TierInfo,
     NoteRequest,
 )
 from app.services.catalog import get_catalog, is_available
@@ -43,7 +44,8 @@ from app.services.profile import compute_profile
 from app.services.recommendations import (
     compute_first_nine,
     compute_filtered_order,
-    compute_progressive_tag_order,
+    compute_tiered_tag_order,
+    reorder_within_tiers,
     diversify_llm_order,
     get_batch,
     get_cross_sell_items,
@@ -273,6 +275,8 @@ async def get_recommendations(
         raise HTTPException(422, detail="Quiz not submitted yet.")
 
     reco_order: list[str] = parse_json_field(session.get("reco_order"), [])
+    reco_tiers: list[dict] = parse_json_field(session.get("reco_tiers"), [])
+    tier_infos = [TierInfo(label=t["label"], start_index=t["start"]) for t in reco_tiers]
     shown_raw: list[list[str]] = parse_json_field(session.get("shown_products"), [])
     shown_batches_count = len(shown_raw)
     extra_reco_order: list[str] = parse_json_field(session.get("extra_reco_order"), [])
@@ -292,6 +296,7 @@ async def get_recommendations(
             batch=batch,
             favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
             products=products,
+            tiers=tier_infos,
         )
 
     catalog = get_catalog()
@@ -299,7 +304,9 @@ async def get_recommendations(
 
     # Handle favorites-based adaptation for batch 4+
     favorites_adaptation_active = bool(session.get("favorites_adaptation_active", 0))
-    if batch >= 4 and stroller_favs and not extra_reco_order:
+    # Tiered sessions keep a fixed exact→relaxed order; reordering the tail by favorite
+    # similarity would scramble the tier headings, so skip adaptation when tiers exist.
+    if batch >= 4 and stroller_favs and not extra_reco_order and not reco_tiers:
         shown_flat = {id_ for b in shown_raw for id_ in b}
         if len(reco_order) > 9:
             # Full filtered order stored — remaining is reco_order[9:]
@@ -360,6 +367,7 @@ async def get_recommendations(
         batch=batch,
         favorites_adaptation_active=favorites_adaptation_active,
         products=products,
+        tiers=tier_infos,
     )
 
 
@@ -632,7 +640,7 @@ async def save_filter_collections(
 
     db = await get_db()
     await db.execute(
-        "UPDATE sessions SET filter_collections=?, reco_order=?, extra_reco_order=NULL WHERE session_id=?",
+        "UPDATE sessions SET filter_collections=?, reco_order=?, reco_tiers=NULL, extra_reco_order=NULL WHERE session_id=?",
         (json.dumps(selections), json.dumps(reco_order), session_id),
     )
     await db.commit()
@@ -711,31 +719,37 @@ async def submit_tag_quiz(
     catalog = get_catalog()
     profile = session.get("derived_profile")
 
-    # Strict AND, with progressive tag-drop fallback so a combination never dead-ends.
+    # Build tiered results: exact AND first, then progressively relaxed tiers.
     strict_count = len(catalog.get_filtered_strollers(tags or None, tag_match="all"))
-    reco_order, kept, dropped = compute_progressive_tag_order(catalog, profile, tags)
+    reco_order, tiers, primary_kept = compute_tiered_tag_order(catalog, profile, tags)
 
-    if not dropped:
+    # primary_kept is the first non-empty tier's tag set; the dropped count reflects how
+    # many wishes had to be relaxed before any stroller matched.
+    dropped_count = len(tags) - len(primary_kept)
+    if dropped_count == 0:
         match_mode = "all"
-    elif kept:
+    elif primary_kept:
         match_mode = "partial"
     else:
         match_mode = "none"
 
-    stroller_count = len(reco_order)
-    accessory_count = len(catalog.get_filtered_accessories(kept or None, tag_match="all"))
+    # Report the primary (top) tier size as the headline match count; reco_order itself
+    # spans every tier down to the full assortment for browsing.
+    stroller_count = tiers[0]["count"] if tiers else 0
+    accessory_count = len(catalog.get_filtered_accessories(primary_kept or None, tag_match="all"))
 
     logger.info(
-        "tag-quiz submit | session=%s selected=%s kept=%s dropped=%s | strict(AND)=%d used=%d mode=%s",
-        session_id, tags, kept, dropped, strict_count, stroller_count, match_mode,
+        "tag-quiz submit | session=%s selected=%s primary_kept=%s tiers=%d | strict(AND)=%d used=%d mode=%s",
+        session_id, tags, primary_kept, len(tiers), strict_count, stroller_count, match_mode,
     )
 
-    # Store the effective (kept) tags so reco_order and filter_tags stay consistent.
+    # Store the primary (kept) tags so accessory filtering stays consistent, plus the
+    # flat tier-ordered reco_order and the tier boundaries for headings.
     db = await get_db()
     await db.execute(
         """UPDATE sessions SET filter_tags=?, filter_brands=NULL, filter_collections=NULL,
-           reco_order=?, extra_reco_order=NULL WHERE session_id=?""",
-        (json.dumps(kept), json.dumps(reco_order), session_id),
+           reco_order=?, reco_tiers=?, extra_reco_order=NULL WHERE session_id=?""",
+        (json.dumps(primary_kept), json.dumps(reco_order), json.dumps(tiers), session_id),
     )
     await db.commit()
 
@@ -744,7 +758,7 @@ async def submit_tag_quiz(
         accessory_count=accessory_count,
         match_mode=match_mode,
         strict_count=strict_count,
-        dropped_count=len(dropped),
+        dropped_count=dropped_count,
     )
 
 
@@ -762,6 +776,7 @@ async def save_note(
 
     note = body.note[:1000] if body.note else None
     reco_order: list[str] = parse_json_field(session.get("reco_order"), [])
+    reco_tiers: list[dict] = parse_json_field(session.get("reco_tiers"), [])
 
     if note and reco_order:
         catalog = get_catalog()
@@ -770,12 +785,22 @@ async def save_note(
         if llm_result:
             llm_set = set(llm_result)
             missing = [id_ for id_ in reco_order if id_ not in llm_set]
-            reco_order = llm_result + missing
+            new_order = llm_result + missing
+            # Honour the note ordering only within each tier, so the exact→relaxed
+            # tier headings stay aligned with the products beneath them.
+            if reco_tiers:
+                new_order, reco_tiers = reorder_within_tiers(reco_order, reco_tiers, new_order)
+            reco_order = new_order
 
     db = await get_db()
     await db.execute(
-        "UPDATE sessions SET optional_note=?, reco_order=? WHERE session_id=?",
-        (note, json.dumps(reco_order) if reco_order else None, session_id),
+        "UPDATE sessions SET optional_note=?, reco_order=?, reco_tiers=? WHERE session_id=?",
+        (
+            note,
+            json.dumps(reco_order) if reco_order else None,
+            json.dumps(reco_tiers) if reco_tiers else None,
+            session_id,
+        ),
     )
     await db.commit()
 
