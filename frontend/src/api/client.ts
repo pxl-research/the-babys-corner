@@ -82,6 +82,8 @@ export interface NamedItem {
   id: string
   name: string
   brand: string
+  image_url: string
+  price?: number | null
 }
 
 export interface ShortlistItem {

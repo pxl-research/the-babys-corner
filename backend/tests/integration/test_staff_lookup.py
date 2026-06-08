@@ -79,10 +79,10 @@ async def test_staff_detail_resolves_product_names(client):
     resp = await client.get(f"/api/staff/sessions/{code}", headers=STAFF_CREDS)
     assert resp.status_code == 200
     detail = resp.json()
-    # Shown products are resolved to {id, name, brand}, not bare IDs.
+    # Shown products are resolved to named objects (with thumbnail), not bare IDs.
     assert detail["shown_products_named"]
     first = detail["shown_products_named"][0][0]
-    assert set(first.keys()) == {"id", "name", "brand"}
+    assert set(first.keys()) == {"id", "name", "brand", "image_url", "price"}
     assert first["name"]
 
 

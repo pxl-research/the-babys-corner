@@ -148,10 +148,12 @@ class FavoriteToggleResponse(BaseModel):
 
 
 class NamedItem(BaseModel):
-    """Minimal product identity for staff-facing views: an ID plus a human label."""
+    """Minimal product identity for staff-facing views: an ID, label, and thumbnail."""
     id: str
     name: str
     brand: str
+    image_url: str = ""
+    price: float | None = None
 
 
 class ShortlistItem(BaseModel):

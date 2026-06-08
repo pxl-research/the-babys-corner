@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import StaffAnswerList from '../components/StaffAnswerList'
+import FavoriteCard from '../components/FavoriteCard'
 import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
 import type { SessionState } from '../api/client'
@@ -56,6 +57,38 @@ export default function StaffHandoffPage() {
       <div className="max-w-lg mx-auto px-6 py-8">
         {detail ? (
           <>
+            <section className="mb-8">
+              <h2 className="font-display text-2xl font-bold text-ink mb-1">Favorieten van de klant</h2>
+              <p className="text-ink/60 text-sm mb-4">De producten die de klant zelf bewaarde.</p>
+
+              {detail.stroller_favorites_named.length === 0 &&
+                detail.accessory_favorites_named.length === 0 && (
+                  <p className="text-sm text-ink/50">Nog geen favorieten bewaard.</p>
+                )}
+
+              {detail.stroller_favorites_named.length > 0 && (
+                <>
+                  <h3 className="text-sm font-semibold text-ink/70 mb-2">Kinderwagens</h3>
+                  <div className="grid grid-cols-2 gap-3 mb-5">
+                    {detail.stroller_favorites_named.map((item) => (
+                      <FavoriteCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {detail.accessory_favorites_named.length > 0 && (
+                <>
+                  <h3 className="text-sm font-semibold text-ink/70 mb-2">Accessoires</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {detail.accessory_favorites_named.map((item) => (
+                      <FavoriteCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                </>
+              )}
+            </section>
+
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-1">Gedragsprofiel</h2>
               <p className="text-brand font-display text-xl">{PROFILE_LABELS[detail.profile || ''] || detail.profile}</p>
@@ -76,22 +109,6 @@ export default function StaffHandoffPage() {
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-2">Bekeken producten</h2>
               <p className="text-ink/60 text-sm">{namedLine(detail.shown_products_named.flat())}</p>
-            </section>
-
-            <section className="mb-6">
-              <h2 className="font-semibold text-ink mb-2">Favorieten</h2>
-              {detail.stroller_favorites_named.length > 0 && (
-                <>
-                  <h3 className="text-sm font-medium text-ink/70 mb-1">Kinderwagens</h3>
-                  <p className="text-sm text-ink/60">{namedLine(detail.stroller_favorites_named)}</p>
-                </>
-              )}
-              {detail.accessory_favorites_named.length > 0 && (
-                <>
-                  <h3 className="text-sm font-medium text-ink/70 mt-2 mb-1">Accessoires</h3>
-                  <p className="text-sm text-ink/60">{namedLine(detail.accessory_favorites_named)}</p>
-                </>
-              )}
             </section>
 
             <section className="mb-6">

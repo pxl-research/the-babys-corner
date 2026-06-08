@@ -21,7 +21,13 @@ def parse_json_field(value, default):
 
 
 def _named(item: dict) -> NamedItem:
-    return NamedItem(id=item["id"], name=item["name"], brand=item["brand"])
+    return NamedItem(
+        id=item["id"],
+        name=item["name"],
+        brand=item["brand"],
+        image_url=item.get("image_url", ""),
+        price=item.get("price"),
+    )
 
 
 def resolve_strollers(ids, catalog) -> list[NamedItem]:
