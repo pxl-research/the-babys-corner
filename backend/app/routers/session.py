@@ -4,9 +4,9 @@ import logging
 import re
 from datetime import datetime, timezone
 from sqlite3 import IntegrityError
-from typing import Optional
+from typing import Annotated, Optional
 
-from fastapi import APIRouter, Cookie, HTTPException, BackgroundTasks, Query
+from fastapi import APIRouter, Cookie, HTTPException, BackgroundTasks, Query, Request
 from fastapi.responses import JSONResponse
 
 from app.config import settings
@@ -62,6 +62,7 @@ from app.services.session_service import (
     resolve_stroller_batches,
 )
 from app.services.email import send_handoff_email
+from app.services.rate_limit import check_rate_limit, client_ip
 from app.services.llm import (
     generate_key_features,
     generate_talking_points,
@@ -73,6 +74,11 @@ from app.services.llm import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
+
+# Shared HTTP error details (referenced from many endpoints).
+NO_SESSION_DETAIL = "No session cookie."
+QUIZ_NOT_SUBMITTED_DETAIL = "Quiz not submitted yet."
+LOCKED_DETAIL = "Session is locked after handoff."
 
 TRANSITION_PHRASES = {
     "A": "Helder. Ik hou het compact en stel enkel de essentials voor.",
@@ -110,18 +116,19 @@ async def _get_session(session_id: str) -> dict:
 
 def _require_active(session: dict):
     if session["status"] == "handed_off":
-        raise HTTPException(409, detail="Session is locked after handoff.")
+        raise HTTPException(409, detail=LOCKED_DETAIL)
     if session["status"] == "abandoned":
         raise HTTPException(409, detail="Session is abandoned.")
 
 
 @router.post("", response_model=SessionCreateResponse)
-async def create_session(source: str = Query(default="home")):
+async def create_session(request: Request, source: Annotated[str, Query()] = "home"):
+    check_rate_limit(f"sessions:create:{client_ip(request)}", limit=60, window_seconds=300)
     session_id = str(uuid.uuid4())
     now = _now()
     db = await get_db()
     # Retry on the rare session_code collision (UNIQUE index enforces uniqueness).
-    for attempt in range(5):
+    for _ in range(5):
         session_code = generate_session_code()
         try:
             await db.execute(
@@ -165,13 +172,13 @@ async def tag_config():
         }
         for q in config["questions"]
     ]
-    return TagConfigResponse(questions=questions)
+    return TagConfigResponse.model_validate({"questions": questions})
 
 
 @router.get("/current", response_model=SessionCurrentResponse)
-async def get_current(session_id: Optional[str] = Cookie(default=None)):
+async def get_current(session_id: Annotated[Optional[str], Cookie()] = None):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
 
     profile = session.get("derived_profile")
@@ -206,10 +213,10 @@ async def get_current(session_id: Optional[str] = Cookie(default=None)):
 @router.post("/current/quiz", response_model=QuizSubmitResponse)
 async def submit_quiz(
     body: QuizSubmitRequest,
-    session_id: Optional[str] = Cookie(default=None),
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
     _require_active(session)
 
@@ -265,18 +272,96 @@ async def submit_quiz(
     )
 
 
+def _handed_off_batch_response(
+    session: dict, batch: int, shown_raw: list[list[str]], shown_batches_count: int,
+    profile: str, tier_infos: list[TierInfo], catalog,
+) -> RecommendationBatchResponse:
+    """After handoff the session is locked: serve only already-shown batches, from cache."""
+    if batch > shown_batches_count:
+        raise HTTPException(409, detail=LOCKED_DETAIL)
+    batch_ids = shown_raw[batch - 1] if batch <= len(shown_raw) else []
+    products = _build_products(batch_ids, profile, catalog)
+    return RecommendationBatchResponse(
+        batch=batch,
+        favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
+        products=products,
+        tiers=tier_infos,
+    )
+
+
+async def _adapt_order_to_favorites(
+    reco_order: list[str], stroller_favs: list[str], shown_raw: list[list[str]], catalog,
+) -> list[str]:
+    """Rerank the not-yet-shown tail by similarity to the user's favorites (LLM).
+
+    Returns the reranked id list, or [] when the LLM yields nothing.
+    """
+    shown_flat = {id_ for b in shown_raw for id_ in b}
+    if len(reco_order) > PRIMARY_POOL:
+        # Full filtered order stored — remaining is reco_order[PRIMARY_POOL:]
+        remaining_ids = [id_ for id_ in reco_order[PRIMARY_POOL:] if id_ not in shown_flat]
+    else:
+        reco_set = set(reco_order)
+        remaining_ids = [
+            s["id"] for s in catalog.get_all_strollers()
+            if s["id"] not in shown_flat and s["id"] not in reco_set
+        ]
+    remaining_pool = [s for id_ in remaining_ids if (s := catalog.get_stroller(id_))]
+    fav_strollers = [s for id_ in stroller_favs if (s := catalog.get_stroller(id_))]
+    return await rank_similar_strollers(fav_strollers, remaining_pool) or []
+
+
+def _select_batch_ids(
+    batch: int, reco_order: list[str], reco_tiers: list[dict],
+    extra_reco_order: list[str], shown_raw: list[list[str]], catalog,
+) -> list[str]:
+    """Stroller ids for this batch: row-filled tier slices, or the paged get_batch."""
+    if reco_tiers:
+        # Tiered sessions are plain contiguous slices of the full assortment; row-fill the
+        # last tier so its grid section doesn't end on an orphan card.
+        already_shown = sum(len(b) for b in shown_raw[:batch - 1])
+        return tiered_batch_ids(reco_order, reco_tiers, already_shown, BATCH_SIZE)
+    products = get_batch(batch, reco_order, catalog, extra_reco_order=extra_reco_order or None)
+    return [p["id"] for p in products]
+
+
+async def _persist_batch_state(
+    session: dict, session_id: str, batch: int, batch_ids: list[str],
+    shown_raw: list[list[str]], shown_batches_count: int,
+    extra_reco_order: list[str], favorites_adaptation_active: bool,
+) -> None:
+    """Record a freshly shown batch plus any first-reco / favorites-adaptation state."""
+    updates: dict = {}
+    if batch > shown_batches_count:
+        shown_raw.append(batch_ids)
+        updates["shown_products"] = json.dumps(shown_raw)
+    if batch == 1 and not session.get("first_reco_at"):
+        updates["first_reco_at"] = _now()
+    if extra_reco_order and not session.get("extra_reco_order"):
+        updates["extra_reco_order"] = json.dumps(extra_reco_order)
+        updates["favorites_adaptation_active"] = 1 if favorites_adaptation_active else 0
+    if not updates:
+        return
+    db = await get_db()
+    set_clause = ", ".join(f"{k}=?" for k in updates)
+    await db.execute(
+        f"UPDATE sessions SET {set_clause} WHERE session_id=?",
+        (*updates.values(), session_id),
+    )
+    await db.commit()
+
+
 @router.get("/current/recommendations", response_model=RecommendationBatchResponse)
 async def get_recommendations(
     background_tasks: BackgroundTasks,
-    batch: int = Query(default=1, ge=1),
-    session_id: Optional[str] = Cookie(default=None),
+    batch: Annotated[int, Query(ge=1)] = 1,
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
-
     if not session.get("quiz_submitted_at"):
-        raise HTTPException(422, detail="Quiz not submitted yet.")
+        raise HTTPException(422, detail=QUIZ_NOT_SUBMITTED_DETAIL)
 
     reco_order: list[str] = parse_json_field(session.get("reco_order"), [])
     reco_tiers: list[dict] = parse_json_field(session.get("reco_tiers"), [])
@@ -285,93 +370,38 @@ async def get_recommendations(
     shown_batches_count = len(shown_raw)
     extra_reco_order: list[str] = parse_json_field(session.get("extra_reco_order"), [])
     stroller_favs: list[str] = parse_json_field(session.get("stroller_favorites"), [])
-    accessory_favs: list[str] = parse_json_field(session.get("accessory_favorites"), [])
     profile = session.get("derived_profile", "B")
+    catalog = get_catalog()
 
-    # Lock check: if handed_off, only allow already-shown batches
     if session["status"] == "handed_off":
-        if batch > shown_batches_count:
-            raise HTTPException(409, detail="Session is locked after handoff.")
-        # Return cached batch
-        batch_ids = shown_raw[batch - 1] if batch <= len(shown_raw) else []
-        catalog = get_catalog()
-        products = _build_products(batch_ids, profile, catalog)
-        return RecommendationBatchResponse(
-            batch=batch,
-            favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
-            products=products,
-            tiers=tier_infos,
+        return _handed_off_batch_response(
+            session, batch, shown_raw, shown_batches_count, profile, tier_infos, catalog
         )
 
-    catalog = get_catalog()
-    acc_favs_list = accessory_favs
-
-    # Handle favorites-based adaptation for batch 4+
+    # Once past the primary pool, rerank the tail by favorite similarity — but not for
+    # tiered sessions, where it would scramble the exact→relaxed tier headings.
     favorites_adaptation_active = bool(session.get("favorites_adaptation_active", 0))
-    # Tiered sessions keep a fixed exact→relaxed order; reordering the tail by favorite
-    # similarity would scramble the tier headings, so skip adaptation when tiers exist.
     if batch > PRIMARY_BATCHES and stroller_favs and not extra_reco_order and not reco_tiers:
-        shown_flat = {id_ for b in shown_raw for id_ in b}
-        if len(reco_order) > PRIMARY_POOL:
-            # Full filtered order stored — remaining is reco_order[PRIMARY_POOL:]
-            remaining_ids = [id_ for id_ in reco_order[PRIMARY_POOL:] if id_ not in shown_flat]
-        else:
-            reco_set = set(reco_order)
-            remaining_ids = [
-                s["id"] for s in catalog.get_all_strollers()
-                if s["id"] not in shown_flat and s["id"] not in reco_set
-            ]
-        remaining_pool = [catalog.get_stroller(id_) for id_ in remaining_ids]
-        remaining_pool = [s for s in remaining_pool if s]
-        fav_strollers = [catalog.get_stroller(id_) for id_ in stroller_favs]
-        fav_strollers = [s for s in fav_strollers if s]
-        llm_order = await rank_similar_strollers(fav_strollers, remaining_pool)
-        if llm_order:
-            extra_reco_order = llm_order
+        adapted = await _adapt_order_to_favorites(reco_order, stroller_favs, shown_raw, catalog)
+        if adapted:
+            extra_reco_order = adapted
             favorites_adaptation_active = True
 
-    if reco_tiers:
-        # Tiered sessions are plain contiguous slices of the full assortment; row-fill the
-        # last tier so its grid section doesn't end on an orphan card.
-        already_shown = sum(len(b) for b in shown_raw[:batch - 1])
-        batch_ids = tiered_batch_ids(reco_order, reco_tiers, already_shown, BATCH_SIZE)
-    else:
-        batch_products = get_batch(
-            batch, reco_order, acc_favs_list, catalog,
-            stroller_favorites=stroller_favs,
-            extra_reco_order=extra_reco_order or None,
-        )
-        batch_ids = [p["id"] for p in batch_products]
-
-    # Update shown_products and other state
-    db = await get_db()
-    updates = {}
-
-    if batch > shown_batches_count:
-        shown_raw.append(batch_ids)
-        updates["shown_products"] = json.dumps(shown_raw)
-
-    if batch == 1 and not session.get("first_reco_at"):
-        updates["first_reco_at"] = _now()
-
-    if extra_reco_order and not session.get("extra_reco_order"):
-        updates["extra_reco_order"] = json.dumps(extra_reco_order)
-        updates["favorites_adaptation_active"] = 1 if favorites_adaptation_active else 0
-
-    if updates:
-        set_clause = ", ".join(f"{k}=?" for k in updates)
-        await db.execute(
-            f"UPDATE sessions SET {set_clause} WHERE session_id=?",
-            (*updates.values(), session_id),
-        )
-        await db.commit()
+    batch_ids = _select_batch_ids(
+        batch, reco_order, reco_tiers, extra_reco_order, shown_raw, catalog
+    )
+    await _persist_batch_state(
+        session, session_id, batch, batch_ids, shown_raw, shown_batches_count,
+        extra_reco_order, favorites_adaptation_active,
+    )
 
     llm_kf = parse_json_field(session.get("llm_key_features"), {})
-
     products = _build_products(batch_ids, profile, catalog, llm_kf)
     missing_key_features = [id_ for id_ in batch_ids if id_ not in llm_kf]
     if missing_key_features:
-        background_tasks.add_task(_generate_key_features_for_products, session_id, missing_key_features, profile)
+        background_tasks.add_task(
+            _generate_key_features_for_products, session_id, missing_key_features, profile
+        )
 
     return RecommendationBatchResponse(
         batch=batch,
@@ -450,45 +480,46 @@ def _looks_like_feature_line(line: str) -> bool:
     return False
 
 
-def _extract_features_from_text(text: str | None) -> str:
-    if not text:
-        return ""
-    clean = text.replace("\r\n", "\n").replace("\r", "\n")
-    lines = [line.strip() for line in clean.split("\n")]
-    if not any(lines):
-        return ""
-
+def _collect_heading_features(lines: list[str]) -> list[str]:
+    """Lines under a 'kenmerken/specificaties' heading, until a stop-heading or blank gap."""
     start = -1
     for i, line in enumerate(lines):
         lowered = line.lower().strip(" :")
         if any(lowered.startswith(h) for h in _FEATURE_HEADINGS):
             start = i + 1
             break
+    if start < 0:
+        return []
 
     collected: list[str] = []
-    if start >= 0:
-        for line in lines[start:]:
-            lowered = line.lower().strip(" :")
-            if any(lowered.startswith(h) for h in _STOP_HEADINGS):
-                break
-            if line and _looks_like_feature_line(line):
-                collected.append(line)
-            elif collected and not line:
-                break
+    for line in lines[start:]:
+        lowered = line.lower().strip(" :")
+        if any(lowered.startswith(h) for h in _STOP_HEADINGS):
+            break
+        if line and _looks_like_feature_line(line):
+            collected.append(line)
+        elif collected and not line:
+            break
+    return collected
 
-    if not collected:
-        # Fallback: capture inline "Specificaties: ..." style text
-        m = re.search(
-            r"(belangrijkste kenmerken|technische specificaties|specificaties|kenmerken)\s*:?\s*(.+)",
-            clean,
-            flags=re.IGNORECASE | re.DOTALL,
-        )
-        if m:
-            tail = m.group(2).strip()
-            tail = re.split(r"\b(onderhoud|wat zit er in de doos)\b", tail, flags=re.IGNORECASE)[0]
-            parts = [p.strip(" •-\n\t") for p in re.split(r"[.;]\s+|\n+", tail) if p.strip()]
-            collected = [p for p in parts if _looks_like_feature_line(p)][:8]
 
+def _fallback_inline_features(clean: str) -> list[str]:
+    """Fallback when no heading block: capture inline 'Specificaties: ...' style text."""
+    m = re.search(
+        r"(belangrijkste kenmerken|technische specificaties|specificaties|kenmerken)\s*:?\s*(.+)",
+        clean,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    if not m:
+        return []
+    tail = m.group(2).strip()
+    tail = re.split(r"\b(onderhoud|wat zit er in de doos)\b", tail, flags=re.IGNORECASE)[0]
+    parts = [p.strip(" •-\n\t") for p in re.split(r"[.;]\s+|\n+", tail) if p.strip()]
+    return [p for p in parts if _looks_like_feature_line(p)][:8]
+
+
+def _normalize_feature_lines(collected: list[str]) -> list[str]:
+    """Strip bullet glyphs, dedupe by alphanumeric key, prefix '• ', cap at 8."""
     normalized: list[str] = []
     seen: set[str] = set()
     for line in collected:
@@ -502,8 +533,18 @@ def _extract_features_from_text(text: str | None) -> str:
         normalized.append(f"• {item}")
         if len(normalized) == 8:
             break
+    return normalized
 
-    return "\n".join(normalized)
+
+def _extract_features_from_text(text: str | None) -> str:
+    if not text:
+        return ""
+    clean = text.replace("\r\n", "\n").replace("\r", "\n")
+    lines = [line.strip() for line in clean.split("\n")]
+    if not any(lines):
+        return ""
+    collected = _collect_heading_features(lines) or _fallback_inline_features(clean)
+    return "\n".join(_normalize_feature_lines(collected))
 
 
 def _pick_key_features(stroller: dict, llm_key_features: str | None) -> str:
@@ -573,14 +614,14 @@ async def _generate_talking_points_for_session(session_id: str):
 @router.post("/current/filters/tags", response_model=FilterTagsResponse)
 async def save_filter_tags(
     body: FilterTagsRequest,
-    session_id: Optional[str] = Cookie(default=None),
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
     _require_active(session)
     if not session.get("quiz_submitted_at"):
-        raise HTTPException(422, detail="Quiz not submitted yet.")
+        raise HTTPException(422, detail=QUIZ_NOT_SUBMITTED_DETAIL)
 
     db = await get_db()
     await db.execute(
@@ -596,14 +637,14 @@ async def save_filter_tags(
 @router.post("/current/filters/brands", response_model=FilterBrandsResponse)
 async def save_filter_brands(
     body: FilterBrandsRequest,
-    session_id: Optional[str] = Cookie(default=None),
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
     _require_active(session)
     if not session.get("quiz_submitted_at"):
-        raise HTTPException(422, detail="Quiz not submitted yet.")
+        raise HTTPException(422, detail=QUIZ_NOT_SUBMITTED_DETAIL)
 
     db = await get_db()
     await db.execute(
@@ -624,14 +665,14 @@ async def save_filter_brands(
 @router.post("/current/filters/collections", response_model=FilterCollectionsResponse)
 async def save_filter_collections(
     body: FilterCollectionsRequest,
-    session_id: Optional[str] = Cookie(default=None),
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
     _require_active(session)
     if not session.get("quiz_submitted_at"):
-        raise HTTPException(422, detail="Quiz not submitted yet.")
+        raise HTTPException(422, detail=QUIZ_NOT_SUBMITTED_DETAIL)
 
     tags = parse_json_field(session.get("filter_tags"), [])
     brands = parse_json_field(session.get("filter_brands"), [])
@@ -658,6 +699,23 @@ async def save_filter_collections(
     return FilterCollectionsResponse(stroller_count=stroller_count, accessory_count=accessory_count)
 
 
+def _answer_tags(ans, question_map: dict) -> list[str]:
+    """Validate one answer against its question and return the tags its options carry."""
+    q = question_map.get(ans.question_id)
+    if not q:
+        raise HTTPException(422, detail=f"Unknown question_id: {ans.question_id}")
+    if not q["multi"] and len(ans.option_indices) > 1:
+        raise HTTPException(422, detail=f"Question {ans.question_id} accepts one answer.")
+    opt_map = {o["index"]: o for o in q["options"]}
+    tags: list[str] = []
+    for idx in ans.option_indices:
+        opt = opt_map.get(idx)
+        if opt is None:
+            raise HTTPException(422, detail=f"Invalid option_index {idx} for {ans.question_id}.")
+        tags.extend(opt.get("tags", []))
+    return tags
+
+
 def _tags_from_answers(body: TagQuizRequest) -> list[str]:
     """Map answer indices to catalog tags server-side; tags never travel to the client."""
     config = load_tag_questions()
@@ -666,34 +724,24 @@ def _tags_from_answers(body: TagQuizRequest) -> list[str]:
     tags: list[str] = []
     seen: set[str] = set()
     for ans in body.answers:
-        q = question_map.get(ans.question_id)
-        if not q:
-            raise HTTPException(422, detail=f"Unknown question_id: {ans.question_id}")
-        if not q["multi"] and len(ans.option_indices) > 1:
-            raise HTTPException(422, detail=f"Question {ans.question_id} accepts one answer.")
-        opt_map = {o["index"]: o for o in q["options"]}
-        for idx in ans.option_indices:
-            opt = opt_map.get(idx)
-            if opt is None:
-                raise HTTPException(422, detail=f"Invalid option_index {idx} for {ans.question_id}.")
-            for tag in opt.get("tags", []):
-                if tag not in seen:
-                    seen.add(tag)
-                    tags.append(tag)
+        for tag in _answer_tags(ans, question_map):
+            if tag not in seen:
+                seen.add(tag)
+                tags.append(tag)
     return tags
 
 
 @router.post("/current/tag-quiz/count", response_model=TagCountResponse)
 async def tag_quiz_count(
     body: TagQuizRequest,
-    session_id: Optional[str] = Cookie(default=None),
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
     """Preview match counts for the currently-selected tags. Does not mutate the session.
 
     Test/debug aid: lets us watch how many strollers remain after each selection.
     """
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     await _get_session(session_id)
 
     tags = _tags_from_answers(body)
@@ -716,14 +764,14 @@ async def tag_quiz_count(
 @router.post("/current/tag-quiz", response_model=TagQuizResponse)
 async def submit_tag_quiz(
     body: TagQuizRequest,
-    session_id: Optional[str] = Cookie(default=None),
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
     _require_active(session)
     if not session.get("quiz_submitted_at"):
-        raise HTTPException(422, detail="Quiz not submitted yet.")
+        raise HTTPException(422, detail=QUIZ_NOT_SUBMITTED_DETAIL)
 
     tags = _tags_from_answers(body)
     catalog = get_catalog()
@@ -775,14 +823,14 @@ async def submit_tag_quiz(
 @router.post("/current/note")
 async def save_note(
     body: NoteRequest,
-    session_id: Optional[str] = Cookie(default=None),
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
     _require_active(session)
     if not session.get("quiz_submitted_at"):
-        raise HTTPException(422, detail="Quiz not submitted yet.")
+        raise HTTPException(422, detail=QUIZ_NOT_SUBMITTED_DETAIL)
 
     note = body.note[:1000] if body.note else None
     reco_order: list[str] = parse_json_field(session.get("reco_order"), [])
@@ -820,10 +868,10 @@ async def save_note(
 @router.post("/current/favorites", response_model=FavoriteToggleResponse)
 async def toggle_favorite(
     body: FavoriteToggleRequest,
-    session_id: Optional[str] = Cookie(default=None),
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
     _require_active(session)
 
@@ -861,14 +909,14 @@ async def toggle_favorite(
 
 
 @router.get("/current/favorites/items", response_model=FavoriteItemsResponse)
-async def get_favorite_items(session_id: Optional[str] = Cookie(default=None)):
+async def get_favorite_items(session_id: Annotated[Optional[str], Cookie()] = None):
     """Resolve favorite IDs to product details straight from the catalog.
 
     The shortlist must not depend on which recommendation batches are still loaded
     client-side, so favorites are resolved server-side here.
     """
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
     catalog = get_catalog()
 
@@ -892,11 +940,13 @@ async def get_favorite_items(session_id: Optional[str] = Cookie(default=None)):
 
 @router.post("/current/handoff", response_model=HandoffResponse)
 async def handoff(
+    request: Request,
     background_tasks: BackgroundTasks,
-    session_id: Optional[str] = Cookie(default=None),
+    session_id: Annotated[Optional[str], Cookie()] = None,
 ):
+    check_rate_limit(f"sessions:handoff:{client_ip(request)}", limit=20, window_seconds=300)
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
 
     if session["status"] == "handed_off":
@@ -904,7 +954,7 @@ async def handoff(
     # Reject abandoned (and any non-active) sessions — handoff must start from active.
     _require_active(session)
     if not session.get("quiz_submitted_at"):
-        raise HTTPException(422, detail="Quiz not submitted yet.")
+        raise HTTPException(422, detail=QUIZ_NOT_SUBMITTED_DETAIL)
     if not session.get("first_reco_at"):
         raise HTTPException(422, detail="No recommendations shown yet.")
 
@@ -929,13 +979,13 @@ async def handoff(
 
 
 @router.post("/current/abandon")
-async def abandon(session_id: Optional[str] = Cookie(default=None)):
+async def abandon(session_id: Annotated[Optional[str], Cookie()] = None):
     if not session_id:
-        raise HTTPException(401, detail="No session cookie.")
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)
 
     if session["status"] == "handed_off":
-        raise HTTPException(409, detail="Session is locked after handoff.")
+        raise HTTPException(409, detail=LOCKED_DETAIL)
 
     db = await get_db()
     await db.execute(

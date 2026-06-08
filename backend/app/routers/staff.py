@@ -1,7 +1,7 @@
 import secrets
 from typing import Optional
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from app.config import settings
@@ -9,6 +9,7 @@ from app.database import get_db
 from app.schemas import StaffSessionItem, StaffSessionDetail
 from app.services.auth import verify_token
 from app.services.catalog import get_catalog
+from app.services.rate_limit import check_rate_limit, client_ip
 from app.services.session_service import (
     fetch_session_by_code,
     session_detail_from_row,
@@ -20,12 +21,14 @@ security = HTTPBasic(auto_error=False)
 
 
 def verify_staff(
+    request: Request,
     auth_token: Optional[str] = Cookie(default=None),
     credentials: Optional[HTTPBasicCredentials] = Depends(security),
 ):
     # Cookie session (preferred) — the admin role also satisfies staff access.
     if verify_token(auth_token) in ("staff", "admin"):
         return
+    check_rate_limit(f"staff:auth:{client_ip(request)}", limit=10, window_seconds=300)
     # Backwards-compatible HTTP Basic.
     if (
         credentials
@@ -38,11 +41,13 @@ def verify_staff(
 
 @router.get("/sessions", response_model=list[StaffSessionItem])
 async def list_sessions(
+    request: Request,
     code: Optional[str] = None,
     date: Optional[str] = None,
     source: Optional[str] = None,
     _: HTTPBasicCredentials = Depends(verify_staff),
 ):
+    check_rate_limit(f"staff:list:{client_ip(request)}", limit=60, window_seconds=60)
     db = await get_db()
     conditions = []
     params = []
@@ -68,9 +73,11 @@ async def list_sessions(
 
 @router.get("/sessions/{session_code}", response_model=StaffSessionDetail)
 async def get_session_by_code(
+    request: Request,
     session_code: str,
     _: HTTPBasicCredentials = Depends(verify_staff),
 ):
+    check_rate_limit(f"staff:detail:{client_ip(request)}", limit=60, window_seconds=60)
     db = await get_db()
     row = await fetch_session_by_code(db, session_code)
     if not row:

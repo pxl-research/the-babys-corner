@@ -42,8 +42,9 @@ async def get_db() -> aiosqlite.Connection:
     global _db
     if _db is None:
         os.makedirs(os.path.dirname(settings.database_path), exist_ok=True)
-        _db = await aiosqlite.connect(settings.database_path)
-        _db.row_factory = aiosqlite.Row
+        conn = await aiosqlite.connect(settings.database_path)
+        conn.row_factory = aiosqlite.Row
+        _db = conn
     return _db
 
 
