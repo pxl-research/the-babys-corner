@@ -1,4 +1,5 @@
 from app.services.recommendations import (
+    BATCH_SIZE,
     compute_first_nine,
     compute_filtered_order,
     compute_progressive_tag_order,
@@ -141,8 +142,16 @@ def test_batch_rotation_returns_existing_batch_idempotently():
     assert [p["id"] for p in batch1_a] == [p["id"] for p in batch1_b]
 
 
+def test_batch_one_fills_the_grid():
+    strollers = [make_stroller(f"ST{i:03}", "A") for i in range(20)]
+    catalog = make_catalog(strollers)
+    reco_order = [s["id"] for s in compute_first_nine("A", catalog)]
+    batch1 = get_batch(1, reco_order, [], catalog)
+    assert len(batch1) == BATCH_SIZE
+
+
 def test_batch_rotation_no_duplicates_until_pool_exhausted():
-    strollers = [make_stroller(f"ST{i:03}", "A") for i in range(9)]
+    strollers = [make_stroller(f"ST{i:03}", "A") for i in range(20)]
     catalog = make_catalog(strollers)
     reco_order = [s["id"] for s in compute_first_nine("A", catalog)]
     seen = set()
@@ -151,6 +160,7 @@ def test_batch_rotation_no_duplicates_until_pool_exhausted():
         ids = [p["id"] for p in batch]
         assert not seen & set(ids)
         seen |= set(ids)
+    assert len(seen) == 20
 
 
 def test_later_batch_similarity_uses_stroller_favorites_only():

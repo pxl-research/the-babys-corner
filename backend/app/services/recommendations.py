@@ -268,6 +268,15 @@ def reorder_within_tiers(
     return ordered, rebuilt
 
 
+# Strollers shown per batch on the results page. Sized for comfortable browsing
+# (fills a 3-column grid). PRIMARY_POOL is the count of leading reco_order picks
+# (see compute_first_nine) served before the relaxed/remaining assortment and
+# favorites adaptation kick in; PRIMARY_BATCHES is how many batches that pool spans.
+BATCH_SIZE = 9
+PRIMARY_POOL = 9
+PRIMARY_BATCHES = PRIMARY_POOL // BATCH_SIZE
+
+
 def get_batch(
     batch_num: int,
     reco_order: list[str],
@@ -276,16 +285,18 @@ def get_batch(
     stroller_favorites: list[str] | None = None,
     extra_reco_order: list[str] | None = None,
 ) -> list[dict]:
-    start = (batch_num - 1) * 3
-    end = start + 3
+    start = (batch_num - 1) * BATCH_SIZE
+    end = start + BATCH_SIZE
 
-    if batch_num <= 3:
-        batch_ids = reco_order[start:end]
+    # Primary pool: leading PRIMARY_POOL picks of reco_order, served first.
+    if start < PRIMARY_POOL:
+        batch_ids = reco_order[start:min(end, PRIMARY_POOL)]
         return [s for id_ in batch_ids if (s := catalog.get_stroller(id_))]
 
-    # Batch 4+: prefer items beyond position 9 in reco_order (filter-generated full order);
-    # fall back to catalog remainder when reco_order has only 9 entries (quiz-generated).
-    remaining_from_reco = reco_order[9:]
+    # Beyond the primary pool: prefer the relaxed tail of reco_order (filter-generated
+    # full order); fall back to catalog remainder when reco_order holds only the
+    # primary pool (quiz-generated).
+    remaining_from_reco = reco_order[PRIMARY_POOL:]
     if remaining_from_reco:
         remaining = remaining_from_reco
     else:
@@ -297,8 +308,8 @@ def get_batch(
         remaining_set = set(remaining)
         remaining = [id_ for id_ in extra_reco_order if id_ in remaining_set]
 
-    extra_start = (batch_num - 4) * 3
-    batch_ids = remaining[extra_start:extra_start + 3]
+    extra_start = start - PRIMARY_POOL
+    batch_ids = remaining[extra_start:extra_start + BATCH_SIZE]
     return [s for id_ in batch_ids if (s := catalog.get_stroller(id_))]
 
 

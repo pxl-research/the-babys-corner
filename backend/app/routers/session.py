@@ -42,6 +42,8 @@ from app.schemas import (
 from app.services.catalog import get_catalog, is_available
 from app.services.profile import compute_profile
 from app.services.recommendations import (
+    PRIMARY_BATCHES,
+    PRIMARY_POOL,
     compute_first_nine,
     compute_filtered_order,
     compute_tiered_tag_order,
@@ -306,11 +308,11 @@ async def get_recommendations(
     favorites_adaptation_active = bool(session.get("favorites_adaptation_active", 0))
     # Tiered sessions keep a fixed exact→relaxed order; reordering the tail by favorite
     # similarity would scramble the tier headings, so skip adaptation when tiers exist.
-    if batch >= 4 and stroller_favs and not extra_reco_order and not reco_tiers:
+    if batch > PRIMARY_BATCHES and stroller_favs and not extra_reco_order and not reco_tiers:
         shown_flat = {id_ for b in shown_raw for id_ in b}
-        if len(reco_order) > 9:
-            # Full filtered order stored — remaining is reco_order[9:]
-            remaining_ids = [id_ for id_ in reco_order[9:] if id_ not in shown_flat]
+        if len(reco_order) > PRIMARY_POOL:
+            # Full filtered order stored — remaining is reco_order[PRIMARY_POOL:]
+            remaining_ids = [id_ for id_ in reco_order[PRIMARY_POOL:] if id_ not in shown_flat]
         else:
             reco_set = set(reco_order)
             remaining_ids = [
