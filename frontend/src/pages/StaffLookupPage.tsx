@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import StaffAnswerList from '../components/StaffAnswerList'
+import FavoriteCard from '../components/FavoriteCard'
 import LoginForm from '../components/LoginForm'
 import SessionList from '../components/SessionList'
 import { api } from '../api/client'
@@ -86,6 +87,34 @@ export default function StaffLookupPage() {
               E-mail naar medewerker niet verzonden. Gebruik de sessiecode.
             </p>
           )}
+          <section className="mb-6">
+            <h3 className="font-display text-xl font-bold text-ink mb-1">Favorieten van de klant</h3>
+            <p className="text-ink/60 text-sm mb-3">De producten die de klant zelf bewaarde.</p>
+            {detail.stroller_favorites_named.length === 0 &&
+              detail.accessory_favorites_named.length === 0 && (
+                <p className="text-sm text-ink/50">Nog geen favorieten bewaard.</p>
+              )}
+            {detail.stroller_favorites_named.length > 0 && (
+              <>
+                <h4 className="text-sm font-semibold text-ink/70 mb-2">Kinderwagens</h4>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {detail.stroller_favorites_named.map((item) => (
+                    <FavoriteCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </>
+            )}
+            {detail.accessory_favorites_named.length > 0 && (
+              <>
+                <h4 className="text-sm font-semibold text-ink/70 mb-2">Accessoires</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {detail.accessory_favorites_named.map((item) => (
+                    <FavoriteCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
           <section className="mb-4">
             <h3 className="font-semibold text-ink mb-2">Antwoorden</h3>
             <StaffAnswerList answers={detail.quiz_answers} />
@@ -96,15 +125,6 @@ export default function StaffLookupPage() {
               <p className="text-sm text-ink/80">{detail.optional_note}</p>
             </section>
           )}
-          <section className="mb-4">
-            <h3 className="font-semibold text-ink mb-1">Favorieten</h3>
-            <p className="text-sm text-ink/60">
-              Kinderwagens: {detail.stroller_favorites_named.map((i) => `${i.name} — ${i.brand}`).join(', ') || '—'}
-            </p>
-            <p className="text-sm text-ink/60">
-              Accessoires: {detail.accessory_favorites_named.map((i) => `${i.name} — ${i.brand}`).join(', ') || '—'}
-            </p>
-          </section>
         </div>
       </div>
     )
