@@ -255,7 +255,6 @@ export default function QuizPage() {
         <div className="max-w-lg mx-auto px-6 py-8">
           <ProgressDots total={TOTAL_STEPS} current={stepNum} filled={filledDots} />
           <p className="font-display text-xl font-bold text-ink mt-6 mb-2">{tagQuestion.text}</p>
-          {tagQuestion.subtitle && <p className="text-sm text-ink/60 mb-1">{tagQuestion.subtitle}</p>}
           <p className="text-xs text-ink/50 mb-6">
             {tagQuestion.multi ? 'Meerdere antwoorden mogelijk' : 'Kies één antwoord'} — of sla over
           </p>
