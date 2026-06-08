@@ -9,19 +9,13 @@ import { useSessionStore } from '../store/sessionStore'
 import { useInactivityReset } from '../hooks/useInactivityReset'
 import type { StrollerItem, AccessoryItem } from '../api/client'
 
-const PROFILE_LABELS: Record<string, string> = {
-  A: 'Minimalist',
-  B: 'Ontdekker',
-  C: 'Planner',
-}
-
 export default function RecommendationsPage() {
   const navigate = useNavigate()
   const {
     source, recommendations, addBatch, currentBatch,
     strollerFavorites, accessoryFavorites, setFavorites,
     favoritesAdaptationActive, setFavoritesAdaptation,
-    profile, recoTiers, setRecoTiers,
+    recoTiers, setRecoTiers,
   } = useSessionStore()
 
   const [loading, setLoading] = useState(false)
@@ -83,9 +77,6 @@ export default function RecommendationsPage() {
       <Header />
       <div className="max-w-4xl mx-auto px-4 py-6">
         <h1 className="font-display text-2xl font-bold text-ink mb-1">Onze aanbevelingen voor jullie</h1>
-        {profile && PROFILE_LABELS[profile] && (
-          <p className="text-ink/60 text-sm mb-2">Afgestemd op jullie profiel: {PROFILE_LABELS[profile]}.</p>
-        )}
         {favoritesAdaptationActive && (
           <p className="text-brand text-sm mb-4">We houden rekening met jullie favorieten.</p>
         )}
