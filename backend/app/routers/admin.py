@@ -1,7 +1,7 @@
 import secrets
 from typing import Optional
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request
 from fastapi.responses import Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
@@ -11,6 +11,7 @@ from app.schemas import StaffSessionItem, StaffSessionDetail
 from app.services.auth import verify_token
 from app.services.catalog import get_catalog
 from app.services.export import build_xlsx
+from app.services.rate_limit import check_rate_limit, client_ip
 from app.services.session_service import (
     fetch_session_by_code,
     session_detail_from_row,
@@ -22,12 +23,14 @@ security = HTTPBasic(auto_error=False)
 
 
 def verify_admin(
+    request: Request,
     auth_token: Optional[str] = Cookie(default=None),
     credentials: Optional[HTTPBasicCredentials] = Depends(security),
 ):
     # Cookie session (preferred) — admin only.
     if verify_token(auth_token) == "admin":
         return
+    check_rate_limit(f"admin:auth:{client_ip(request)}", limit=10, window_seconds=300)
     # Backwards-compatible HTTP Basic.
     if (
         credentials
@@ -40,10 +43,12 @@ def verify_admin(
 
 @router.get("/sessions", response_model=list[StaffSessionItem])
 async def list_sessions(
+    request: Request,
     profile: Optional[str] = None,
     code: Optional[str] = None,
     _: HTTPBasicCredentials = Depends(verify_admin),
 ):
+    check_rate_limit(f"admin:list:{client_ip(request)}", limit=60, window_seconds=60)
     db = await get_db()
     conditions = []
     params = []
@@ -65,7 +70,11 @@ async def list_sessions(
 
 
 @router.get("/sessions/export")
-async def export_sessions(_: HTTPBasicCredentials = Depends(verify_admin)):
+async def export_sessions(
+    request: Request,
+    _: HTTPBasicCredentials = Depends(verify_admin),
+):
+    check_rate_limit(f"admin:export:{client_ip(request)}", limit=10, window_seconds=60)
     db = await get_db()
     async with db.execute("SELECT * FROM sessions ORDER BY started_at DESC") as cur:
         rows = [dict(row) async for row in cur]
@@ -80,9 +89,11 @@ async def export_sessions(_: HTTPBasicCredentials = Depends(verify_admin)):
 
 @router.get("/sessions/{session_code}", response_model=StaffSessionDetail)
 async def get_admin_session_detail(
+    request: Request,
     session_code: str,
     _: HTTPBasicCredentials = Depends(verify_admin),
 ):
+    check_rate_limit(f"admin:detail:{client_ip(request)}", limit=60, window_seconds=60)
     db = await get_db()
     row = await fetch_session_by_code(db, session_code)
     if not row:

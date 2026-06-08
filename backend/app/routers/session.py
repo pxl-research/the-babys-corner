@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from sqlite3 import IntegrityError
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Cookie, HTTPException, BackgroundTasks, Query
+from fastapi import APIRouter, Cookie, HTTPException, BackgroundTasks, Query, Request
 from fastapi.responses import JSONResponse
 
 from app.config import settings
@@ -62,6 +62,7 @@ from app.services.session_service import (
     resolve_stroller_batches,
 )
 from app.services.email import send_handoff_email
+from app.services.rate_limit import check_rate_limit, client_ip
 from app.services.llm import (
     generate_key_features,
     generate_talking_points,
@@ -121,7 +122,8 @@ def _require_active(session: dict):
 
 
 @router.post("", response_model=SessionCreateResponse)
-async def create_session(source: Annotated[str, Query()] = "home"):
+async def create_session(request: Request, source: Annotated[str, Query()] = "home"):
+    check_rate_limit(f"sessions:create:{client_ip(request)}", limit=60, window_seconds=300)
     session_id = str(uuid.uuid4())
     now = _now()
     db = await get_db()
@@ -938,9 +940,11 @@ async def get_favorite_items(session_id: Annotated[Optional[str], Cookie()] = No
 
 @router.post("/current/handoff", response_model=HandoffResponse)
 async def handoff(
+    request: Request,
     background_tasks: BackgroundTasks,
     session_id: Annotated[Optional[str], Cookie()] = None,
 ):
+    check_rate_limit(f"sessions:handoff:{client_ip(request)}", limit=20, window_seconds=300)
     if not session_id:
         raise HTTPException(401, detail=NO_SESSION_DETAIL)
     session = await _get_session(session_id)

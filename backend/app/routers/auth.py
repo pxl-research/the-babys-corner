@@ -1,12 +1,13 @@
 import secrets
 from typing import Optional
 
-from fastapi import APIRouter, Cookie, HTTPException
+from fastapi import APIRouter, Cookie, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.config import settings
 from app.services.auth import COOKIE_NAME, DEFAULT_TTL_SECONDS, issue_token, verify_token
+from app.services.rate_limit import check_rate_limit, client_ip
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -29,7 +30,8 @@ def _role_for(username: str, password: str) -> Optional[str]:
 
 
 @router.post("/login")
-async def login(body: LoginRequest):
+async def login(body: LoginRequest, request: Request):
+    check_rate_limit(f"auth:login:ip:{client_ip(request)}", limit=10, window_seconds=300)
     role = _role_for(body.username, body.password)
     if not role:
         raise HTTPException(401, detail="Invalid credentials.")
