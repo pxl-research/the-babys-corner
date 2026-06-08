@@ -313,8 +313,21 @@ def get_batch(
     return [s for id_ in batch_ids if (s := catalog.get_stroller(id_))]
 
 
-# How many cross-sell accessories to surface, scaled by profile appetite.
-_CROSS_SELL_TARGET = {"A": 5, "B": 10, "C": 15}
+# Cross-sell composition per profile: how many accessories to draw from each profile
+# category. Caps are the row sums (A=5, B=10, C=15). Untagged accessories are never
+# shown, and categories absent for a profile are excluded entirely:
+#   A (Minimalist): must-only.
+#   B (Ontdekker):  mostly must, a few should.
+#   C (Planner):    even mix of must, should and nice.
+# When a category has fewer items than its quota, the shortfall is redistributed to the
+# profile's other allowed categories in priority order (must > should > nice).
+_CROSS_SELL_QUOTA: dict[str, dict[str, int]] = {
+    "A": {"must": 5},
+    "B": {"must": 7, "should": 3},
+    "C": {"must": 5, "should": 5, "nice": 5},
+}
+
+_TIER_CATEGORY = {0: "must", 1: "should", 2: "nice"}
 
 
 def _accessory_collections(accessory: dict) -> set[str]:
@@ -325,17 +338,82 @@ def _accessory_collections(accessory: dict) -> set[str]:
     return colls
 
 
+def _accessory_profile_tier(accessory: dict, profile: str) -> int:
+    """Profile relevance of an accessory: must(0) > should(1) > nice(2) > untagged(3)."""
+    if profile in (accessory.get("must_have_profiles") or []):
+        return 0
+    if profile in (accessory.get("should_have_profiles") or []):
+        return 1
+    if profile in (accessory.get("nice_to_have_profiles") or []):
+        return 2
+    return 3
+
+
+def _rank_by_color(items: list[dict], stroller_colors: set[str], rng: random.Random) -> list[dict]:
+    """Colour matches to the stroller first, shuffled within each group, deduped by name."""
+    matches = [a for a in items if stroller_colors and (_extract_colors(a.get("name", "")) & stroller_colors)]
+    match_ids = {id(a) for a in matches}
+    rest = [a for a in items if id(a) not in match_ids]
+    rng.shuffle(matches)
+    rng.shuffle(rest)
+
+    seen: set[str] = set()
+    deduped: list[dict] = []
+    for acc in matches + rest:
+        norm = re.sub(r"[^a-z0-9]+", "", (acc.get("name") or "").lower())
+        if norm in seen:
+            continue
+        seen.add(norm)
+        deduped.append(acc)
+    return deduped
+
+
+def _allocate_by_quota(buckets: dict[str, list[dict]], quota: dict[str, int]) -> list[dict]:
+    """Take up to each category's quota, then top up to the cap from leftover items.
+
+    Redistribution prefers must, then should, then nice, so a short category is covered
+    by the next-best one rather than left unfilled.
+    """
+    cap = sum(quota.values())
+    order = [c for c in ("must", "should", "nice") if quota.get(c, 0) > 0]
+    taken = dict.fromkeys(order, 0)
+    selected: list[dict] = []
+
+    for cat in order:
+        items = buckets.get(cat, [])
+        n = min(quota[cat], len(items))
+        selected.extend(items[:n])
+        taken[cat] = n
+
+    while len(selected) < cap:
+        advanced = False
+        for cat in order:
+            if len(selected) >= cap:
+                break
+            items = buckets.get(cat, [])
+            if taken[cat] < len(items):
+                selected.append(items[taken[cat]])
+                taken[cat] += 1
+                advanced = True
+        if not advanced:
+            break
+    return selected
+
+
 def get_cross_sell_items(
     stroller: dict,
     profile: str,
     catalog: CatalogService,
 ) -> list[dict]:
-    """Accessories compatible with the stroller's collection only.
+    """Accessories compatible with the stroller's collection, composed by profile.
 
-    An accessory matches when the stroller's collection appears in its
-    `compatible_collections` (or equals its own collection). Strollers whose
-    collection has no compatible accessory show none — this is intentional;
-    cross-sell is strictly collection-scoped, not a heuristic.
+    Eligibility is strictly collection-scoped: an accessory matches when the
+    stroller's collection appears in its `compatible_collections` (or equals its own
+    collection). Strollers whose collection has no compatible accessory show none.
+
+    From that pool, accessories are drawn per the profile's category quota
+    (`_CROSS_SELL_QUOTA`) using their must/should/nice tags — untagged accessories are
+    never shown. Within a category, colour matches to the stroller rank first.
     """
     collection = (stroller.get("collection") or "").strip()
     if not collection:
@@ -345,33 +423,20 @@ def get_cross_sell_items(
     if not pool:
         return []
 
-    target_total = _CROSS_SELL_TARGET.get(profile, _CROSS_SELL_TARGET["B"])
+    quota = _CROSS_SELL_QUOTA.get(profile, _CROSS_SELL_QUOTA["B"])
     stroller_colors = _extract_colors(stroller.get("name", ""))
-
-    def normalize_name(name: str) -> str:
-        return re.sub(r"[^a-z0-9]+", "", (name or "").lower())
-
-    # Colour-matching accessories first, then the rest; shuffle within each group.
     rng = random.Random()
-    if stroller_colors:
-        color_matches = [a for a in pool if _extract_colors(a.get("name", "")) & stroller_colors]
-        rest = [a for a in pool if a not in color_matches]
-    else:
-        color_matches, rest = [], pool[:]
-    rng.shuffle(color_matches)
-    rng.shuffle(rest)
 
-    selected: list[dict] = []
-    seen_names: set[str] = set()
-    for acc in color_matches + rest:
-        norm = normalize_name(acc.get("name", ""))
-        if norm in seen_names:
+    buckets: dict[str, list[dict]] = {}
+    for acc in pool:
+        cat = _TIER_CATEGORY.get(_accessory_profile_tier(acc, profile))
+        if cat is None or cat not in quota:
             continue
-        seen_names.add(norm)
-        selected.append(acc)
-        if len(selected) == target_total:
-            break
-    return selected
+        buckets.setdefault(cat, []).append(acc)
+    for cat in buckets:
+        buckets[cat] = _rank_by_color(buckets[cat], stroller_colors, rng)
+
+    return _allocate_by_quota(buckets, quota)
 
 
 def _extract_colors(name: str) -> set[str]:

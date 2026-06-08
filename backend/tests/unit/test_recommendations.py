@@ -225,10 +225,10 @@ def _stroller_in(collection: str, profile: str = "A", name: str = "Stroller") ->
 def test_cross_sell_only_returns_collection_compatible():
     stroller = _stroller_in("Fox 5")
     accessories = [
-        make_accessory("A1", "Adapter", "bugaboo", compatible_collections=["Fox 5"]),
-        make_accessory("A2", "Voetenzak", "bugaboo", collection="Fox 5"),
-        make_accessory("X1", "Other adapter", "joolz", compatible_collections=["Donkey"]),
-        make_accessory("X2", "Unrelated", "cybex"),
+        make_accessory("A1", "Adapter", "bugaboo", compatible_collections=["Fox 5"], must=["A"]),
+        make_accessory("A2", "Voetenzak", "bugaboo", collection="Fox 5", must=["A"]),
+        make_accessory("X1", "Other adapter", "joolz", compatible_collections=["Donkey"], must=["A"]),
+        make_accessory("X2", "Unrelated", "cybex", must=["A"]),
     ]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
     items = get_cross_sell_items(stroller, "A", catalog)
@@ -254,7 +254,7 @@ def test_cross_sell_count_scales_by_profile():
     stroller_a = _stroller_in("Fox 5", "A")
     stroller_c = _stroller_in("Fox 5", "C")
     accessories = [
-        make_accessory(f"A{i}", f"Item {i}", "bugaboo", compatible_collections=["Fox 5"])
+        make_accessory(f"A{i}", f"Item {i}", "bugaboo", compatible_collections=["Fox 5"], must=["A", "B", "C"])
         for i in range(30)
     ]
     catalog = CatalogService(strollers=[stroller_a], accessories=accessories)
@@ -265,10 +265,10 @@ def test_cross_sell_count_scales_by_profile():
 def test_cross_sell_dedupes_by_normalized_name():
     stroller = _stroller_in("Fox 5")
     accessories = [
-        make_accessory("A1", "Regenhoes Bee", "bugaboo", compatible_collections=["Fox 5"]),
-        make_accessory("A2", "regenhoes bee", "bugaboo", compatible_collections=["Fox 5"]),
-        make_accessory("A3", "Regenhoes   Bee!!!", "bugaboo", compatible_collections=["Fox 5"]),
-        make_accessory("A4", "Voetenzak", "bugaboo", compatible_collections=["Fox 5"]),
+        make_accessory("A1", "Regenhoes Bee", "bugaboo", compatible_collections=["Fox 5"], must=["A"]),
+        make_accessory("A2", "regenhoes bee", "bugaboo", compatible_collections=["Fox 5"], must=["A"]),
+        make_accessory("A3", "Regenhoes   Bee!!!", "bugaboo", compatible_collections=["Fox 5"], must=["A"]),
+        make_accessory("A4", "Voetenzak", "bugaboo", compatible_collections=["Fox 5"], must=["A"]),
     ]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
     items = get_cross_sell_items(stroller, "A", catalog)
@@ -279,7 +279,7 @@ def test_cross_sell_dedupes_by_normalized_name():
 def test_cross_sell_keeps_unavailable_items():
     stroller = _stroller_in("Fox 5")
     accessories = [
-        make_accessory(f"A{i}", f"Item {i}", "bugaboo", compatible_collections=["Fox 5"], available=False)
+        make_accessory(f"A{i}", f"Item {i}", "bugaboo", compatible_collections=["Fox 5"], available=False, must=["A"])
         for i in range(3)
     ]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
@@ -291,15 +291,114 @@ def test_cross_sell_keeps_unavailable_items():
 def test_cross_sell_prefers_matching_color_in_titles():
     stroller = _stroller_in("Aer²", name="Buggy ultracompact Aer2 - calming beige")
     accessories = [
-        make_accessory("M1", "Voetenzak space black", "joolz", compatible_collections=["Aer²"]),
-        make_accessory("M2", "Voetenzak calming beige", "joolz", compatible_collections=["Aer²"]),
-        make_accessory("M3", "Regenhoes zwart", "joolz", compatible_collections=["Aer²"]),
-        make_accessory("M4", "Liner calming beige", "joolz", compatible_collections=["Aer²"]),
+        make_accessory("M1", "Voetenzak space black", "joolz", compatible_collections=["Aer²"], must=["A"]),
+        make_accessory("M2", "Voetenzak calming beige", "joolz", compatible_collections=["Aer²"], must=["A"]),
+        make_accessory("M3", "Regenhoes zwart", "joolz", compatible_collections=["Aer²"], must=["A"]),
+        make_accessory("M4", "Liner calming beige", "joolz", compatible_collections=["Aer²"], must=["A"]),
     ]
     catalog = CatalogService(strollers=[stroller], accessories=accessories)
     items = get_cross_sell_items(stroller, "A", catalog)
     # Capped at 5 for profile A; with beige stroller, beige accessories rank first.
     assert any("beige" in a["name"].lower() for a in items[:2])
+
+
+def _acc(id_, must=None, should=None, nice=None):
+    return make_accessory(id_, f"Item {id_}", "bugaboo", compatible_collections=["Fox 5"],
+                          must=must, should=should, nice=nice)
+
+
+def test_cross_sell_minimalist_is_must_only():
+    # Profile A draws ONLY from must — should/nice/untagged are excluded entirely.
+    stroller = _stroller_in("Fox 5")
+    accessories = (
+        [_acc(f"M{i}", must=["A"]) for i in range(3)]
+        + [_acc(f"S{i}", should=["A"]) for i in range(3)]
+        + [_acc(f"N{i}", nice=["A"]) for i in range(3)]
+        + [_acc(f"O{i}") for i in range(3)]
+    )
+    catalog = CatalogService(strollers=[stroller], accessories=accessories)
+    ids = {a["id"] for a in get_cross_sell_items(stroller, "A", catalog)}
+    assert ids == {"M0", "M1", "M2"}
+
+
+def test_cross_sell_minimalist_shows_fewer_when_must_short():
+    # Fewer than 5 must → show only those, never backfill from should/nice.
+    stroller = _stroller_in("Fox 5")
+    accessories = [_acc("M0", must=["A"]), _acc("M1", must=["A"])] + [_acc(f"S{i}", should=["A"]) for i in range(10)]
+    catalog = CatalogService(strollers=[stroller], accessories=accessories)
+    items = get_cross_sell_items(stroller, "A", catalog)
+    assert {a["id"] for a in items} == {"M0", "M1"}
+
+
+def test_cross_sell_ontdekker_is_mostly_must_few_should():
+    # Profile B (cap 10): 7 must + 3 should when both are plentiful; no nice/untagged.
+    stroller = _stroller_in("Fox 5")
+    accessories = (
+        [_acc(f"M{i}", must=["B"]) for i in range(20)]
+        + [_acc(f"S{i}", should=["B"]) for i in range(20)]
+        + [_acc(f"N{i}", nice=["B"]) for i in range(20)]
+        + [_acc(f"O{i}") for i in range(20)]
+    )
+    catalog = CatalogService(strollers=[stroller], accessories=accessories)
+    items = get_cross_sell_items(stroller, "B", catalog)
+    assert len(items) == 10
+    n_must = sum(1 for a in items if a["id"].startswith("M"))
+    n_should = sum(1 for a in items if a["id"].startswith("S"))
+    assert (n_must, n_should) == (7, 3)
+
+
+def test_cross_sell_ontdekker_rebalances_when_must_short():
+    # B with only 4 must → fill the rest of the cap with should (still no nice/untagged).
+    stroller = _stroller_in("Fox 5")
+    accessories = (
+        [_acc(f"M{i}", must=["B"]) for i in range(4)]
+        + [_acc(f"S{i}", should=["B"]) for i in range(20)]
+        + [_acc(f"N{i}", nice=["B"]) for i in range(20)]
+    )
+    catalog = CatalogService(strollers=[stroller], accessories=accessories)
+    items = get_cross_sell_items(stroller, "B", catalog)
+    ids = [a["id"] for a in items]
+    assert len(ids) == 10
+    assert sum(1 for x in ids if x.startswith("M")) == 4
+    assert sum(1 for x in ids if x.startswith("S")) == 6
+    assert not any(x.startswith("N") for x in ids)
+
+
+def test_cross_sell_planner_is_even_split():
+    # Profile C (cap 15): even 5/5/5 across must/should/nice; no untagged.
+    stroller = _stroller_in("Fox 5")
+    accessories = (
+        [_acc(f"M{i}", must=["C"]) for i in range(20)]
+        + [_acc(f"S{i}", should=["C"]) for i in range(20)]
+        + [_acc(f"N{i}", nice=["C"]) for i in range(20)]
+        + [_acc(f"O{i}") for i in range(20)]
+    )
+    catalog = CatalogService(strollers=[stroller], accessories=accessories)
+    items = get_cross_sell_items(stroller, "C", catalog)
+    ids = [a["id"] for a in items]
+    assert len(ids) == 15
+    counts = (
+        sum(1 for x in ids if x.startswith("M")),
+        sum(1 for x in ids if x.startswith("S")),
+        sum(1 for x in ids if x.startswith("N")),
+    )
+    assert counts == (5, 5, 5)
+    assert not any(x.startswith("O") for x in ids)
+
+
+def test_cross_sell_planner_rebalances_when_category_short():
+    # C with only 3 must → top up the cap from should/nice (must-first), still no untagged.
+    stroller = _stroller_in("Fox 5")
+    accessories = (
+        [_acc(f"M{i}", must=["C"]) for i in range(3)]
+        + [_acc(f"S{i}", should=["C"]) for i in range(20)]
+        + [_acc(f"N{i}", nice=["C"]) for i in range(20)]
+    )
+    catalog = CatalogService(strollers=[stroller], accessories=accessories)
+    items = get_cross_sell_items(stroller, "C", catalog)
+    ids = [a["id"] for a in items]
+    assert len(ids) == 15
+    assert sum(1 for x in ids if x.startswith("M")) == 3
 
 
 # ── progressive tag-drop fallback ────────────────────────────────────────────
