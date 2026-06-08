@@ -276,6 +276,54 @@ BATCH_SIZE = 9
 PRIMARY_POOL = 9
 PRIMARY_BATCHES = PRIMARY_POOL // BATCH_SIZE
 
+# Results render in a 3-column grid; tier sections each get their own grid, so a tier
+# should end on a full row to avoid a lonely orphan card on its last line.
+GRID_COLUMNS = 3
+
+
+def _extend_to_full_row(end: int, tiers: list[dict], total: int) -> int:
+    """Grow a batch end index so the last tier shown ends on a full grid row.
+
+    Tiers are contiguous `{start, count}` segments of reco_order. Batches always end on a
+    tier-row boundary, so the items shown from the last tier are `end - tier.start`. If
+    that isn't a multiple of GRID_COLUMNS, extend within the tier to the next multiple —
+    unless the tier runs out first (then it's shown whole; the short last row is
+    unavoidable, "no more results in this tier").
+    """
+    if end <= 0 or not tiers:
+        return min(end, total)
+    last = None
+    for tier in tiers:
+        if tier["start"] < end:
+            last = tier
+        else:
+            break
+    if last is None:
+        return min(end, total)
+
+    shown_in_tier = end - last["start"]
+    remainder = shown_in_tier % GRID_COLUMNS
+    if remainder == 0:
+        return min(end, total)
+    tier_end = last["start"] + last["count"]
+    return min(end + (GRID_COLUMNS - remainder), tier_end, total)
+
+
+def tiered_batch_ids(
+    reco_order: list[str], tiers: list[dict], already_shown: int, batch_size: int
+) -> list[str]:
+    """Next contiguous slice of a tiered reco_order, row-filled.
+
+    Tiered sessions order the full assortment into exact→relaxed tiers with no favorites
+    rerank, so batches are plain contiguous slices. The slice starts after the items
+    already shown and is extended so its last tier ends on a full grid row.
+    """
+    start = already_shown
+    if start >= len(reco_order):
+        return []
+    end = _extend_to_full_row(min(start + batch_size, len(reco_order)), tiers, len(reco_order))
+    return reco_order[start:end]
+
 
 def get_batch(
     batch_num: int,

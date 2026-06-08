@@ -1,5 +1,6 @@
 from app.services.recommendations import (
     BATCH_SIZE,
+    tiered_batch_ids,
     compute_first_nine,
     compute_filtered_order,
     compute_progressive_tag_order,
@@ -399,6 +400,50 @@ def test_cross_sell_planner_rebalances_when_category_short():
     ids = [a["id"] for a in items]
     assert len(ids) == 15
     assert sum(1 for x in ids if x.startswith("M")) == 3
+
+
+# ── tiered batch row-fill ────────────────────────────────────────────────────
+
+
+def _tiers(*specs):
+    # specs: (start, count) pairs; labels are irrelevant to slicing
+    return [{"label": f"t{i}", "start": s, "count": c} for i, (s, c) in enumerate(specs)]
+
+
+def test_tiered_batch_fills_last_tier_to_full_row():
+    # 2 exact + a large relaxed tier. Base batch of 9 would show 7 relaxed (orphan row);
+    # row-fill extends to 9 relaxed so the section ends on a full row of 3.
+    order = [f"x{i}" for i in range(30)]
+    tiers = _tiers((0, 2), (2, 28))
+    ids = tiered_batch_ids(order, tiers, already_shown=0, batch_size=9)
+    assert len(ids) == 11           # 2 exact + 9 relaxed
+    assert ids[:2] == ["x0", "x1"]  # exact tier left at its natural 2 (data-limited)
+    assert (len(ids) - 2) % 3 == 0  # relaxed section fills full rows
+
+
+def test_tiered_batch_is_contiguous_across_batches():
+    order = [f"x{i}" for i in range(30)]
+    tiers = _tiers((0, 2), (2, 28))
+    b1 = tiered_batch_ids(order, tiers, already_shown=0, batch_size=9)
+    b2 = tiered_batch_ids(order, tiers, already_shown=len(b1), batch_size=9)
+    assert set(b1) & set(b2) == set()          # no overlap
+    assert b1 + b2 == order[: len(b1) + len(b2)]  # contiguous
+    assert len(b2) % 3 == 0                     # next batch also row-aligned
+
+
+def test_tiered_batch_short_tier_not_padded_past_its_end():
+    # Last tier has only 4 items (total 6); can't reach a multiple of 3, so it's shown
+    # whole — the short final row is unavoidable ("no more results in this tier").
+    order = [f"x{i}" for i in range(6)]
+    tiers = _tiers((0, 2), (2, 4))
+    ids = tiered_batch_ids(order, tiers, already_shown=0, batch_size=9)
+    assert ids == order  # all 6, capped at the assortment
+
+
+def test_tiered_batch_empty_when_exhausted():
+    order = [f"x{i}" for i in range(6)]
+    tiers = _tiers((0, 6))
+    assert tiered_batch_ids(order, tiers, already_shown=6, batch_size=9) == []
 
 
 # ── progressive tag-drop fallback ────────────────────────────────────────────

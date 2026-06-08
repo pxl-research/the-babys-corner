@@ -42,6 +42,7 @@ from app.schemas import (
 from app.services.catalog import get_catalog, is_available
 from app.services.profile import compute_profile
 from app.services.recommendations import (
+    BATCH_SIZE,
     PRIMARY_BATCHES,
     PRIMARY_POOL,
     compute_first_nine,
@@ -51,6 +52,7 @@ from app.services.recommendations import (
     diversify_llm_order,
     get_batch,
     get_cross_sell_items,
+    tiered_batch_ids,
 )
 from app.services.session_code import generate_session_code
 from app.services.session_service import (
@@ -328,12 +330,18 @@ async def get_recommendations(
             extra_reco_order = llm_order
             favorites_adaptation_active = True
 
-    batch_products = get_batch(
-        batch, reco_order, acc_favs_list, catalog,
-        stroller_favorites=stroller_favs,
-        extra_reco_order=extra_reco_order or None,
-    )
-    batch_ids = [p["id"] for p in batch_products]
+    if reco_tiers:
+        # Tiered sessions are plain contiguous slices of the full assortment; row-fill the
+        # last tier so its grid section doesn't end on an orphan card.
+        already_shown = sum(len(b) for b in shown_raw[:batch - 1])
+        batch_ids = tiered_batch_ids(reco_order, reco_tiers, already_shown, BATCH_SIZE)
+    else:
+        batch_products = get_batch(
+            batch, reco_order, acc_favs_list, catalog,
+            stroller_favorites=stroller_favs,
+            extra_reco_order=extra_reco_order or None,
+        )
+        batch_ids = [p["id"] for p in batch_products]
 
     # Update shown_products and other state
     db = await get_db()
