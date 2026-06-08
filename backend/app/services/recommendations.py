@@ -328,9 +328,7 @@ def tiered_batch_ids(
 def get_batch(
     batch_num: int,
     reco_order: list[str],
-    accessory_favorites: list[str],
     catalog: CatalogService,
-    stroller_favorites: list[str] | None = None,
     extra_reco_order: list[str] | None = None,
 ) -> list[dict]:
     start = (batch_num - 1) * BATCH_SIZE

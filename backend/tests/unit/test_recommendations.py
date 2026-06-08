@@ -138,8 +138,8 @@ def test_batch_rotation_returns_existing_batch_idempotently():
     strollers = [make_stroller(f"ST{i:03}", "A") for i in range(12)]
     catalog = make_catalog(strollers)
     reco_order = [s["id"] for s in compute_first_nine("A", catalog)]
-    batch1_a = get_batch(1, reco_order, [], catalog)
-    batch1_b = get_batch(1, reco_order, [], catalog)
+    batch1_a = get_batch(1, reco_order, catalog)
+    batch1_b = get_batch(1, reco_order, catalog)
     assert [p["id"] for p in batch1_a] == [p["id"] for p in batch1_b]
 
 
@@ -147,7 +147,7 @@ def test_batch_one_fills_the_grid():
     strollers = [make_stroller(f"ST{i:03}", "A") for i in range(20)]
     catalog = make_catalog(strollers)
     reco_order = [s["id"] for s in compute_first_nine("A", catalog)]
-    batch1 = get_batch(1, reco_order, [], catalog)
+    batch1 = get_batch(1, reco_order, catalog)
     assert len(batch1) == BATCH_SIZE
 
 
@@ -157,22 +157,19 @@ def test_batch_rotation_no_duplicates_until_pool_exhausted():
     reco_order = [s["id"] for s in compute_first_nine("A", catalog)]
     seen = set()
     for i in range(1, 4):
-        batch = get_batch(i, reco_order, [], catalog)
+        batch = get_batch(i, reco_order, catalog)
         ids = [p["id"] for p in batch]
         assert not seen & set(ids)
         seen |= set(ids)
     assert len(seen) == 20
 
 
-def test_later_batch_similarity_uses_stroller_favorites_only():
-    # Accessory favorites must not influence stroller ranking
-    strollers = [make_stroller(f"ST{i:03}", "A") for i in range(12)]
+def test_batch_beyond_primary_pool_returns_remainder():
+    strollers = [make_stroller(f"ST{i:03}", "A") for i in range(20)]
     catalog = make_catalog(strollers)
     reco_order = [s["id"] for s in compute_first_nine("A", catalog)]
-    # batch 4 should only use stroller favorites for similarity, not accessories
-    # (this is a structural assertion — accessory IDs not in stroller pool)
-    acc_favs = ["ACC001", "ACC002"]
-    batch4 = get_batch(4, reco_order, acc_favs, catalog, stroller_favorites=["ST000"])
+    # batch 4 is past the 9-item primary pool — it draws from the catalog remainder.
+    batch4 = get_batch(4, reco_order, catalog)
     assert all(p["id"].startswith("ST") for p in batch4)
 
 
@@ -545,7 +542,7 @@ def test_tiered_order_exact_first_then_relaxed_tiers():
 def test_tiered_order_best_matches_first_when_no_exact():
     # No stroller has both X and Y → tier 0 (exact) is empty, first shown is "Beste matches".
     cat = make_catalog([_tagged("s1", ["X"]), _tagged("s2", ["Y"])])
-    reco, tiers, primary = compute_tiered_tag_order(cat, "A", ["X", "Y"])
+    reco, tiers, _ = compute_tiered_tag_order(cat, "A", ["X", "Y"])
     assert tiers[0]["label"] == "Beste matches"
     assert set(reco) == {"s1", "s2"}
 
@@ -554,7 +551,7 @@ def test_tiered_order_protects_priority_tag_to_deepest_tier():
     # s_duo has only the priority tag; s_other has only the normal tag X.
     DUO = "Twee kinderen (Duo / Tweeling)"
     cat = make_catalog([_tagged("s_duo", [DUO]), _tagged("s_other", ["X"])])
-    reco, tiers, _ = compute_tiered_tag_order(cat, "A", [DUO, "X"])
+    reco, _, _ = compute_tiered_tag_order(cat, "A", [DUO, "X"])
     # Relaxing X (non-priority) comes before relaxing the priority duo tag, so the
     # duo stroller is unlocked in an earlier tier than the non-duo one.
     assert reco.index("s_duo") < reco.index("s_other")
