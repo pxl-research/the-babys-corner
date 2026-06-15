@@ -6,13 +6,12 @@ import ProductModal from '../components/ProductModal'
 import AccessoryModal from '../components/AccessoryModal'
 import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
-import { useInactivityReset } from '../hooks/useInactivityReset'
 import type { StrollerItem, AccessoryItem } from '../api/client'
 
 export default function RecommendationsPage() {
   const navigate = useNavigate()
   const {
-    source, recommendations, addBatch, currentBatch,
+    recommendations, addBatch, currentBatch,
     strollerFavorites, accessoryFavorites, setFavorites,
     favoritesAdaptationActive, setFavoritesAdaptation,
     recoTiers, setRecoTiers,
@@ -24,8 +23,6 @@ export default function RecommendationsPage() {
   const [selectedStroller, setSelectedStroller] = useState<StrollerItem | null>(null)
   const [selectedAccessory, setSelectedAccessory] = useState<AccessoryItem | null>(null)
   const [returnToStroller, setReturnToStroller] = useState<StrollerItem | null>(null)
-
-  useInactivityReset(source)
 
   // Load batch 1 on mount
   useEffect(() => {

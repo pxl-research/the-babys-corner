@@ -8,10 +8,12 @@ import CompletionPage from './pages/CompletionPage'
 import StaffHandoffPage from './pages/StaffHandoffPage'
 import StaffLookupPage from './pages/StaffLookupPage'
 import AdminPage from './pages/AdminPage'
+import InactivityGuard from './components/InactivityGuard'
 
 export default function App() {
   return (
     <BrowserRouter>
+      <InactivityGuard />
       <Routes>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/quiz/:step" element={<QuizPage />} />

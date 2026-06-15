@@ -4,7 +4,6 @@ import Header from '../components/Header'
 import ProgressDots from '../components/ProgressDots'
 import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
-import { useInactivityReset } from '../hooks/useInactivityReset'
 
 const PROFILE_STEPS = 3
 const TAG_STEPS = 4
@@ -26,10 +25,7 @@ export default function QuizPage() {
     quizConfig, setQuizConfig,
     tagConfig, setTagConfig,
     tagAnswers, setTagAnswer, setTagOutcome,
-    source,
   } = useSessionStore()
-
-  useInactivityReset(source)
 
   const [submitting, setSubmitting] = useState(false)
   // Fill a dot per answered profile question, per answered tag question, and once the

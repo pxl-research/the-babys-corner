@@ -3,7 +3,6 @@ import Header from '../components/Header'
 import { api } from '../api/client'
 import type { ShortlistItem } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
-import { useInactivityReset } from '../hooks/useInactivityReset'
 import { useEffect, useState } from 'react'
 
 export default function ShortlistPage() {
@@ -21,8 +20,6 @@ export default function ShortlistPage() {
   const hasFavorites = strollerFavorites.length + accessoryFavorites.length > 0
   // Email is optional, but if filled it must look like an address before we hand off.
   const emailInvalid = contactEmail.trim() !== '' && !/^\S+@\S+\.\S+$/.test(contactEmail.trim())
-
-  useInactivityReset(source)
 
   // Resolve favorites server-side so the shortlist never depends on which
   // recommendation batches happen to be loaded.
