@@ -58,7 +58,7 @@ export default function Header() {
               </button>
               <button
                 onClick={() => setConfirmOpen(false)}
-                className="border border-brand text-brand rounded-btn px-6 py-3 font-medium"
+                className="border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium"
               >
                 Annuleren
               </button>

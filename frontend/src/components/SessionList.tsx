@@ -25,7 +25,7 @@ export default function SessionList({ sessions, onSelect, emptyLabel = 'Geen ses
             </div>
             <span
               className={`text-xs px-2 py-0.5 rounded-full ${
-                s.status === 'handed_off' ? 'bg-brand/20 text-brand' : 'bg-muted text-ink/70'
+                s.status === 'handed_off' ? 'bg-brand/20 text-brand-dark' : 'bg-muted text-ink/70'
               }`}
             >
               {s.status}

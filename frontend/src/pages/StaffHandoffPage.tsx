@@ -98,7 +98,7 @@ export default function StaffHandoffPage() {
                   </p>
                 )}
                 {detail.contact_email && (
-                  <a href={`mailto:${detail.contact_email}`} className="text-sm text-brand underline">
+                  <a href={`mailto:${detail.contact_email}`} className="text-sm text-brand-dark underline">
                     {detail.contact_email}
                   </a>
                 )}
@@ -107,7 +107,7 @@ export default function StaffHandoffPage() {
 
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-1">Gedragsprofiel</h2>
-              <p className="text-brand font-display text-xl">{PROFILE_LABELS[detail.profile || ''] || detail.profile}</p>
+              <p className="text-brand-dark font-display text-xl">{PROFILE_LABELS[detail.profile || ''] || detail.profile}</p>
             </section>
 
             <section className="mb-6">

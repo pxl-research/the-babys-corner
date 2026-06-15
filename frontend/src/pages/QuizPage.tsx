@@ -219,7 +219,7 @@ export default function QuizPage() {
             >
               {noteConfig.continue_label}
             </button>
-            <button onClick={() => navigate(`/quiz/${LAST_TAG_STEP}`)} className="border border-brand text-brand rounded-btn px-6 py-3 font-medium">
+            <button onClick={() => navigate(`/quiz/${LAST_TAG_STEP}`)} className="border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium">
               Terug
             </button>
           </div>
@@ -273,7 +273,7 @@ export default function QuizPage() {
             >
               {submitting ? 'Bezig…' : stepNum === LAST_TAG_STEP ? 'Bekijk aanbevelingen' : 'Volgende'}
             </button>
-            <button onClick={handleBack} className="border border-brand text-brand rounded-btn px-6 py-3 font-medium">
+            <button onClick={handleBack} className="border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium">
               Terug
             </button>
           </div>
@@ -317,7 +317,7 @@ export default function QuizPage() {
             {submitting ? 'Bezig…' : 'Volgende'}
           </button>
           {stepNum > 1 && (
-            <button onClick={handleBack} className="border border-brand text-brand rounded-btn px-6 py-3 font-medium">
+            <button onClick={handleBack} className="border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium">
               Terug
             </button>
           )}

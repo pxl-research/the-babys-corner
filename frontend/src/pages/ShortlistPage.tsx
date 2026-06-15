@@ -184,7 +184,7 @@ export default function ShortlistPage() {
           {undo && (
             <div className="flex items-center justify-between gap-3 text-sm bg-white border border-muted rounded-card px-3 py-2">
               <span className="text-ink/70">Favoriet verwijderd.</span>
-              <button onClick={handleUndoRemove} className="text-brand font-medium underline">
+              <button onClick={handleUndoRemove} className="text-brand-dark font-medium underline">
                 Ongedaan maken
               </button>
             </div>
@@ -201,7 +201,7 @@ export default function ShortlistPage() {
           </button>
           <button
             onClick={() => navigate('/recommendations')}
-            className="w-full border border-brand text-brand rounded-btn px-6 py-3 font-medium"
+            className="w-full border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium"
           >
             Terug naar aanbevelingen
           </button>

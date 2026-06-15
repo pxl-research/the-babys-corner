@@ -4,18 +4,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand:  '#8B9E77',
-        cream:  '#FAF7F2',
-        ink:    '#2C2C2C',
-        danger: '#C0392B',
-        muted:  '#D6D0C8',
+        // Matches thebabyscorner.be brand identity: vivid pink accent on warm cream.
+        brand:        '#E50051', // signature pink — fills, accents, active states
+        'brand-dark': '#B2003F', // darker pink for text/links on light (site link color)
+        cream:        '#FFF9F0', // warm off-white page background
+        ink:          '#403F3D', // warm charcoal body text
+        danger:       '#C0392B',
+        muted:        '#D6D0C8',
       },
       fontFamily: {
-        sans:    ['Inter', 'sans-serif'],
-        display: ['Playfair Display', 'serif'],
+        sans:    ['Mulish', 'sans-serif'],
+        display: ['Quicksand', 'sans-serif'],
       },
       borderRadius: {
-        btn:  '10px',
+        btn:  '12px',
         card: '16px',
       },
     },

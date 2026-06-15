@@ -76,7 +76,7 @@ export default function RecommendationsPage() {
       <div className="max-w-4xl mx-auto px-4 py-6">
         <h1 className="font-display text-2xl font-bold text-ink mb-1">Onze aanbevelingen voor jullie</h1>
         {favoritesAdaptationActive && (
-          <p className="text-brand text-sm mb-4">We houden rekening met jullie favorieten.</p>
+          <p className="text-brand-dark text-sm mb-4">We houden rekening met jullie favorieten.</p>
         )}
         {tagMatchMode === 'partial' && droppedTagCount > 0 && (
           <p className="text-ink/70 text-sm mb-4">
@@ -106,7 +106,7 @@ export default function RecommendationsPage() {
           <div className="mt-6 text-center">
             <button
               onClick={loadNextBatch}
-              className="border border-brand text-brand rounded-btn px-6 py-3 font-medium"
+              className="border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium"
             >
               Bekijk meer opties
             </button>

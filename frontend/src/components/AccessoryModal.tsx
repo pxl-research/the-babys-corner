@@ -65,7 +65,7 @@ export default function AccessoryModal({
               )}
               <p className="text-xs font-semibold tracking-widest uppercase text-ink/70 mb-1">{accessory.brand}</p>
               {accessory.reason && (
-                <span className="bg-brand/10 text-brand text-xs px-2 py-0.5 rounded-full mb-1 inline-block">
+                <span className="bg-brand/10 text-brand-dark text-xs px-2 py-0.5 rounded-full mb-1 inline-block">
                   {accessory.reason}
                 </span>
               )}

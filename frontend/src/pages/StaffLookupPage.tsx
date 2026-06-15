@@ -83,7 +83,7 @@ export default function StaffLookupPage() {
       <div className="min-h-screen bg-cream text-ink font-sans">
         <Header />
         <div className="max-w-lg mx-auto px-6 py-8">
-          <button onClick={() => setDetail(null)} className="text-brand underline text-sm mb-4">
+          <button onClick={() => setDetail(null)} className="text-brand-dark underline text-sm mb-4">
             ← Terug
           </button>
           <h2 className="font-display text-xl font-bold mb-1">Sessie {detail.session_code}</h2>
@@ -97,7 +97,7 @@ export default function StaffLookupPage() {
                 </p>
               )}
               {detail.contact_email && (
-                <a href={`mailto:${detail.contact_email}`} className="text-sm text-brand underline">
+                <a href={`mailto:${detail.contact_email}`} className="text-sm text-brand-dark underline">
                   {detail.contact_email}
                 </a>
               )}
@@ -135,7 +135,7 @@ export default function StaffLookupPage() {
             <h3 className="font-semibold text-ink mb-2">Antwoorden</h3>
             {detail.profile && (
               <div className="mb-4 rounded-card bg-brand/10 p-3">
-                <p className="text-sm font-semibold text-brand">
+                <p className="text-sm font-semibold text-brand-dark">
                   Profiel {detail.profile} — {PROFILE_LABELS[detail.profile] ?? detail.profile}
                 </p>
                 <p className="text-xs text-ink/70 mt-0.5">

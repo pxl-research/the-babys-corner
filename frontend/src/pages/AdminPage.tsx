@@ -91,7 +91,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-cream text-ink font-sans">
         <Header />
         <div className="max-w-lg mx-auto px-6 py-8">
-          <button onClick={() => setDetail(null)} className="text-brand underline text-sm mb-4">
+          <button onClick={() => setDetail(null)} className="text-brand-dark underline text-sm mb-4">
             ← Terug
           </button>
           <h2 className="font-display text-xl font-bold mb-1">Sessie {detail.session_code}</h2>

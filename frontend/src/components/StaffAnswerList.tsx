@@ -15,7 +15,7 @@ export default function StaffAnswerList({ answers }: Props) {
           key={`${answer.question_text ?? 'question'}-${index}`}
           className="flex gap-3 rounded-card border border-muted/70 bg-white px-3 py-3 shadow-sm"
         >
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand/15 text-sm font-semibold text-brand">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand/15 text-sm font-semibold text-brand-dark">
             {index + 1}
           </span>
           <div className="min-w-0">
