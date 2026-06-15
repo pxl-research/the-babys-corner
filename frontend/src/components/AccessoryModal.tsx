@@ -55,11 +55,6 @@ export default function AccessoryModal({
               <p className="text-xs font-semibold tracking-widest uppercase text-ink/60 mb-1">{accessory.brand}</p>
               <h2 className="font-display text-xl font-bold text-ink mb-1">{accessory.name}</h2>
               <p className="text-lg font-medium text-ink mb-2">€ {accessory.price.toFixed(2)}</p>
-              {!accessory.is_available && (
-                <span className="bg-muted/60 text-ink/60 text-xs px-2 py-0.5 rounded-full mb-2 inline-block">
-                  Niet beschikbaar
-                </span>
-              )}
               <p className="text-ink/80 mb-6">{accessory.description}</p>
               {(canAdd || canRemove) && (
                 <button

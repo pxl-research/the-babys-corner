@@ -19,11 +19,6 @@ export default function AccessoryCarouselCard({ accessory, onClick }: Props) {
         />
       )}
       <p className="text-sm text-ink leading-snug min-h-10 overflow-hidden">{accessory.name}</p>
-      {!accessory.is_available && (
-        <span className="bg-muted/60 text-ink/60 text-xs px-2 py-0.5 rounded-full mt-1 inline-block">
-          Niet beschikbaar
-        </span>
-      )}
     </button>
   )
 }

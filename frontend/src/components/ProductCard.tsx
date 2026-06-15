@@ -21,11 +21,6 @@ export default function ProductCard({
           <p className="text-xs font-semibold tracking-widest uppercase text-ink/60 mb-0.5">{stroller.brand}</p>
           <h3 className="font-medium text-ink leading-snug mb-1 min-h-14">{stroller.name}</h3>
           <p className="font-medium text-ink">€ {stroller.price.toFixed(2)}</p>
-          {!stroller.is_available && (
-            <span className="bg-muted/60 text-ink/60 text-xs px-2 py-0.5 rounded-full mt-1 inline-block">
-              Niet beschikbaar
-            </span>
-          )}
         </div>
       </button>
       <div className="px-4 pb-4 flex items-center justify-end mt-auto">
