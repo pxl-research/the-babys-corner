@@ -7,6 +7,12 @@ import SessionList from '../components/SessionList'
 import { api } from '../api/client'
 import type { StaffSession, StaffSessionDetail } from '../api/client'
 
+const PROFILE_LABELS: Record<string, string> = {
+  A: 'Minimalist',
+  B: 'Ontdekker',
+  C: 'Planner',
+}
+
 export default function StaffLookupPage() {
   const [authed, setAuthed] = useState(false)
   const [username, setUsername] = useState('')
@@ -82,11 +88,6 @@ export default function StaffLookupPage() {
           </button>
           <h2 className="font-display text-xl font-bold mb-1">Sessie {detail.session_code}</h2>
           <p className="text-sm text-ink/60 mb-4">{detail.source} · {detail.profile} · {detail.started_at.slice(0, 10)}</p>
-          {detail.email_failed_warning && (
-            <p className="bg-danger/10 text-danger text-sm p-3 rounded-card mb-4">
-              E-mail naar medewerker niet verzonden. Gebruik de sessiecode.
-            </p>
-          )}
           {(detail.contact_name || detail.contact_surname || detail.contact_email) && (
             <section className="mb-6 bg-white rounded-card border border-muted p-4">
               <h3 className="font-semibold text-ink mb-1">Contactgegevens klant</h3>
@@ -132,7 +133,24 @@ export default function StaffLookupPage() {
           </section>
           <section className="mb-4">
             <h3 className="font-semibold text-ink mb-2">Antwoorden</h3>
+            {detail.profile && (
+              <div className="mb-4 rounded-card bg-brand/10 p-3">
+                <p className="text-sm font-semibold text-brand">
+                  Profiel {detail.profile} — {PROFILE_LABELS[detail.profile] ?? detail.profile}
+                </p>
+                <p className="text-xs text-ink/60 mt-0.5">
+                  Toegekend op basis van de eerste 3 antwoorden.
+                </p>
+              </div>
+            )}
+            <h4 className="text-sm font-semibold text-ink/70 mb-2">Profielvragen</h4>
             <StaffAnswerList answers={detail.quiz_answers} />
+            {detail.tag_answers.length > 0 && (
+              <>
+                <h4 className="text-sm font-semibold text-ink/70 mt-4 mb-2">Voorkeuren</h4>
+                <StaffAnswerList answers={detail.tag_answers} />
+              </>
+            )}
           </section>
           {detail.optional_note && (
             <section className="mb-4">

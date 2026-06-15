@@ -165,6 +165,7 @@ export interface StaffSession {
 
 export interface StaffSessionDetail extends StaffSession {
   quiz_answers: object[]
+  tag_answers: object[]
   optional_note: string | null
   shown_products: string[][]
   stroller_favorites: string[]

@@ -76,6 +76,7 @@ def session_detail_from_row(row, catalog=None) -> StaffSessionDetail:
         handoff_at=row.get("handoff_at"),
         profile=row.get("derived_profile"),
         quiz_answers=parse_json_field(row.get("quiz_answers"), []),
+        tag_answers=parse_json_field(row.get("tag_answers"), []),
         optional_note=row.get("optional_note"),
         shown_products=shown,
         stroller_favorites=stroller_favs,

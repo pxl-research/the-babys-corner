@@ -36,7 +36,8 @@ CREATE TABLE IF NOT EXISTS sessions (
     filter_collections TEXT,
     contact_name TEXT,
     contact_surname TEXT,
-    contact_email TEXT
+    contact_email TEXT,
+    tag_answers TEXT
 );
 """
 
@@ -59,6 +60,7 @@ _MIGRATION_COLUMNS = [
     "contact_name TEXT",
     "contact_surname TEXT",
     "contact_email TEXT",
+    "tag_answers TEXT",
 ]
 
 

@@ -722,6 +722,28 @@ def _answer_tags(ans, question_map: dict) -> list[str]:
     return tags
 
 
+def _enriched_tag_answers(body: TagQuizRequest) -> list[dict]:
+    """Resolve tag-quiz answers to readable question/option text for staff display.
+
+    One entry per answered question, in the order submitted. Multi-select options are
+    joined; a question with no selection is recorded as 'Overgeslagen' (skipped).
+    """
+    config = load_tag_questions()
+    question_map = {q["id"]: q for q in config["questions"]}
+    enriched: list[dict] = []
+    for ans in body.answers:
+        q = question_map.get(ans.question_id)
+        if not q:
+            continue
+        opt_map = {o["index"]: o for o in q["options"]}
+        texts = [opt_map[i]["text"] for i in ans.option_indices if i in opt_map]
+        enriched.append({
+            "question_text": q["text"],
+            "option_text": ", ".join(texts) if texts else "Overgeslagen",
+        })
+    return enriched
+
+
 def _tags_from_answers(body: TagQuizRequest) -> list[str]:
     """Map answer indices to catalog tags server-side; tags never travel to the client."""
     config = load_tag_questions()
@@ -809,11 +831,13 @@ async def submit_tag_quiz(
 
     # Store the primary (kept) tags so accessory filtering stays consistent, plus the
     # flat tier-ordered reco_order and the tier boundaries for headings.
+    tag_answers = _enriched_tag_answers(body)
     db = await get_db()
     await db.execute(
         """UPDATE sessions SET filter_tags=?, filter_brands=NULL, filter_collections=NULL,
-           reco_order=?, reco_tiers=?, extra_reco_order=NULL WHERE session_id=?""",
-        (json.dumps(primary_kept), json.dumps(reco_order), json.dumps(tiers), session_id),
+           reco_order=?, reco_tiers=?, extra_reco_order=NULL, tag_answers=? WHERE session_id=?""",
+        (json.dumps(primary_kept), json.dumps(reco_order), json.dumps(tiers),
+         json.dumps(tag_answers), session_id),
     )
     await db.commit()
 

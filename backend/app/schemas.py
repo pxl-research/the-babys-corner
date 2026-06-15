@@ -280,6 +280,7 @@ class StaffSessionDetail(BaseModel):
     handoff_at: Optional[str] = None
     profile: Optional[str] = None
     quiz_answers: list[dict] = []
+    tag_answers: list[dict] = []
     optional_note: Optional[str] = None
     shown_products: list[list[str]] = []
     stroller_favorites: list[str] = []

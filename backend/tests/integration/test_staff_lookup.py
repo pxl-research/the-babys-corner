@@ -86,6 +86,29 @@ async def test_staff_detail_resolves_product_names(client):
     assert first["name"]
 
 
+async def test_staff_detail_includes_tag_answers(client):
+    await client.post("/api/sessions?source=store")
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+    tag_answers = [
+        {"question_id": "usage", "option_indices": [1]},
+        {"question_id": "start_age", "option_indices": [0]},
+        {"question_id": "fold", "option_indices": []},          # skipped
+        {"question_id": "comfort", "option_indices": [0, 2]},   # multi-select
+    ]
+    await client.post("/api/sessions/current/tag-quiz", json={"answers": tag_answers})
+    await client.get("/api/sessions/current/recommendations?batch=1")
+    code = (await client.get("/api/sessions/current")).json()["session_code"]
+    await client.post("/api/sessions/current/handoff")
+
+    detail = (await client.get(f"/api/staff/sessions/{code}", headers=STAFF_CREDS)).json()
+    ta = detail["tag_answers"]
+    assert len(ta) == 4
+    assert all(a["question_text"] for a in ta)
+    assert any(a["option_text"] == "Overgeslagen" for a in ta)   # skipped question recorded
+    assert any(", " in a["option_text"] for a in ta)             # multi-select joined
+
+
 async def test_staff_home_email_failed_warning_only_for_home(client):
     from app.database import get_db
     session_data = await _create_and_handoff_session(client, source="home")
