@@ -61,6 +61,7 @@ export interface AccessoryItem {
   image_url: string
   availability: string
   is_available: boolean
+  reason?: string
 }
 
 export interface StrollerItem {

@@ -18,6 +18,11 @@ export default function AccessoryCarouselCard({ accessory, onClick }: Props) {
           className="w-full h-24 object-contain rounded-card bg-white mb-2"
         />
       )}
+      {accessory.reason && (
+        <span className="bg-brand/10 text-brand text-xs px-2 py-0.5 rounded-full mb-1 inline-block">
+          {accessory.reason}
+        </span>
+      )}
       <p className="text-sm text-ink leading-snug min-h-10 overflow-hidden">{accessory.name}</p>
     </button>
   )

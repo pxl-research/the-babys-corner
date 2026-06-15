@@ -376,6 +376,20 @@ _CROSS_SELL_QUOTA: dict[str, dict[str, int]] = {
 _TIER_CATEGORY = {0: "must", 1: "should", 2: "nice"}
 
 
+def cross_sell_reason(stroller: dict, accessory: dict) -> str:
+    """Customer-facing reason an accessory is shown with a stroller.
+
+    'Uit de collectie' when the accessory belongs to the stroller's own collection
+    (part of the same set); otherwise 'Bijpassende accessoire' — it matched via the
+    accessory's compatible_collections, i.e. it fits but is from another collection.
+    """
+    collection = (stroller.get("collection") or "").strip()
+    own = (accessory.get("collection") or "").strip()
+    if collection and own and own == collection:
+        return "Uit de collectie"
+    return "Bijpassende accessoire"
+
+
 def _accessory_collections(accessory: dict) -> set[str]:
     colls = {c for c in (accessory.get("compatible_collections") or []) if c}
     own = (accessory.get("collection") or "").strip()

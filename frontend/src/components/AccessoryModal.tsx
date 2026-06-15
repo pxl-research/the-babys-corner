@@ -53,6 +53,11 @@ export default function AccessoryModal({
                 <img src={accessory.image_url} alt={accessory.name} className="w-full h-48 object-contain mb-4 rounded-card" />
               )}
               <p className="text-xs font-semibold tracking-widest uppercase text-ink/60 mb-1">{accessory.brand}</p>
+              {accessory.reason && (
+                <span className="bg-brand/10 text-brand text-xs px-2 py-0.5 rounded-full mb-1 inline-block">
+                  {accessory.reason}
+                </span>
+              )}
               <h2 className="font-display text-xl font-bold text-ink mb-1">{accessory.name}</h2>
               <p className="text-lg font-medium text-ink mb-2">€ {accessory.price.toFixed(2)}</p>
               <p className="text-ink/80 mb-6">{accessory.description}</p>

@@ -108,6 +108,7 @@ class AccessoryItem(BaseModel):
     image_url: str
     availability: str
     is_available: bool
+    reason: str = ""  # why this accessory is shown (e.g. "Uit de collectie")
 
 
 class StrollerItem(BaseModel):

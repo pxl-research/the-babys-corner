@@ -9,8 +9,29 @@ from app.services.recommendations import (
     diversify_llm_order,
     get_batch,
     get_cross_sell_items,
+    cross_sell_reason,
 )
 from app.services.catalog import CatalogService
+
+
+def test_cross_sell_reason_same_collection_is_uit_de_collectie():
+    stroller = {"collection": "Fox 5"}
+    accessory = make_accessory("a1", "Cup", "B", collection="Fox 5")
+    assert cross_sell_reason(stroller, accessory) == "Uit de collectie"
+
+
+def test_cross_sell_reason_compatible_collection_is_bijpassend():
+    stroller = {"collection": "Fox 5"}
+    accessory = make_accessory("a1", "Cup", "B", collection="Donkey 5",
+                               compatible_collections=["Fox 5"])
+    assert cross_sell_reason(stroller, accessory) == "Bijpassende accessoire"
+
+
+def test_cross_sell_reason_no_own_collection_is_bijpassend():
+    stroller = {"collection": "Fox 5"}
+    accessory = make_accessory("a1", "Cup", "B", collection=None,
+                               compatible_collections=["Fox 5"])
+    assert cross_sell_reason(stroller, accessory) == "Bijpassende accessoire"
 
 
 def make_stroller(id_, profile_must, profile_nice=None, available=True):

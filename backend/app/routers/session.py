@@ -52,6 +52,7 @@ from app.services.recommendations import (
     diversify_llm_order,
     get_batch,
     get_cross_sell_items,
+    cross_sell_reason,
     tiered_batch_ids,
 )
 from app.services.session_code import generate_session_code
@@ -446,6 +447,7 @@ def _build_products(
                     image_url=a["image_url"],
                     availability=a["availability"],
                     is_available=is_available(a),
+                    reason=cross_sell_reason(s, a),
                 )
                 for a in cross_sell
             ],
