@@ -61,7 +61,7 @@ export default function ShortlistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cream text-ink font-sans pb-24">
+    <div className="min-h-screen bg-cream text-ink font-sans pb-48">
       <Header />
       <div className="max-w-4xl mx-auto px-6 py-8">
         <h1 className="font-display text-2xl font-bold text-ink mb-1">Jullie favorieten</h1>
@@ -162,23 +162,25 @@ export default function ShortlistPage() {
         </section>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4 flex flex-col gap-3 max-w-lg mx-auto">
-        {!hasFavorites && (
-          <p className="text-center text-sm text-ink/60">Bewaar minstens één favoriet om te delen.</p>
-        )}
-        <button
-          onClick={handleConfirm}
-          disabled={!hasFavorites || emailInvalid}
-          className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
-        >
-          Deel met medewerker
-        </button>
-        <button
-          onClick={() => navigate('/recommendations')}
-          className="w-full border border-brand text-brand rounded-btn px-6 py-3 font-medium"
-        >
-          Terug naar aanbevelingen
-        </button>
+      <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4">
+        <div className="max-w-lg mx-auto flex flex-col gap-3">
+          {!hasFavorites && (
+            <p className="text-center text-sm text-ink/60">Bewaar minstens één favoriet om te delen.</p>
+          )}
+          <button
+            onClick={handleConfirm}
+            disabled={!hasFavorites || emailInvalid}
+            className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
+          >
+            Deel met medewerker
+          </button>
+          <button
+            onClick={() => navigate('/recommendations')}
+            className="w-full border border-brand text-brand rounded-btn px-6 py-3 font-medium"
+          >
+            Terug naar aanbevelingen
+          </button>
+        </div>
       </div>
     </div>
   )
