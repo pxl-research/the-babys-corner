@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import type { StrollerItem, AccessoryItem } from '../api/client'
 import AccessoryCarouselCard from './AccessoryCarouselCard'
@@ -16,6 +17,16 @@ export default function ProductModal({
 }: Props) {
   const reduceMotion = useReducedMotion()
   const descriptionText = stroller?.formatted_description ?? stroller?.description ?? ''
+
+  // Close on Escape so keyboard users aren't trapped (backdrop click already closes).
+  useEffect(() => {
+    if (!stroller) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [stroller, onClose])
 
   function isRedundantKeyFeatures(features: string, description: string) {
     const f = features.trim()

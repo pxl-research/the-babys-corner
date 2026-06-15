@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import type { AccessoryItem } from '../api/client'
 
@@ -19,6 +20,16 @@ export default function AccessoryModal({
   const reduceMotion = useReducedMotion()
   const canRemove = isFavorited
   const canAdd = !isFavorited
+
+  // Close on Escape so keyboard users aren't trapped (backdrop click already closes).
+  useEffect(() => {
+    if (!accessory) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [accessory, onClose])
 
   return (
     <AnimatePresence>
