@@ -89,6 +89,22 @@ export default function StaffHandoffPage() {
               )}
             </section>
 
+            {(detail.contact_name || detail.contact_surname || detail.contact_email) && (
+              <section className="mb-6 bg-white rounded-card border border-muted p-4">
+                <h2 className="font-semibold text-ink mb-1">Contactgegevens klant</h2>
+                {(detail.contact_name || detail.contact_surname) && (
+                  <p className="text-sm text-ink/80">
+                    {[detail.contact_name, detail.contact_surname].filter(Boolean).join(' ')}
+                  </p>
+                )}
+                {detail.contact_email && (
+                  <a href={`mailto:${detail.contact_email}`} className="text-sm text-brand underline">
+                    {detail.contact_email}
+                  </a>
+                )}
+              </section>
+            )}
+
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-1">Gedragsprofiel</h2>
               <p className="text-brand font-display text-xl">{PROFILE_LABELS[detail.profile || ''] || detail.profile}</p>

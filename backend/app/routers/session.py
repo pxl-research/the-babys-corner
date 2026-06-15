@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from sqlite3 import IntegrityError
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Cookie, HTTPException, BackgroundTasks, Query, Request
+from fastapi import APIRouter, Body, Cookie, HTTPException, BackgroundTasks, Query, Request
 from fastapi.responses import JSONResponse
 
 from app.config import settings
@@ -24,7 +24,8 @@ from app.schemas import (
     FavoriteToggleResponse,
     ShortlistItem,
     FavoriteItemsResponse,
-    HandoffResponse,
+    HandoffRequest,
+HandoffResponse,
     FilterTagsRequest,
     FilterTagsResponse,
     FilterBrandsRequest,
@@ -207,6 +208,9 @@ async def get_current(session_id: Annotated[Optional[str], Cookie()] = None):
         accessory_favorites_named=resolve_accessories(accessory_favs, catalog),
         email_status=session.get("email_status", "not_sent"),
         favorites_adaptation_active=bool(session.get("favorites_adaptation_active", 0)),
+        contact_name=session.get("contact_name"),
+        contact_surname=session.get("contact_surname"),
+        contact_email=session.get("contact_email"),
         talking_points=parse_json_field(session.get("llm_talking_points"), None),
     )
 
@@ -945,6 +949,7 @@ async def handoff(
     request: Request,
     background_tasks: BackgroundTasks,
     session_id: Annotated[Optional[str], Cookie()] = None,
+    contact: Annotated[Optional[HandoffRequest], Body()] = None,
 ):
     check_rate_limit(f"sessions:handoff:{client_ip(request)}", limit=20, window_seconds=300)
     if not session_id:
@@ -960,11 +965,22 @@ async def handoff(
     if not session.get("first_reco_at"):
         raise HTTPException(422, detail="No recommendations shown yet.")
 
+    # Optional contact details — stored only; empty fields are kept as NULL.
+    def _clean(value: Optional[str]) -> Optional[str]:
+        cleaned = (value or "").strip()
+        return cleaned or None
+
+    contact = contact or HandoffRequest()
+    contact_name = _clean(contact.name)
+    contact_surname = _clean(contact.surname)
+    contact_email = _clean(contact.email)
+
     now = _now()
     db = await get_db()
     await db.execute(
-        "UPDATE sessions SET status='handed_off', handoff_at=?, email_status='pending' WHERE session_id=?",
-        (now, session_id),
+        "UPDATE sessions SET status='handed_off', handoff_at=?, email_status='pending', "
+        "contact_name=?, contact_surname=?, contact_email=? WHERE session_id=?",
+        (now, contact_name, contact_surname, contact_email, session_id),
     )
     await db.commit()
 

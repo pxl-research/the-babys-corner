@@ -33,7 +33,10 @@ CREATE TABLE IF NOT EXISTS sessions (
     llm_similarity_output TEXT,
     filter_tags TEXT,
     filter_brands TEXT,
-    filter_collections TEXT
+    filter_collections TEXT,
+    contact_name TEXT,
+    contact_surname TEXT,
+    contact_email TEXT
 );
 """
 
@@ -53,6 +56,9 @@ _MIGRATION_COLUMNS = [
     "filter_brands TEXT",
     "filter_collections TEXT",
     "reco_tiers TEXT",
+    "contact_name TEXT",
+    "contact_surname TEXT",
+    "contact_email TEXT",
 ]
 
 

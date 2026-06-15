@@ -87,6 +87,21 @@ export default function StaffLookupPage() {
               E-mail naar medewerker niet verzonden. Gebruik de sessiecode.
             </p>
           )}
+          {(detail.contact_name || detail.contact_surname || detail.contact_email) && (
+            <section className="mb-6 bg-white rounded-card border border-muted p-4">
+              <h3 className="font-semibold text-ink mb-1">Contactgegevens klant</h3>
+              {(detail.contact_name || detail.contact_surname) && (
+                <p className="text-sm text-ink/80">
+                  {[detail.contact_name, detail.contact_surname].filter(Boolean).join(' ')}
+                </p>
+              )}
+              {detail.contact_email && (
+                <a href={`mailto:${detail.contact_email}`} className="text-sm text-brand underline">
+                  {detail.contact_email}
+                </a>
+              )}
+            </section>
+          )}
           <section className="mb-6">
             <h3 className="font-display text-xl font-bold text-ink mb-1">Favorieten van de klant</h3>
             <p className="text-ink/60 text-sm mb-3">De producten die de klant zelf bewaarde.</p>

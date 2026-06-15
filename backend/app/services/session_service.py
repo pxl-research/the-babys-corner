@@ -86,6 +86,9 @@ def session_detail_from_row(row, catalog=None) -> StaffSessionDetail:
         talking_points=parse_json_field(row.get("llm_talking_points"), None),
         email_status=row.get("email_status"),
         email_failed_warning=row["source"] == "home" and row.get("email_status") == "failed",
+        contact_name=row.get("contact_name"),
+        contact_surname=row.get("contact_surname"),
+        contact_email=row.get("contact_email"),
     )
 
 

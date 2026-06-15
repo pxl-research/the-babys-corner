@@ -15,7 +15,12 @@ export default function ShortlistPage() {
   const [busyId, setBusyId] = useState<string | null>(null)
   const [favStrollers, setFavStrollers] = useState<ShortlistItem[]>([])
   const [favAccessories, setFavAccessories] = useState<ShortlistItem[]>([])
+  const [contactName, setContactName] = useState('')
+  const [contactSurname, setContactSurname] = useState('')
+  const [contactEmail, setContactEmail] = useState('')
   const hasFavorites = strollerFavorites.length + accessoryFavorites.length > 0
+  // Email is optional, but if filled it must look like an address before we hand off.
+  const emailInvalid = contactEmail.trim() !== '' && !/^\S+@\S+\.\S+$/.test(contactEmail.trim())
 
   useInactivityReset(source)
 
@@ -32,7 +37,12 @@ export default function ShortlistPage() {
   }, [])
 
   async function handleConfirm() {
-    const result = await api.handoff()
+    if (emailInvalid) return
+    const result = await api.handoff({
+      name: contactName.trim() || undefined,
+      surname: contactSurname.trim() || undefined,
+      email: contactEmail.trim() || undefined,
+    })
     setHandoff(result.session_code, result.handoff_at)
     setStatus('handoff')
     if (source === 'store') navigate('/handoff')
@@ -115,6 +125,41 @@ export default function ShortlistPage() {
             )}
           </>
         )}
+
+        <section className="mt-8 border-t border-muted pt-6">
+          <h2 className="font-semibold text-ink mb-1">Jullie gegevens (optioneel)</h2>
+          <p className="text-ink/60 text-sm mb-4">
+            Laat eventueel je naam en e-mailadres achter. Niet verplicht — je kan ook
+            gewoon de sessiecode gebruiken.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input
+              value={contactName}
+              onChange={(e) => setContactName(e.target.value)}
+              placeholder="Voornaam"
+              autoComplete="given-name"
+              className="border-2 border-muted rounded-card px-3 py-2 bg-white text-sm outline-none focus:border-brand"
+            />
+            <input
+              value={contactSurname}
+              onChange={(e) => setContactSurname(e.target.value)}
+              placeholder="Achternaam"
+              autoComplete="family-name"
+              className="border-2 border-muted rounded-card px-3 py-2 bg-white text-sm outline-none focus:border-brand"
+            />
+            <input
+              type="email"
+              value={contactEmail}
+              onChange={(e) => setContactEmail(e.target.value)}
+              placeholder="E-mailadres"
+              autoComplete="email"
+              className="sm:col-span-2 border-2 border-muted rounded-card px-3 py-2 bg-white text-sm outline-none focus:border-brand"
+            />
+          </div>
+          {emailInvalid && (
+            <p className="text-danger text-sm mt-2">Vul een geldig e-mailadres in of laat het veld leeg.</p>
+          )}
+        </section>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4 flex flex-col gap-3 max-w-lg mx-auto">
@@ -123,7 +168,7 @@ export default function ShortlistPage() {
         )}
         <button
           onClick={handleConfirm}
-          disabled={!hasFavorites}
+          disabled={!hasFavorites || emailInvalid}
           className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
         >
           Deel met medewerker

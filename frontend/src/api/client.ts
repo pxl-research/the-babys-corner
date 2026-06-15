@@ -134,7 +134,16 @@ export interface SessionState {
   accessory_favorites_named: NamedItem[]
   email_status: string
   favorites_adaptation_active: boolean
+  contact_name: string | null
+  contact_surname: string | null
+  contact_email: string | null
   talking_points: string[] | null
+}
+
+export interface ContactDetails {
+  name?: string
+  surname?: string
+  email?: string
 }
 
 export interface HandoffResponse {
@@ -165,6 +174,9 @@ export interface StaffSessionDetail extends StaffSession {
   accessory_favorites_named: NamedItem[]
   talking_points: string[] | null
   email_failed_warning: boolean
+  contact_name: string | null
+  contact_surname: string | null
+  contact_email: string | null
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -226,8 +238,11 @@ export const api = {
   getFavoriteItems: () =>
     request<FavoriteItemsResponse>('/api/sessions/current/favorites/items'),
 
-  handoff: () =>
-    request<HandoffResponse>('/api/sessions/current/handoff', { method: 'POST' }),
+  handoff: (contact?: ContactDetails) =>
+    request<HandoffResponse>('/api/sessions/current/handoff', {
+      method: 'POST',
+      body: JSON.stringify(contact ?? {}),
+    }),
 
   abandon: () => request<void>('/api/sessions/current/abandon', { method: 'POST' }),
 

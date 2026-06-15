@@ -197,7 +197,18 @@ class SessionCurrentResponse(BaseModel):
     accessory_favorites_named: list[NamedItem] = []
     email_status: str = "not_sent"
     favorites_adaptation_active: bool = False
+    contact_name: Optional[str] = None
+    contact_surname: Optional[str] = None
+    contact_email: Optional[str] = None
     talking_points: Optional[list[str]] = None
+
+
+class HandoffRequest(BaseModel):
+    """Optional contact details a customer may fill in before handoff. All optional —
+    a customer can hand off with just the session code and no contact info."""
+    name: Optional[str] = None
+    surname: Optional[str] = None
+    email: Optional[str] = None
 
 
 class HandoffResponse(BaseModel):
@@ -279,3 +290,6 @@ class StaffSessionDetail(BaseModel):
     talking_points: Optional[list[str]] = None
     email_status: Optional[str] = None
     email_failed_warning: bool = False
+    contact_name: Optional[str] = None
+    contact_surname: Optional[str] = None
+    contact_email: Optional[str] = None

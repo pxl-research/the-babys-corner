@@ -24,6 +24,38 @@ async def test_instore_handoff_returns_staff_context(client):
     assert "handoff_at" in data
 
 
+async def test_handoff_saves_optional_contact(client):
+    await client.post("/api/sessions?source=store")
+    answers = [{"question_id": i + 1, "option_index": 2} for i in range(3)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+    await client.get("/api/sessions/current/recommendations?batch=1")
+
+    resp = await client.post(
+        "/api/sessions/current/handoff",
+        json={"name": "  Anna ", "surname": "Janssens", "email": "anna@example.com"},
+    )
+    assert resp.status_code == 200
+
+    current = (await client.get("/api/sessions/current")).json()
+    assert current["contact_name"] == "Anna"  # trimmed
+    assert current["contact_surname"] == "Janssens"
+    assert current["contact_email"] == "anna@example.com"
+
+
+async def test_handoff_without_contact_keeps_fields_null(client):
+    await client.post("/api/sessions?source=store")
+    answers = [{"question_id": i + 1, "option_index": 2} for i in range(3)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+    await client.get("/api/sessions/current/recommendations?batch=1")
+
+    resp = await client.post("/api/sessions/current/handoff")
+    assert resp.status_code == 200
+
+    current = (await client.get("/api/sessions/current")).json()
+    assert current["contact_name"] is None
+    assert current["contact_email"] is None
+
+
 async def test_instore_inactivity_abandon_marks_abandoned_without_email(client):
     resp = await client.post("/api/sessions?source=store")
     assert resp.status_code == 200
