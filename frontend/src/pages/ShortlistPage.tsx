@@ -3,7 +3,7 @@ import Header from '../components/Header'
 import { api } from '../api/client'
 import type { ShortlistItem } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export default function ShortlistPage() {
   const navigate = useNavigate()
@@ -17,6 +17,8 @@ export default function ShortlistPage() {
   const [contactName, setContactName] = useState('')
   const [contactSurname, setContactSurname] = useState('')
   const [contactEmail, setContactEmail] = useState('')
+  const [undo, setUndo] = useState<{ id: string; type: 'stroller' | 'accessory' } | null>(null)
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasFavorites = strollerFavorites.length + accessoryFavorites.length > 0
   // Email is optional, but if filled it must look like an address before we hand off.
   const emailInvalid = contactEmail.trim() !== '' && !/^\S+@\S+\.\S+$/.test(contactEmail.trim())
@@ -31,6 +33,10 @@ export default function ShortlistPage() {
 
   useEffect(() => {
     loadFavorites().catch(console.error)
+  }, [])
+
+  useEffect(() => () => {
+    if (undoTimer.current) clearTimeout(undoTimer.current)
   }, [])
 
   async function handleConfirm() {
@@ -52,9 +58,23 @@ export default function ShortlistPage() {
       const result = await api.toggleFavorite(id, type)
       setFavorites(result.stroller_favorites, result.accessory_favorites)
       await loadFavorites()
+      // Offer a brief undo — a tap on the small "Verwijder" button is easy to misfire.
+      setUndo({ id, type })
+      if (undoTimer.current) clearTimeout(undoTimer.current)
+      undoTimer.current = setTimeout(() => setUndo(null), 6000)
     } finally {
       setBusyId(null)
     }
+  }
+
+  async function handleUndoRemove() {
+    if (!undo) return
+    const { id, type } = undo
+    setUndo(null)
+    if (undoTimer.current) clearTimeout(undoTimer.current)
+    const result = await api.toggleFavorite(id, type) // toggling again re-adds it
+    setFavorites(result.stroller_favorites, result.accessory_favorites)
+    await loadFavorites()
   }
 
   return (
@@ -161,8 +181,16 @@ export default function ShortlistPage() {
 
       <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4">
         <div className="max-w-lg mx-auto flex flex-col gap-3">
+          {undo && (
+            <div className="flex items-center justify-between gap-3 text-sm bg-white border border-muted rounded-card px-3 py-2">
+              <span className="text-ink/70">Favoriet verwijderd.</span>
+              <button onClick={handleUndoRemove} className="text-brand font-medium underline">
+                Ongedaan maken
+              </button>
+            </div>
+          )}
           {!hasFavorites && (
-            <p className="text-center text-sm text-ink/60">Bewaar minstens één favoriet om te delen.</p>
+            <p className="text-center text-sm text-ink/70">Bewaar minstens één favoriet om te delen.</p>
           )}
           <button
             onClick={handleConfirm}
