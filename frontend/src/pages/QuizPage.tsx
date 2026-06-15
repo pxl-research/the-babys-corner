@@ -223,12 +223,6 @@ export default function QuizPage() {
             >
               {noteConfig.continue_label}
             </button>
-            <button
-              onClick={() => handleNoteSubmit('')}
-              className="text-ink/60 underline underline-offset-2 px-6 py-2 font-medium"
-            >
-              {noteConfig.skip_label}
-            </button>
             <button onClick={() => navigate(`/quiz/${LAST_TAG_STEP}`)} className="border border-brand text-brand rounded-btn px-6 py-3 font-medium">
               Terug
             </button>
