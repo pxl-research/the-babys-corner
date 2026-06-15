@@ -18,7 +18,7 @@ export default function ProductCard({
           <img src={stroller.image_url} alt={stroller.name} className="w-full h-48 object-contain bg-white" />
         )}
         <div className="p-4 min-h-44">
-          <p className="text-xs font-semibold tracking-widest uppercase text-ink/60 mb-0.5">{stroller.brand}</p>
+          <p className="text-xs font-semibold tracking-widest uppercase text-ink/70 mb-0.5">{stroller.brand}</p>
           <h3 className="font-medium text-ink leading-snug mb-1 min-h-14">{stroller.name}</h3>
           <p className="font-medium text-ink">€ {stroller.price.toFixed(2)}</p>
         </div>

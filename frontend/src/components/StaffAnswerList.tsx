@@ -19,7 +19,7 @@ export default function StaffAnswerList({ answers }: Props) {
             {index + 1}
           </span>
           <div className="min-w-0">
-            <p className="text-xs font-medium leading-snug text-ink/55">
+            <p className="text-xs font-medium leading-snug text-ink/70">
               {answer.question_text}
             </p>
             <p className="mt-1 text-sm font-semibold leading-snug text-ink">

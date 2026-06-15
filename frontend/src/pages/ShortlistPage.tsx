@@ -82,10 +82,10 @@ export default function ShortlistPage() {
       <Header />
       <div className="max-w-4xl mx-auto px-6 py-8">
         <h1 className="font-display text-2xl font-bold text-ink mb-1">Jullie favorieten</h1>
-        <p className="text-ink/60 mb-6">Deze items hebben jullie bewaard.</p>
+        <p className="text-ink/70 mb-6">Deze items hebben jullie bewaard.</p>
 
         {strollerFavorites.length === 0 && accessoryFavorites.length === 0 ? (
-          <p className="text-ink/50 italic">Jullie hebben nog geen favorieten bewaard.</p>
+          <p className="text-ink/70 italic">Jullie hebben nog geen favorieten bewaard.</p>
         ) : (
           <>
             {favStrollers.length > 0 && (
@@ -97,7 +97,7 @@ export default function ShortlistPage() {
                       {s.image_url && (
                         <img src={s.image_url} alt={s.name} className="w-full h-32 object-contain mb-2" />
                       )}
-                      <p className="text-xs font-semibold tracking-widest uppercase text-ink/60 mb-0.5">{s.brand}</p>
+                      <p className="text-xs font-semibold tracking-widest uppercase text-ink/70 mb-0.5">{s.brand}</p>
                       <p className="font-medium text-ink leading-snug mb-1 min-h-12">{s.name}</p>
                       <div className="flex items-center justify-between">
                         <p className="text-ink/70 text-sm">€ {s.price.toFixed(2)}</p>
@@ -123,7 +123,7 @@ export default function ShortlistPage() {
                       {a.image_url && (
                         <img src={a.image_url} alt={a.name} className="w-full h-32 object-contain mb-2" />
                       )}
-                      <p className="text-xs font-semibold tracking-widest uppercase text-ink/60 mb-0.5">{a.brand}</p>
+                      <p className="text-xs font-semibold tracking-widest uppercase text-ink/70 mb-0.5">{a.brand}</p>
                       <p className="font-medium text-ink leading-snug mb-1 min-h-12">{a.name}</p>
                       <div className="flex items-center justify-between">
                         <p className="text-ink/70 text-sm">€ {a.price.toFixed(2)}</p>
@@ -145,7 +145,7 @@ export default function ShortlistPage() {
 
         <section className="mt-8 border-t border-muted pt-6">
           <h2 className="font-semibold text-ink mb-1">Jullie gegevens (optioneel)</h2>
-          <p className="text-ink/60 text-sm mb-4">
+          <p className="text-ink/70 text-sm mb-4">
             Laat eventueel je naam en e-mailadres achter. Niet verplicht — je kan ook
             gewoon de sessiecode gebruiken.
           </p>

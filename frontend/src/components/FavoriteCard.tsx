@@ -13,7 +13,7 @@ export default function FavoriteCard({ item }: { item: NamedItem }) {
         />
       )}
       <div className="p-3">
-        <p className="text-[10px] font-semibold tracking-widest uppercase text-ink/60 mb-0.5">
+        <p className="text-[10px] font-semibold tracking-widest uppercase text-ink/70 mb-0.5">
           {item.brand}
         </p>
         <h4 className="text-sm font-medium text-ink leading-snug">{item.name}</h4>

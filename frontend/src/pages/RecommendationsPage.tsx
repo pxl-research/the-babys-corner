@@ -113,9 +113,9 @@ export default function RecommendationsPage() {
           </div>
         )}
         {!loading && exhausted && (
-          <p className="text-center text-ink/50 mt-6">Alle opties getoond.</p>
+          <p className="text-center text-ink/70 mt-6">Alle opties getoond.</p>
         )}
-        {loading && <p className="text-center text-ink/50 mt-6">Laden…</p>}
+        {loading && <p className="text-center text-ink/70 mt-6">Laden…</p>}
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4">

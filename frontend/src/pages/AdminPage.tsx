@@ -95,7 +95,7 @@ export default function AdminPage() {
             ← Terug
           </button>
           <h2 className="font-display text-xl font-bold mb-1">Sessie {detail.session_code}</h2>
-          <p className="text-sm text-ink/60 mb-4">{detail.source} · Profiel {detail.profile} · {detail.started_at.slice(0, 10)} · {detail.status}</p>
+          <p className="text-sm text-ink/70 mb-4">{detail.source} · Profiel {detail.profile} · {detail.started_at.slice(0, 10)} · {detail.status}</p>
           {detail.email_failed_warning && (
             <p className="bg-danger/10 text-danger text-sm p-3 rounded-card mb-4">
               E-mail naar medewerker niet verzonden. Gebruik de sessiecode.
@@ -113,12 +113,12 @@ export default function AdminPage() {
           )}
           <section className="mb-4">
             <h3 className="font-semibold text-ink mb-2">Bekeken producten</h3>
-            <p className="text-sm text-ink/60">{detail.shown_products.flat().join(', ') || '—'}</p>
+            <p className="text-sm text-ink/70">{detail.shown_products.flat().join(', ') || '—'}</p>
           </section>
           <section className="mb-4">
             <h3 className="font-semibold text-ink mb-1">Favorieten</h3>
-            <p className="text-sm text-ink/60">Kinderwagens: {detail.stroller_favorites.join(', ') || '—'}</p>
-            <p className="text-sm text-ink/60">Accessoires: {detail.accessory_favorites.join(', ') || '—'}</p>
+            <p className="text-sm text-ink/70">Kinderwagens: {detail.stroller_favorites.join(', ') || '—'}</p>
+            <p className="text-sm text-ink/70">Accessoires: {detail.accessory_favorites.join(', ') || '—'}</p>
           </section>
           {detail.talking_points && detail.talking_points.length > 0 && (
             <section className="mb-4">

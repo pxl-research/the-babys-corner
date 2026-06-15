@@ -87,7 +87,7 @@ export default function StaffLookupPage() {
             ← Terug
           </button>
           <h2 className="font-display text-xl font-bold mb-1">Sessie {detail.session_code}</h2>
-          <p className="text-sm text-ink/60 mb-4">{detail.source} · {detail.profile} · {detail.started_at.slice(0, 10)}</p>
+          <p className="text-sm text-ink/70 mb-4">{detail.source} · {detail.profile} · {detail.started_at.slice(0, 10)}</p>
           {(detail.contact_name || detail.contact_surname || detail.contact_email) && (
             <section className="mb-6 bg-white rounded-card border border-muted p-4">
               <h3 className="font-semibold text-ink mb-1">Contactgegevens klant</h3>
@@ -105,10 +105,10 @@ export default function StaffLookupPage() {
           )}
           <section className="mb-6">
             <h3 className="font-display text-xl font-bold text-ink mb-1">Favorieten van de klant</h3>
-            <p className="text-ink/60 text-sm mb-3">De producten die de klant zelf bewaarde.</p>
+            <p className="text-ink/70 text-sm mb-3">De producten die de klant zelf bewaarde.</p>
             {detail.stroller_favorites_named.length === 0 &&
               detail.accessory_favorites_named.length === 0 && (
-                <p className="text-sm text-ink/50">Nog geen favorieten bewaard.</p>
+                <p className="text-sm text-ink/70">Nog geen favorieten bewaard.</p>
               )}
             {detail.stroller_favorites_named.length > 0 && (
               <>
@@ -138,7 +138,7 @@ export default function StaffLookupPage() {
                 <p className="text-sm font-semibold text-brand">
                   Profiel {detail.profile} — {PROFILE_LABELS[detail.profile] ?? detail.profile}
                 </p>
-                <p className="text-xs text-ink/60 mt-0.5">
+                <p className="text-xs text-ink/70 mt-0.5">
                   Toegekend op basis van de eerste 3 antwoorden.
                 </p>
               </div>

@@ -83,7 +83,7 @@ export default function ProductModal({
               {stroller.image_url && (
                 <img src={stroller.image_url} alt={stroller.name} className="w-full h-56 object-contain mb-4 rounded-card" />
               )}
-              <p className="text-xs font-semibold tracking-widest uppercase text-ink/60 mb-1">{stroller.brand}</p>
+              <p className="text-xs font-semibold tracking-widest uppercase text-ink/70 mb-1">{stroller.brand}</p>
               <h2 className="font-display text-2xl font-bold text-ink mb-1">{stroller.name}</h2>
               <p className="text-xl font-medium text-ink mb-2">€ {stroller.price.toFixed(2)}</p>
               <Markdown text={descriptionText} className="text-ink/80 mb-4" />

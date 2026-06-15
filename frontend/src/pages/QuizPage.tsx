@@ -159,7 +159,7 @@ export default function QuizPage() {
   if (!quizConfig) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
-        <p className="text-ink/50">Laden…</p>
+        <p className="text-ink/70">Laden…</p>
       </div>
     )
   }
@@ -188,7 +188,7 @@ export default function QuizPage() {
           <p className="font-display text-xl font-bold text-ink text-center">
             We zoeken de beste matches voor jullie…
           </p>
-          <p className="text-sm text-ink/60 text-center max-w-xs">
+          <p className="text-sm text-ink/70 text-center max-w-xs">
             We vergelijken jullie wensen met ons volledige assortiment. Dit duurt even.
           </p>
         </div>
@@ -201,9 +201,9 @@ export default function QuizPage() {
         <div className="max-w-lg mx-auto px-6 py-8">
           <ProgressDots total={TOTAL_STEPS} current={NOTE_STEP} filled={filledDots} />
           <p className="font-display text-xl font-bold text-ink mt-6 mb-1">
-            {noteConfig.text} <span className="text-ink/50 font-normal text-base">(optioneel)</span>
+            {noteConfig.text} <span className="text-ink/70 font-normal text-base">(optioneel)</span>
           </p>
-          <p className="text-sm text-ink/60 mb-4">Geen extra info? Sla deze stap gerust over.</p>
+          <p className="text-sm text-ink/70 mb-4">Geen extra info? Sla deze stap gerust over.</p>
           <textarea
             value={optionalNote}
             onChange={(e) => setOptionalNote(e.target.value)}
@@ -233,7 +233,7 @@ export default function QuizPage() {
     if (!tagConfig || !tagQuestion) {
       return (
         <div className="min-h-screen bg-cream flex items-center justify-center">
-          <p className="text-ink/50">Laden…</p>
+          <p className="text-ink/70">Laden…</p>
         </div>
       )
     }
@@ -245,7 +245,7 @@ export default function QuizPage() {
         <div className="max-w-lg mx-auto px-6 py-8">
           <ProgressDots total={TOTAL_STEPS} current={stepNum} filled={filledDots} />
           <p className="font-display text-xl font-bold text-ink mt-6 mb-2">{tagQuestion.text}</p>
-          <p className="text-xs text-ink/50 mb-6">
+          <p className="text-xs text-ink/70 mb-6">
             {tagQuestion.multi ? 'Meerdere antwoorden mogelijk' : 'Kies één antwoord'} — of sla over
           </p>
           <div className="flex flex-col gap-2">

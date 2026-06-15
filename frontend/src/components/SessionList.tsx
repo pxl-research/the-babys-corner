@@ -19,13 +19,13 @@ export default function SessionList({ sessions, onSelect, emptyLabel = 'Geen ses
           <div className="flex justify-between items-start">
             <div>
               <p className="font-mono font-bold text-ink">{s.session_code}</p>
-              <p className="text-sm text-ink/60">
+              <p className="text-sm text-ink/70">
                 {s.source} · Profiel {s.profile} · {s.started_at.slice(0, 10)}
               </p>
             </div>
             <span
               className={`text-xs px-2 py-0.5 rounded-full ${
-                s.status === 'handed_off' ? 'bg-brand/20 text-brand' : 'bg-muted text-ink/60'
+                s.status === 'handed_off' ? 'bg-brand/20 text-brand' : 'bg-muted text-ink/70'
               }`}
             >
               {s.status}
@@ -33,7 +33,7 @@ export default function SessionList({ sessions, onSelect, emptyLabel = 'Geen ses
           </div>
         </button>
       ))}
-      {sessions.length === 0 && <p className="text-ink/50 text-sm">{emptyLabel}</p>}
+      {sessions.length === 0 && <p className="text-ink/70 text-sm">{emptyLabel}</p>}
     </div>
   )
 }
