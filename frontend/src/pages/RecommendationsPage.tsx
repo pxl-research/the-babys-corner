@@ -16,6 +16,7 @@ export default function RecommendationsPage() {
     strollerFavorites, accessoryFavorites, setFavorites,
     favoritesAdaptationActive, setFavoritesAdaptation,
     recoTiers, setRecoTiers,
+    tagMatchMode, droppedTagCount,
   } = useSessionStore()
 
   const [loading, setLoading] = useState(false)
@@ -79,6 +80,12 @@ export default function RecommendationsPage() {
         <h1 className="font-display text-2xl font-bold text-ink mb-1">Onze aanbevelingen voor jullie</h1>
         {favoritesAdaptationActive && (
           <p className="text-brand text-sm mb-4">We houden rekening met jullie favorieten.</p>
+        )}
+        {tagMatchMode === 'partial' && droppedTagCount > 0 && (
+          <p className="text-ink/70 text-sm mb-4">
+            Niet al jullie wensen waren samen te combineren. Naast de beste matches tonen
+            we daarom ook ruimere opties die goed bij jullie passen.
+          </p>
         )}
         {sections.map((section, i) => (
           <section key={section.label || i} className="mt-6">
