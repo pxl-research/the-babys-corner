@@ -119,7 +119,7 @@ export default function RecommendationsPage() {
           onClick={() => navigate('/shortlist')}
           className="w-full max-w-lg mx-auto block bg-brand text-white rounded-btn px-6 py-3 font-medium text-center"
         >
-          Deel met medewerker
+          Naar mijn favorieten
         </button>
       </div>
 
