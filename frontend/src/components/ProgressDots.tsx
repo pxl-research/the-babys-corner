@@ -6,7 +6,14 @@ interface Props {
 
 export default function ProgressDots({ total, current, filled }: Props) {
   return (
-    <div className="flex gap-2 justify-center py-2">
+    <div
+      className="flex gap-2 justify-center py-2"
+      role="progressbar"
+      aria-valuemin={1}
+      aria-valuemax={total}
+      aria-valuenow={current}
+      aria-label={`Stap ${current} van ${total}`}
+    >
       {Array.from({ length: total }, (_, i) => {
         const step = i + 1
         const isFilled = step <= filled
