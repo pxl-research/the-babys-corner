@@ -99,6 +99,16 @@ class QuizSubmitResponse(BaseModel):
     transition_phrase: str
 
 
+class VariantSummary(BaseModel):
+    id: str
+    name: str
+    image_url: str
+    price: float
+    availability: str
+    is_available: bool
+    colour_label: str
+
+
 class AccessoryItem(BaseModel):
     id: str
     name: str
@@ -126,6 +136,7 @@ class StrollerItem(BaseModel):
     show_cross_sell_chips: bool = False
     variant_count: int = 1  # number of colour/size variants of this product (incl. itself)
     variant_ids: list[str] = []  # ids of all variants, available-first; this product included
+    variant_summaries: list[VariantSummary] = []  # compact data for the colour picker
 
 
 class TierInfo(BaseModel):

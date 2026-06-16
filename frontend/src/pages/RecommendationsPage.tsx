@@ -130,7 +130,7 @@ export default function RecommendationsPage() {
       <ProductModal
         stroller={selectedStroller}
         isFavorited={selectedStroller ? strollerFavorites.includes(selectedStroller.id) : false}
-        onToggleFavorite={() => selectedStroller && handleToggleFavorite(selectedStroller.id, 'stroller')}
+        onToggleFavorite={(id) => handleToggleFavorite(id, 'stroller')}
         onAccessoryClick={(acc) => {
           if (selectedStroller) setReturnToStroller(selectedStroller)
           setSelectedStroller(null)

@@ -52,6 +52,16 @@ export interface TagCountResponse {
   total_count: number
 }
 
+export interface VariantSummary {
+  id: string
+  name: string
+  image_url: string
+  price: number
+  availability: string
+  is_available: boolean
+  colour_label: string
+}
+
 export interface AccessoryItem {
   id: string
   name: string
@@ -79,6 +89,7 @@ export interface StrollerItem {
   show_cross_sell_chips: boolean
   variant_count?: number
   variant_ids?: string[]
+  variant_summaries?: VariantSummary[]
 }
 
 export interface NamedItem {

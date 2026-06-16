@@ -20,12 +20,13 @@ from app.schemas import (
     RecommendationBatchResponse,
     StrollerItem,
     AccessoryItem,
+    VariantSummary,
     FavoriteToggleRequest,
     FavoriteToggleResponse,
     ShortlistItem,
     FavoriteItemsResponse,
     HandoffRequest,
-HandoffResponse,
+    HandoffResponse,
     FilterTagsRequest,
     FilterTagsResponse,
     FilterBrandsRequest,
@@ -458,6 +459,7 @@ def _build_products(
             show_cross_sell_chips=show_chips,
             variant_count=s.get("variant_count", 1),
             variant_ids=s.get("variant_ids", []),
+            variant_summaries=[VariantSummary(**v) for v in s.get("variant_summaries", [])],
         ))
     return products
 

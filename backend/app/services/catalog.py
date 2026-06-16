@@ -69,16 +69,64 @@ class CatalogService:
         with open(path, encoding="utf-8") as f:
             return json.load(f)
 
+    @staticmethod
+    def _colour_label(name: str, common_prefix: str) -> str:
+        """Strip the shared product-name prefix from a variant name to get the colour label.
+        Falls back to the full name when nothing remains after stripping."""
+        suffix = name[len(common_prefix):].strip(" -–—")
+        return suffix if suffix else name.strip()
+
+    @staticmethod
+    def _common_prefix(names: list[str]) -> str:
+        """Longest common prefix of all variant names, trimmed to a word boundary."""
+        if not names:
+            return ""
+        prefix = names[0]
+        for n in names[1:]:
+            while not n.startswith(prefix):
+                prefix = prefix[:-1]
+                if not prefix:
+                    return ""
+        # Already ends on a word boundary (trailing space) — return as-is.
+        if prefix.endswith(" "):
+            return prefix
+        # Otherwise trim back to the last space.
+        last_space = prefix.rfind(" ")
+        return prefix[: last_space + 1] if last_space >= 0 else ""
+
+    def _build_variant_summaries(self, member_ids: list[str]) -> list[dict]:
+        """Compact per-variant data for the colour picker (id, name, image, price,
+        availability, colour_label). Sorted available-first, then lowest id."""
+        names = [self._strollers[i]["name"] for i in member_ids if i in self._strollers]
+        prefix = self._common_prefix(names)
+        summaries = []
+        for i in member_ids:
+            s = self._strollers.get(i)
+            if not s:
+                continue
+            summaries.append({
+                "id": i,
+                "name": s["name"],
+                "image_url": s["image_url"],
+                "price": s["price"],
+                "availability": s["availability"],
+                "is_available": is_available(s),
+                "colour_label": self._colour_label(s["name"], prefix),
+            })
+        return summaries
+
     def _with_variants(self, item: dict) -> dict:
         """Annotate a stroller with its variant group: `variant_ids` (all members,
-        available-first) and `variant_count`. Returns a shallow copy so the stored
-        catalog item stays pristine."""
+        available-first), `variant_count`, and `variant_summaries` (compact per-variant
+        data for the colour picker). Returns a shallow copy so the stored item stays
+        pristine."""
         members = self._variant_members.get(group_id_of(item), [item["id"]])
         return {
             **item,
             "group_id": group_id_of(item),
             "variant_ids": members,
             "variant_count": len(members),
+            "variant_summaries": self._build_variant_summaries(members),
         }
 
     def _representative_id(self, member_ids: list[str]) -> str:

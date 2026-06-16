@@ -1,13 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import type { StrollerItem, AccessoryItem } from '../api/client'
+import type { StrollerItem, AccessoryItem, VariantSummary } from '../api/client'
 import AccessoryCarouselCard from './AccessoryCarouselCard'
 import Markdown from './Markdown'
 
 interface Props {
   stroller: StrollerItem | null
   isFavorited: boolean
-  onToggleFavorite: () => void
+  onToggleFavorite: (id: string) => void
   onAccessoryClick: (acc: AccessoryItem) => void
   onClose: () => void
 }
@@ -16,7 +16,20 @@ export default function ProductModal({
   stroller, isFavorited, onToggleFavorite, onAccessoryClick, onClose,
 }: Props) {
   const reduceMotion = useReducedMotion()
+  // Tracks the active colour variant within the modal. Resets when a new product opens.
+  const [activeVariant, setActiveVariant] = useState<VariantSummary | null>(null)
+  useEffect(() => { setActiveVariant(null) }, [stroller?.id])
+
+  // Overlay the representative stroller with the selected variant's display fields.
+  const displayName = activeVariant?.name ?? stroller?.name ?? ''
+  const displayImage = activeVariant?.image_url ?? stroller?.image_url ?? ''
+  const displayPrice = activeVariant?.price ?? stroller?.price ?? 0
+  const displayAvailability = activeVariant?.availability ?? stroller?.availability ?? ''
+  const activeId = activeVariant?.id ?? stroller?.id ?? ''
+
   const descriptionText = stroller?.formatted_description ?? stroller?.description ?? ''
+  const variants = stroller?.variant_summaries ?? []
+  const hasVariants = variants.length > 1
 
   // Close on Escape so keyboard users aren't trapped (backdrop click already closes).
   useEffect(() => {
@@ -80,12 +93,37 @@ export default function ProductModal({
                   Sluiten
                 </button>
               </div>
-              {stroller.image_url && (
-                <img src={stroller.image_url} alt={stroller.name} className="w-full h-56 object-contain mb-4 rounded-card" />
+              {displayImage && (
+                <img src={displayImage} alt={displayName} className="w-full h-56 object-contain mb-4 rounded-card" />
               )}
               <p className="text-xs font-semibold tracking-widest uppercase text-ink/70 mb-1">{stroller.brand}</p>
-              <h2 className="font-display text-2xl font-bold text-ink mb-1">{stroller.name}</h2>
-              <p className="text-xl font-medium text-ink mb-2">€ {stroller.price.toFixed(2)}</p>
+              <h2 className="font-display text-2xl font-bold text-ink mb-1">{displayName}</h2>
+              <p className="text-xl font-medium text-ink mb-1">€ {displayPrice.toFixed(2)}</p>
+              <p className="text-sm text-ink/60 mb-3">{displayAvailability}</p>
+              {hasVariants && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-ink/60 uppercase tracking-widest mb-2">Kleur</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {variants.map((v) => (
+                      <button
+                        key={v.id}
+                        onClick={() => setActiveVariant(v.id === activeId && activeVariant ? null : v)}
+                        className={`flex flex-col items-center gap-1 rounded-card border-2 p-1 transition-colors ${
+                          v.id === activeId
+                            ? 'border-brand-dark'
+                            : 'border-muted/50 hover:border-muted'
+                        } ${!v.is_available ? 'opacity-50' : ''}`}
+                        title={v.colour_label + (!v.is_available ? ' (niet op voorraad)' : '')}
+                      >
+                        <img src={v.image_url} alt={v.colour_label} className="w-14 h-14 object-contain rounded" />
+                        <span className="text-[10px] text-ink/70 leading-tight text-center max-w-[56px] line-clamp-2">
+                          {v.colour_label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <Markdown text={descriptionText} className="text-ink/80 mb-4" />
               {showKeyFeatures && (
                 <div className="bg-brand/10 rounded-card p-4 mb-4">
@@ -104,7 +142,7 @@ export default function ProductModal({
                 </div>
               )}
               <button
-                onClick={onToggleFavorite}
+                onClick={() => onToggleFavorite(activeId)}
                 className="w-full bg-brand text-ink rounded-btn px-6 py-3 font-medium"
               >
                 {isFavorited ? '♥ In favorieten' : 'Voeg toe aan favorieten'}
