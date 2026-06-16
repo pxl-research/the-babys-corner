@@ -124,6 +124,8 @@ class StrollerItem(BaseModel):
     key_features: str
     cross_sell_items: list[AccessoryItem]
     show_cross_sell_chips: bool = False
+    variant_count: int = 1  # number of colour/size variants of this product (incl. itself)
+    variant_ids: list[str] = []  # ids of all variants, available-first; this product included
 
 
 class TierInfo(BaseModel):

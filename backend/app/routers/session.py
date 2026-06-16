@@ -456,6 +456,8 @@ def _build_products(
                 for a in cross_sell
             ],
             show_cross_sell_chips=show_chips,
+            variant_count=s.get("variant_count", 1),
+            variant_ids=s.get("variant_ids", []),
         ))
     return products
 

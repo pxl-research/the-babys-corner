@@ -13,6 +13,18 @@ def is_available(item: dict) -> bool:
     return item.get("availability") == "Op voorraad"
 
 
+def _id_sort_key(id_: str) -> tuple[int, object]:
+    """Sort numeric ids numerically, fall back to string for non-numeric ids."""
+    return (0, int(id_)) if id_.isdigit() else (1, id_)
+
+
+def group_id_of(item: dict) -> str:
+    """Variant-group key for an item: the feed's groep_id, or the item's own id when
+    it belongs to no group. Items sharing a group are colour/size variants of one
+    product."""
+    return (item.get("group_id") or "").strip() or item.get("id", "")
+
+
 def _validate_item(item: dict, required: set[str]) -> bool:
     missing = required - item.keys()
     if missing:
@@ -38,6 +50,16 @@ class CatalogService:
             if _validate_item(a, REQUIRED_ACCESSORY_FIELDS):
                 self._accessories[a["id"]] = a
 
+        # Map each variant group to its member ids (available-first, then lowest id),
+        # so the stroller assortment can be shown one representative per product
+        # instead of once per colour/size. Accessories are left ungrouped — cross-sell
+        # already de-dupes them by name.
+        self._variant_members: dict[str, list[str]] = {}
+        for s in self._strollers.values():
+            self._variant_members.setdefault(group_id_of(s), []).append(s["id"])
+        for ids in self._variant_members.values():
+            ids.sort(key=lambda i: (not is_available(self._strollers[i]), _id_sort_key(i)))
+
     @staticmethod
     def _load_file() -> dict:
         path = settings.catalog_path
@@ -47,14 +69,53 @@ class CatalogService:
         with open(path, encoding="utf-8") as f:
             return json.load(f)
 
+    def _with_variants(self, item: dict) -> dict:
+        """Annotate a stroller with its variant group: `variant_ids` (all members,
+        available-first) and `variant_count`. Returns a shallow copy so the stored
+        catalog item stays pristine."""
+        members = self._variant_members.get(group_id_of(item), [item["id"]])
+        return {
+            **item,
+            "group_id": group_id_of(item),
+            "variant_ids": members,
+            "variant_count": len(members),
+        }
+
+    def _representative_id(self, member_ids: list[str]) -> str:
+        """Pick the representative of a variant group among the given members:
+        the group leader (id == group_id) first, then an available item, then lowest id."""
+        return min(
+            member_ids,
+            key=lambda i: (
+                group_id_of(self._strollers[i]) != i,
+                not is_available(self._strollers[i]),
+                _id_sort_key(i),
+            ),
+        )
+
+    def _collapse(self, items: list[dict]) -> list[dict]:
+        """Collapse variants to one representative per group, preserving first-seen
+        group order. The representative is chosen among the items actually present
+        (so a filtered-out colour never becomes the representative)."""
+        by_group: dict[str, list[str]] = {}
+        order: list[str] = []
+        for it in items:
+            g = group_id_of(it)
+            if g not in by_group:
+                by_group[g] = []
+                order.append(g)
+            by_group[g].append(it["id"])
+        return [self._with_variants(self._strollers[self._representative_id(by_group[g])]) for g in order]
+
     def get_stroller(self, id_: str) -> dict | None:
-        return self._strollers.get(id_)
+        s = self._strollers.get(id_)
+        return self._with_variants(s) if s else None
 
     def get_accessory(self, id_: str) -> dict | None:
         return self._accessories.get(id_)
 
     def get_all_strollers(self) -> list[dict]:
-        return list(self._strollers.values())
+        return self._collapse(list(self._strollers.values()))
 
     def get_all_accessories(self) -> list[dict]:
         return list(self._accessories.values())
@@ -122,7 +183,9 @@ class CatalogService:
         t, b, c = tags or [], brands or [], collections or []
         if not t and not b and not c:
             return self.get_all_strollers()
-        return [s for s in self._strollers.values() if self._matches_filter(s, t, b, c, tag_match)]
+        return self._collapse(
+            [s for s in self._strollers.values() if self._matches_filter(s, t, b, c, tag_match)]
+        )
 
     def get_filtered_accessories(
         self,
