@@ -21,6 +21,9 @@ export default function ProductCard({
           <p className="text-xs font-semibold tracking-widest uppercase text-ink/70 mb-0.5">{stroller.brand}</p>
           <h3 className="font-medium text-ink leading-snug mb-1 min-h-14">{stroller.name}</h3>
           <p className="font-medium text-ink">€ {stroller.price.toFixed(2)}</p>
+          {(stroller.variant_count ?? 1) > 1 && (
+            <p className="mt-1.5 text-xs text-ink/60">Ook in {stroller.variant_count! - 1} andere kleur{stroller.variant_count! - 1 === 1 ? '' : 'en'}</p>
+          )}
         </div>
       </button>
       <div className="px-4 pb-4 flex items-center justify-end mt-auto">

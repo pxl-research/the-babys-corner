@@ -77,6 +77,8 @@ export interface StrollerItem {
   key_features: string
   cross_sell_items: AccessoryItem[]
   show_cross_sell_chips: boolean
+  variant_count?: number
+  variant_ids?: string[]
 }
 
 export interface NamedItem {
