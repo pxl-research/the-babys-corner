@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import StaffAnswerList from '../components/StaffAnswerList'
+import FavoriteCard from '../components/FavoriteCard'
 import LoginForm from '../components/LoginForm'
 import SessionList from '../components/SessionList'
 import { api } from '../api/client'
 import type { StaffSession, StaffSessionDetail } from '../api/client'
+
+const PROFILE_LABELS: Record<string, string> = {
+  A: 'Minimalist',
+  B: 'Ontdekker',
+  C: 'Planner',
+}
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false)
@@ -95,15 +102,72 @@ export default function AdminPage() {
             ← Terug
           </button>
           <h2 className="font-display text-xl font-bold mb-1">Sessie {detail.session_code}</h2>
-          <p className="text-sm text-ink/70 mb-4">{detail.source} · Profiel {detail.profile} · {detail.started_at.slice(0, 10)} · {detail.status}</p>
-          {detail.email_failed_warning && (
-            <p className="bg-danger/10 text-danger text-sm p-3 rounded-card mb-4">
-              E-mail naar medewerker niet verzonden. Gebruik de sessiecode.
-            </p>
+          <p className="text-sm text-ink/70 mb-4">
+            {detail.source} · {detail.profile ? `${detail.profile} — ${PROFILE_LABELS[detail.profile] ?? detail.profile}` : '—'} · {detail.started_at.slice(0, 10)} · {detail.status}
+          </p>
+          {(detail.contact_name || detail.contact_surname || detail.contact_email) && (
+            <section className="mb-6 bg-white rounded-card border border-muted p-4">
+              <h3 className="font-semibold text-ink mb-1">Contactgegevens klant</h3>
+              {(detail.contact_name || detail.contact_surname) && (
+                <p className="text-sm text-ink/80">
+                  {[detail.contact_name, detail.contact_surname].filter(Boolean).join(' ')}
+                </p>
+              )}
+              {detail.contact_email && (
+                <a href={`mailto:${detail.contact_email}`} className="text-sm text-brand-dark underline">
+                  {detail.contact_email}
+                </a>
+              )}
+            </section>
           )}
+          <section className="mb-6">
+            <h3 className="font-display text-xl font-bold text-ink mb-1">Favorieten van de klant</h3>
+            <p className="text-ink/70 text-sm mb-3">De producten die de klant zelf bewaarde.</p>
+            {detail.stroller_favorites_named.length === 0 &&
+              detail.accessory_favorites_named.length === 0 && (
+                <p className="text-sm text-ink/70">Nog geen favorieten bewaard.</p>
+              )}
+            {detail.stroller_favorites_named.length > 0 && (
+              <>
+                <h4 className="text-sm font-semibold text-ink/70 mb-2">Kinderwagens</h4>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {detail.stroller_favorites_named.map((item) => (
+                    <FavoriteCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </>
+            )}
+            {detail.accessory_favorites_named.length > 0 && (
+              <>
+                <h4 className="text-sm font-semibold text-ink/70 mb-2">Accessoires</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {detail.accessory_favorites_named.map((item) => (
+                    <FavoriteCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
           <section className="mb-4">
             <h3 className="font-semibold text-ink mb-2">Antwoorden</h3>
+            {detail.profile && (
+              <div className="mb-4 rounded-card bg-brand/10 p-3">
+                <p className="text-sm font-semibold text-brand-dark">
+                  Profiel {detail.profile} — {PROFILE_LABELS[detail.profile] ?? detail.profile}
+                </p>
+                <p className="text-xs text-ink/70 mt-0.5">
+                  Toegekend op basis van de eerste 3 antwoorden.
+                </p>
+              </div>
+            )}
+            <h4 className="text-sm font-semibold text-ink/70 mb-2">Profielvragen</h4>
             <StaffAnswerList answers={detail.quiz_answers} />
+            {detail.tag_answers.length > 0 && (
+              <>
+                <h4 className="text-sm font-semibold text-ink/70 mt-4 mb-2">Voorkeuren</h4>
+                <StaffAnswerList answers={detail.tag_answers} />
+              </>
+            )}
           </section>
           {detail.optional_note && (
             <section className="mb-4">
@@ -115,21 +179,6 @@ export default function AdminPage() {
             <h3 className="font-semibold text-ink mb-2">Bekeken producten</h3>
             <p className="text-sm text-ink/70">{detail.shown_products.flat().join(', ') || '—'}</p>
           </section>
-          <section className="mb-4">
-            <h3 className="font-semibold text-ink mb-1">Favorieten</h3>
-            <p className="text-sm text-ink/70">Kinderwagens: {detail.stroller_favorites.join(', ') || '—'}</p>
-            <p className="text-sm text-ink/70">Accessoires: {detail.accessory_favorites.join(', ') || '—'}</p>
-          </section>
-          {detail.talking_points && detail.talking_points.length > 0 && (
-            <section className="mb-4">
-              <h3 className="font-semibold text-ink mb-2">Gespreksopeners</h3>
-              <ul className="space-y-1">
-                {detail.talking_points.map((tp, i) => (
-                  <li key={i} className="text-sm text-ink/80">• {tp}</li>
-                ))}
-              </ul>
-            </section>
-          )}
         </div>
       </div>
     )
