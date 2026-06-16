@@ -52,7 +52,7 @@ export default function Header() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={confirmRestart}
-                className="bg-brand text-white rounded-btn px-6 py-3 font-medium"
+                className="bg-brand text-ink rounded-btn px-6 py-3 font-medium"
               >
                 Ja, opnieuw beginnen
               </button>

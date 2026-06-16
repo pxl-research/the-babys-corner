@@ -150,7 +150,7 @@ export default function StaffHandoffPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4">
         <button
           onClick={handleNewClient}
-          className="w-full max-w-lg mx-auto block bg-brand text-white rounded-btn px-6 py-3 font-medium"
+          className="w-full max-w-lg mx-auto block bg-brand text-ink rounded-btn px-6 py-3 font-medium"
         >
           Nieuwe klant
         </button>

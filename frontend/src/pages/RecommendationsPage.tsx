@@ -121,7 +121,7 @@ export default function RecommendationsPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4">
         <button
           onClick={() => navigate('/shortlist')}
-          className="w-full max-w-lg mx-auto block bg-brand text-white rounded-btn px-6 py-3 font-medium text-center"
+          className="w-full max-w-lg mx-auto block bg-brand text-ink rounded-btn px-6 py-3 font-medium text-center"
         >
           Naar mijn favorieten
         </button>

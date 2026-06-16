@@ -87,7 +87,7 @@ export default function InactivityGuard() {
         </p>
         <button
           onClick={() => resetRef.current()}
-          className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium"
+          className="w-full bg-brand text-ink rounded-btn px-6 py-3 font-medium"
         >
           Ja, ik ben er nog
         </button>

@@ -34,7 +34,7 @@ export default function WelcomePage() {
         </p>
         <button
           onClick={handleStart}
-          className="bg-brand text-white rounded-btn px-8 py-3 font-medium text-lg mt-4"
+          className="bg-brand text-ink rounded-btn px-8 py-3 font-medium text-lg mt-4"
         >
           Start
         </button>

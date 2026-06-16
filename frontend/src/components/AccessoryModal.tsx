@@ -75,7 +75,7 @@ export default function AccessoryModal({
               {(canAdd || canRemove) && (
                 <button
                   onClick={onToggleFavorite}
-                  className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium"
+                  className="w-full bg-brand text-ink rounded-btn px-6 py-3 font-medium"
                 >
                   {isFavorited ? '♥ In favorieten' : 'Voeg toe aan favorieten'}
                 </button>

@@ -195,7 +195,7 @@ export default function ShortlistPage() {
           <button
             onClick={handleConfirm}
             disabled={!hasFavorites || emailInvalid}
-            className="w-full bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
+            className="w-full bg-brand text-ink rounded-btn px-6 py-3 font-medium disabled:opacity-50"
           >
             Deel met medewerker
           </button>

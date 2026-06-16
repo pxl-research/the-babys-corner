@@ -32,7 +32,7 @@ export default function LoginForm({
             className="border-2 border-muted rounded-card px-4 py-3 bg-white outline-none focus:border-brand"
           />
           {error && <p className="text-danger text-sm">Ongeldige inloggegevens.</p>}
-          <button type="submit" className="bg-brand text-white rounded-btn px-6 py-3 font-medium">
+          <button type="submit" className="bg-brand text-ink rounded-btn px-6 py-3 font-medium">
             Inloggen
           </button>
         </form>

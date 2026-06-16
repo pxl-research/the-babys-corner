@@ -4,9 +4,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Matches thebabyscorner.be brand identity: vivid pink accent on warm cream.
-        brand:        '#E50051', // signature pink — fills, accents, active states
-        'brand-dark': '#B2003F', // darker pink for text/links on light (site link color)
+        // Matches thebabyscorner.be brand identity: softened pink-rose accent on warm cream.
+        // Toned down from the vivid #E50051 so primary buttons read as friendly, not "danger".
+        brand:        '#E86A8E', // signature rose — fills, accents, active states
+        'brand-dark': '#C24E6E', // darker rose for text/links on light
         cream:        '#FFF9F0', // warm off-white page background
         ink:          '#403F3D', // warm charcoal body text
         danger:       '#C0392B',

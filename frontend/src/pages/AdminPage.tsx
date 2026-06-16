@@ -144,7 +144,7 @@ export default function AdminPage() {
           <button
             onClick={handleExport}
             disabled={exporting}
-            className="bg-brand text-white rounded-btn px-4 py-2 text-sm font-medium disabled:opacity-50"
+            className="bg-brand text-ink rounded-btn px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
             {exporting ? 'Exporteren…' : 'Download XLSX'}
           </button>

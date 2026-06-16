@@ -215,7 +215,7 @@ export default function QuizPage() {
           <div className="flex flex-col gap-3 mt-6">
             <button
               onClick={() => handleNoteSubmit(optionalNote)}
-              className="bg-brand text-white rounded-btn px-6 py-3 font-medium"
+              className="bg-brand text-ink rounded-btn px-6 py-3 font-medium"
             >
               {noteConfig.continue_label}
             </button>
@@ -269,7 +269,7 @@ export default function QuizPage() {
             <button
               onClick={handleTagNext}
               disabled={submitting}
-              className="bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
+              className="bg-brand text-ink rounded-btn px-6 py-3 font-medium disabled:opacity-50"
             >
               {submitting ? 'Bezig…' : stepNum === LAST_TAG_STEP ? 'Bekijk aanbevelingen' : 'Volgende'}
             </button>
@@ -312,7 +312,7 @@ export default function QuizPage() {
           <button
             onClick={handleProfileNext}
             disabled={selectedOption === -1 || submitting}
-            className="bg-brand text-white rounded-btn px-6 py-3 font-medium disabled:opacity-50"
+            className="bg-brand text-ink rounded-btn px-6 py-3 font-medium disabled:opacity-50"
           >
             {submitting ? 'Bezig…' : 'Volgende'}
           </button>
