@@ -14,7 +14,7 @@ async def test_email_trigger_only_on_handoff(client):
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
 

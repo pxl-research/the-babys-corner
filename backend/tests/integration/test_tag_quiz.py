@@ -13,7 +13,7 @@ async def client():
 
 async def _session_with_quiz(client):
     await client.post("/api/sessions?source=home")
-    answers = [{"question_id": i + 1, "option_index": 0} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 0} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
 
 

@@ -1,6 +1,10 @@
 from collections import Counter
 
-_TIEBREAK = ["B", "A", "C"]
+# Profile = the most-chosen answer profile. Ties are broken by this priority order:
+# B (Ontdekker) stays the safe default, then C (Planner) beats A (Minimalist) — so a
+# straight A&C tie resolves to C (Planner), per spec §2 "Bij gelijkstand A & C → profiel C".
+# max() returns the first element reaching the highest count, so list order = tie priority.
+_TIEBREAK = ["B", "C", "A"]
 
 
 def compute_profile(answers: list[dict]) -> str:

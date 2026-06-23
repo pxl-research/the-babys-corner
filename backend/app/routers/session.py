@@ -232,8 +232,9 @@ async def submit_quiz(
     config = load_quiz_config()
     question_map = {q["id"]: q for q in config["questions"]}
 
-    if len(body.answers) != 3:
-        raise HTTPException(422, detail="Exactly 3 answers required.")
+    expected = len(config["questions"])
+    if len(body.answers) != expected:
+        raise HTTPException(422, detail=f"Exactly {expected} answers required.")
 
     enriched_answers = []
     for ans in body.answers:

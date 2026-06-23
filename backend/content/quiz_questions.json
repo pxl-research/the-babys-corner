@@ -2,29 +2,20 @@
   "questions": [
     {
       "id": 1,
-      "text": "Hoe groot zien jullie de uitzet?",
+      "text": "Wat is jullie visie op de babyuitzet?",
       "options": [
-        {"index": 0, "text": "Compact", "profile": "A"},
-        {"index": 1, "text": "Goed gevuld", "profile": "B"},
-        {"index": 2, "text": "Volledig", "profile": "C"}
+        {"index": 0, "text": "Alleen wat echt nodig is, niet te veel", "profile": "A"},
+        {"index": 1, "text": "Een goede basis, plus wat extra's", "profile": "B"},
+        {"index": 2, "text": "Zo volledig mogelijk, we willen niets missen", "profile": "C"}
       ]
     },
     {
       "id": 2,
-      "text": "Wat is jullie voorkeur qua stijl en sfeer?",
-      "options": [
-        {"index": 0, "text": "Strak en sober: eenvoud werkt", "profile": "A"},
-        {"index": 1, "text": "Functioneel: comfort en gebruiksgemak primeren", "profile": "B"},
-        {"index": 2, "text": "Doordacht: kleuren, materialen en details matchen", "profile": "C"}
-      ]
-    },
-    {
-      "id": 3,
       "text": "Hoe pakken jullie de voorbereiding aan?",
       "options": [
-        {"index": 0, "text": "Snel en pragmatisch: beslissingen mogen vlot vallen", "profile": "A"},
-        {"index": 1, "text": "Begeleid: wijs ons de bestsellers", "profile": "B"},
-        {"index": 2, "text": "Geleidelijk: we willen zelf elk detail bepalen", "profile": "C"}
+        {"index": 0, "text": "Snel en pragmatisch — knopen doorhakken", "profile": "A"},
+        {"index": 1, "text": "Begeleid — toon ons de toppers", "profile": "B"},
+        {"index": 2, "text": "Stap voor stap — elk detail telt voor ons", "profile": "C"}
       ]
     }
   ],

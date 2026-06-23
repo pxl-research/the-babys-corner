@@ -28,7 +28,7 @@ async def client():
 
 async def _create_and_handoff_session(client, source="home", profile_option=1):
     await client.post(f"/api/sessions?source={source}")
-    answers = [{"question_id": i + 1, "option_index": profile_option} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": profile_option} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
     await client.post("/api/sessions/current/handoff")
@@ -88,7 +88,7 @@ async def test_staff_detail_resolves_product_names(client):
 
 async def test_staff_detail_includes_tag_answers(client):
     await client.post("/api/sessions?source=store")
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     tag_answers = [
         {"question_id": "usage", "option_indices": [1]},

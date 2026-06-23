@@ -31,7 +31,7 @@ async def client():
 
 async def _create_session(client, profile_option=2):
     await client.post("/api/sessions?source=home")
-    answers = [{"question_id": i + 1, "option_index": profile_option} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": profile_option} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
     await client.post("/api/sessions/current/handoff")

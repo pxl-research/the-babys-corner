@@ -24,7 +24,6 @@ export default function ProductModal({
   const displayName = activeVariant?.name ?? stroller?.name ?? ''
   const displayImage = activeVariant?.image_url ?? stroller?.image_url ?? ''
   const displayPrice = activeVariant?.price ?? stroller?.price ?? 0
-  const displayAvailability = activeVariant?.availability ?? stroller?.availability ?? ''
   const activeId = activeVariant?.id ?? stroller?.id ?? ''
 
   const descriptionText = stroller?.formatted_description ?? stroller?.description ?? ''
@@ -98,8 +97,7 @@ export default function ProductModal({
               )}
               <p className="text-xs font-semibold tracking-widest uppercase text-ink/70 mb-1">{stroller.brand}</p>
               <h2 className="font-display text-2xl font-bold text-ink mb-1">{displayName}</h2>
-              <p className="text-xl font-medium text-ink mb-1">€ {displayPrice.toFixed(2)}</p>
-              <p className="text-sm text-ink/60 mb-3">{displayAvailability}</p>
+              <p className="text-xl font-medium text-ink mb-3">€ {displayPrice.toFixed(2)}</p>
               {hasVariants && (
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-ink/60 uppercase tracking-widest mb-2">Kleur</p>
@@ -112,8 +110,8 @@ export default function ProductModal({
                           v.id === activeId
                             ? 'border-brand-dark'
                             : 'border-muted/50 hover:border-muted'
-                        } ${!v.is_available ? 'opacity-50' : ''}`}
-                        title={v.colour_label + (!v.is_available ? ' (niet op voorraad)' : '')}
+                        }`}
+                        title={v.colour_label}
                       >
                         <img src={v.image_url} alt={v.colour_label} className="w-14 h-14 object-contain rounded" />
                         <span className="text-[10px] text-ink/70 leading-tight text-center max-w-[56px] line-clamp-2">

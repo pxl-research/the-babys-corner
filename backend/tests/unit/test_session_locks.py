@@ -11,7 +11,7 @@ async def client():
 
 async def _start_session(client):
     await client.post("/api/sessions?source=home")
-    answers = [{"question_id": i + 1, "option_index": 0} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 0} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
 
 
@@ -38,7 +38,7 @@ async def test_schema_creates_sessions_table_with_required_columns(reset_db):
 async def test_handed_off_session_rejects_quiz_submit(client, reset_db):
     await client.post("/api/sessions?source=home")
     await _set_status(reset_db, "handed_off")
-    answers = [{"question_id": i + 1, "option_index": 0} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 0} for i in range(2)]
     resp = await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     assert resp.status_code == 409
 

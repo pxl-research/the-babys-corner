@@ -27,10 +27,13 @@ export default function WelcomePage() {
       <Header />
       <main className="max-w-lg mx-auto px-6 py-12 flex flex-col items-center text-center gap-6">
         <h1 className="font-display text-3xl md:text-4xl font-bold text-ink leading-tight">
-          Vind de kinderwagen die bij jullie past
+          Welkom bij the baby's corner!
         </h1>
         <p className="text-ink/70 text-lg">
-          Beantwoord enkele korte vragen en ontdek welke kinderwagen het beste bij jullie past.
+          De voorbereiding op je baby is een spannende tijd, vol dromen en keuzes. Onze
+          digitale babychecklist begeleidt je stap voor stap: van kinderwagen tot
+          babykamer, afgestemd op wat écht bij jullie past. Ik start met twee korte
+          vragen, zodat ik je meteen de juiste richting kan wijzen.
         </p>
         <button
           onClick={handleStart}

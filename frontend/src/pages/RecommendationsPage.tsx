@@ -75,6 +75,9 @@ export default function RecommendationsPage() {
       <Header />
       <div className="max-w-4xl mx-auto px-4 py-6">
         <h1 className="font-display text-2xl font-bold text-ink mb-1">Onze aanbevelingen voor jullie</h1>
+        <p className="text-ink/70 mb-4">
+          Op basis van jullie antwoorden hebben we de beste matches voor jullie geselecteerd.
+        </p>
         {favoritesAdaptationActive && (
           <p className="text-brand-dark text-sm mb-4">We houden rekening met jullie favorieten.</p>
         )}

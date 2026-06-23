@@ -5,11 +5,11 @@ import ProgressDots from '../components/ProgressDots'
 import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
 
-const PROFILE_STEPS = 3
+const PROFILE_STEPS = 2
 const TAG_STEPS = 4
-const FIRST_TAG_STEP = PROFILE_STEPS + 1 // 4
-const LAST_TAG_STEP = PROFILE_STEPS + TAG_STEPS // 7
-const NOTE_STEP = PROFILE_STEPS + TAG_STEPS + 1 // 8
+const FIRST_TAG_STEP = PROFILE_STEPS + 1 // 3
+const LAST_TAG_STEP = PROFILE_STEPS + TAG_STEPS // 6
+const NOTE_STEP = PROFILE_STEPS + TAG_STEPS + 1 // 7
 const TOTAL_STEPS = NOTE_STEP
 
 export default function QuizPage() {
@@ -244,6 +244,13 @@ export default function QuizPage() {
         <Header />
         <div className="max-w-lg mx-auto px-6 py-8">
           <ProgressDots total={TOTAL_STEPS} current={stepNum} filled={filledDots} />
+          {stepNum === FIRST_TAG_STEP && (
+            <p className="text-ink/80 mt-6 mb-2">
+              Kinderwagens zijn onze specialiteit — en voor elk gezin is er het perfecte
+              model. Ik stel je een paar gerichte vragen, zodat ik je precies kan tonen
+              wat bij jullie past.
+            </p>
+          )}
           <p className="font-display text-xl font-bold text-ink mt-6 mb-2">{tagQuestion.text}</p>
           <p className="text-xs text-ink/70 mb-6">
             {tagQuestion.multi ? 'Meerdere antwoorden mogelijk' : 'Kies één antwoord'} — of sla over

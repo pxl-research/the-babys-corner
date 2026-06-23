@@ -15,7 +15,7 @@ async def test_quiz_config_returns_config_driven_copy(client):
     resp = await client.get("/api/sessions/quiz-config")
     assert resp.status_code == 200
     data = resp.json()
-    assert len(data["questions"]) == 3
+    assert len(data["questions"]) == 2
     assert data["optional_note"]["skip_label"] == "Niet nodig"
 
 
@@ -27,7 +27,7 @@ async def test_full_flow_submits_optional_note_on_step_six_then_stable_recommend
     assert "session_id" in resp.cookies
 
     # Submit quiz with optional note
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     resp = await client.post(
         "/api/sessions/current/quiz",
         json={"answers": answers, "optional_note": "We houden van stijl"},
@@ -54,7 +54,7 @@ async def test_no_optional_note_skips_llm_ranking(client):
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 0} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 0} for i in range(2)]
     resp = await client.post(
         "/api/sessions/current/quiz",
         json={"answers": answers, "optional_note": ""},
@@ -66,7 +66,7 @@ async def test_handoff_sets_pending_email_and_locks_session(client):
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
 
@@ -85,7 +85,7 @@ async def test_after_handoff_favorite_toggle_returns_409(client):
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
     await client.post("/api/sessions/current/handoff")
@@ -127,7 +127,7 @@ async def test_after_handoff_new_batch_returns_409(client):
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
     await client.post("/api/sessions/current/handoff")
@@ -140,7 +140,7 @@ async def test_abandon_after_handoff_returns_409(client):
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
     await client.post("/api/sessions/current/handoff")
@@ -153,7 +153,7 @@ async def test_recommendations_generate_and_cache_llm_key_features(client, reset
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
 
     with patch("app.routers.session.generate_key_features", new=AsyncMock(return_value="Compact en wendbaar.")):
@@ -174,7 +174,7 @@ async def test_handoff_generates_talking_points_in_background(client, reset_db):
     resp = await client.post("/api/sessions?source=home")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
 
@@ -196,7 +196,7 @@ async def test_current_session_exposes_talking_points_after_handoff(client):
     resp = await client.post("/api/sessions?source=store")
     assert resp.status_code == 200
 
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
 
@@ -214,7 +214,7 @@ async def test_current_session_exposes_talking_points_after_handoff(client):
 
 async def test_favorite_items_resolve_from_catalog(client):
     await client.post("/api/sessions?source=home")
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
 
     # Favorite an accessory by id without ever loading the batch that contains it.
@@ -240,7 +240,7 @@ async def test_create_session_retries_on_code_collision(client):
 
 async def test_abandoned_session_cannot_be_handed_off(client):
     await client.post("/api/sessions?source=home")
-    answers = [{"question_id": i + 1, "option_index": 1} for i in range(3)]
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
     await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
     await client.get("/api/sessions/current/recommendations?batch=1")
 

@@ -13,8 +13,9 @@ def test_compute_profile_tie_b_beats_a():
     assert compute_profile(_answers(["A", "A", "B", "B", "C"])) == "B"
 
 
-def test_compute_profile_tie_a_beats_c():
-    assert compute_profile(_answers(["A", "A", "C", "C", "B"])) == "A"
+def test_compute_profile_tie_c_beats_a():
+    # Spec §2: bij gelijkstand A & C → profiel C (Planner).
+    assert compute_profile(_answers(["A", "A", "C", "C", "B"])) == "C"
 
 
 def test_compute_profile_tie_b_beats_c():
@@ -33,16 +34,33 @@ def test_compute_profile_all_five_answered():
     assert compute_profile(_answers(["C", "C", "C", "C", "C"])) == "C"
 
 
-# ── 3-question profile (current flow) ────────────────────────────────────────
+# ── 2-question profile (current flow, spec §2) ───────────────────────────────
+
+
+def test_compute_profile_two_q_clean_win():
+    assert compute_profile(_answers(["A", "A"])) == "A"
+    assert compute_profile(_answers(["C", "C"])) == "C"
+
+
+def test_compute_profile_two_q_tie_a_and_c_returns_c():
+    # Spec §2: bij gelijkstand A & C → profiel C (Planner).
+    assert compute_profile(_answers(["A", "C"])) == "C"
+
+
+def test_compute_profile_two_q_tie_with_b_stays_b():
+    # B (Ontdekker) keeps priority over A and C on a straight 1-1 tie.
+    assert compute_profile(_answers(["A", "B"])) == "B"
+    assert compute_profile(_answers(["B", "C"])) == "B"
+
+
+# ── legacy multi-answer cases (compute_profile is count-agnostic) ─────────────
 
 
 def test_compute_profile_three_q_two_b_one_a():
-    # Doc example: B-B-A → Ontdekker
     assert compute_profile(_answers(["B", "B", "A"])) == "B"
 
 
 def test_compute_profile_three_q_perfect_spread_returns_b():
-    # Doc: "Perfecte spreiding = ontdekker"
     assert compute_profile(_answers(["A", "B", "C"])) == "B"
 
 
