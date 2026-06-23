@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import WelcomePage from './pages/WelcomePage'
 import QuizPage from './pages/QuizPage'
+import CategoryOverviewPage from './pages/CategoryOverviewPage'
+import CategoryIntroPage from './pages/CategoryIntroPage'
 import TransitionPage from './pages/TransitionPage'
 import RecommendationsPage from './pages/RecommendationsPage'
 import ShortlistPage from './pages/ShortlistPage'
@@ -17,6 +19,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/quiz/:step" element={<QuizPage />} />
+        <Route path="/categories" element={<CategoryOverviewPage />} />
+        <Route path="/category/:id" element={<CategoryIntroPage />} />
         <Route path="/transition" element={<TransitionPage />} />
         <Route path="/recommendations" element={<RecommendationsPage />} />
         <Route path="/shortlist" element={<ShortlistPage />} />

@@ -8,7 +8,7 @@ const WARN_MS = 60 * 1000 // show the warning this long before resetting
 
 // Routes where an idle kiosk should reset to welcome. Welcome/transition and the
 // staff-facing handoff/completion screens are intentionally excluded.
-const GUARDED = ['/quiz', '/recommendations', '/shortlist']
+const GUARDED = ['/quiz', '/categories', '/category', '/recommendations', '/shortlist']
 
 // In-store kiosks reset to the welcome screen when a customer walks away, so the next
 // customer never resumes a stranger's session. Before wiping, a countdown warning lets a
