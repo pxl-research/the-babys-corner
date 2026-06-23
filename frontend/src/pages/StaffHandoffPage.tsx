@@ -6,6 +6,12 @@ import { api } from '../api/client'
 import { useSessionStore } from '../store/sessionStore'
 import type { SessionState } from '../api/client'
 
+function resolveCategories(ids: string[], categoryConfig: { categories: { id: string; label: string }[] } | null): string[] {
+  if (!ids.length) return []
+  const map = Object.fromEntries((categoryConfig?.categories ?? []).map((c) => [c.id, c.label]))
+  return ids.map((id) => map[id] ?? id)
+}
+
 const PROFILE_LABELS: Record<string, string> = {
   A: 'Minimalist',
   B: 'Ontdekker',
@@ -17,7 +23,7 @@ function namedLine(items: { name: string; brand: string }[]): string {
 }
 
 export default function StaffHandoffPage() {
-  const { reset } = useSessionStore()
+  const { reset, categoryConfig } = useSessionStore()
   const [detail, setDetail] = useState<SessionState | null>(null)
   const [pointsExhausted, setPointsExhausted] = useState(false)
 
@@ -109,6 +115,15 @@ export default function StaffHandoffPage() {
               <h2 className="font-semibold text-ink mb-1">Gedragsprofiel</h2>
               <p className="text-brand-dark font-display text-xl">{PROFILE_LABELS[detail.profile || ''] || detail.profile}</p>
             </section>
+
+            {detail.selected_categories?.length > 0 && (
+              <section className="mb-6">
+                <h2 className="font-semibold text-ink mb-1">Bekeken categorie(ën)</h2>
+                <p className="text-ink/80 text-sm">
+                  {resolveCategories(detail.selected_categories, categoryConfig).join(', ')}
+                </p>
+              </section>
+            )}
 
             <section className="mb-6">
               <h2 className="font-semibold text-ink mb-2">Antwoorden</h2>

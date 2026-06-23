@@ -175,6 +175,12 @@ export default function AdminPage() {
               <p className="text-sm text-ink/80">{detail.optional_note}</p>
             </section>
           )}
+          {detail.selected_categories?.length > 0 && (
+            <section className="mb-4">
+              <h3 className="font-semibold text-ink mb-1">Bekeken categorie(ën)</h3>
+              <p className="text-sm text-ink/70">{detail.selected_categories.join(', ')}</p>
+            </section>
+          )}
           <section className="mb-4">
             <h3 className="font-semibold text-ink mb-2">Bekeken producten</h3>
             <p className="text-sm text-ink/70">{detail.shown_products.flat().join(', ') || '—'}</p>

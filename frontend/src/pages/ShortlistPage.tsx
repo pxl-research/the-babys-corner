@@ -205,6 +205,12 @@ export default function ShortlistPage() {
           >
             Terug naar aanbevelingen
           </button>
+          <button
+            onClick={() => navigate('/categories')}
+            className="w-full border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium"
+          >
+            Terug naar overzicht
+          </button>
         </div>
       </div>
     </div>

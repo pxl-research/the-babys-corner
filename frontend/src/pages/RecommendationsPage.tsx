@@ -40,7 +40,7 @@ export default function RecommendationsPage() {
       }
       addBatch(batch.products)
       if (batch.tiers?.length) setRecoTiers(batch.tiers)
-      if (batch.favorites_adaptation_active) setFavoritesAdaptation(true)
+      setFavoritesAdaptation(batch.favorites_adaptation_active)
       // A short batch means the assortment is spent — no more pages after this one.
       if (batch.products.length < 3) setExhausted(true)
     } finally {
@@ -122,12 +122,20 @@ export default function RecommendationsPage() {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-muted p-4">
-        <button
-          onClick={() => navigate('/shortlist')}
-          className="w-full max-w-lg mx-auto block bg-brand text-ink rounded-btn px-6 py-3 font-medium text-center"
-        >
-          Naar mijn favorieten
-        </button>
+        <div className="max-w-lg mx-auto flex flex-col gap-3">
+          <button
+            onClick={() => navigate('/shortlist')}
+            className="w-full bg-brand text-ink rounded-btn px-6 py-3 font-medium text-center"
+          >
+            Naar mijn favorieten
+          </button>
+          <button
+            onClick={() => navigate('/categories')}
+            className="w-full border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium text-center"
+          >
+            Terug naar overzicht
+          </button>
+        </div>
       </div>
 
       <ProductModal
