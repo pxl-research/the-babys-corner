@@ -7,7 +7,7 @@ import { useSessionStore } from '../store/sessionStore'
 import { OVERVIEW_STEP, TOTAL_STEPS, PROFILE_STEPS } from '../config/flowSteps'
 
 const STATUS_BADGE: Record<string, { emoji: string; label: string }> = {
-  ai: { emoji: '✅', label: 'Ik help je kiezen' },
+  ai: { emoji: '✅', label: 'AI-begeleid' },
   assortiment: { emoji: '🔗', label: 'Bekijk assortiment' },
   soon: { emoji: '⏳', label: 'Binnenkort beschikbaar' },
 }
@@ -95,6 +95,14 @@ export default function CategoryOverviewPage() {
               </div>
             )
           })}
+        </div>
+        <div className="mt-6">
+          <button
+            onClick={() => navigate('/quiz/' + PROFILE_STEPS)}
+            className="w-full border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium"
+          >
+            Terug
+          </button>
         </div>
       </div>
     </div>

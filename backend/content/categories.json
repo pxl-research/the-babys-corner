@@ -10,14 +10,14 @@
     },
     {
       "id": "car_seats",
-      "label": "Autostoeltjes",
+      "label": "Autostoelen",
       "status": "soon",
       "intro": null,
       "url": null
     },
     {
       "id": "sleeping",
-      "label": "Slaapkamer & slapen",
+      "label": "Slapen",
       "status": "soon",
       "intro": null,
       "url": null
@@ -31,7 +31,7 @@
     },
     {
       "id": "feeding",
-      "label": "Voeding",
+      "label": "Voeding & aan tafel",
       "status": "soon",
       "intro": null,
       "url": null
@@ -45,14 +45,14 @@
     },
     {
       "id": "play",
-      "label": "Spelen & ontwikkeling",
+      "label": "Spelen",
       "status": "soon",
       "intro": null,
       "url": null
     },
     {
       "id": "clothing",
-      "label": "Kleding & textiel",
+      "label": "Kleding",
       "status": "soon",
       "intro": null,
       "url": null
