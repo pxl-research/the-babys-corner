@@ -21,6 +21,19 @@ export interface QuizConfig {
   optional_note: OptionalNoteConfig
 }
 
+export interface Category {
+  id: string
+  label: string
+  status: 'ai' | 'assortiment' | 'soon'
+  intro: string | null
+  url: string | null
+}
+
+export interface CategoryConfig {
+  overview_intro: string
+  categories: Category[]
+}
+
 export interface TagQuestion {
   id: string
   text: string
@@ -151,6 +164,7 @@ export interface SessionState {
   contact_surname: string | null
   contact_email: string | null
   talking_points: string[] | null
+  selected_categories: string[]
 }
 
 export interface ContactDetails {
@@ -191,6 +205,7 @@ export interface StaffSessionDetail extends StaffSession {
   contact_name: string | null
   contact_surname: string | null
   contact_email: string | null
+  selected_categories: string[]
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -218,6 +233,14 @@ export const api = {
     request<{ profile: string; transition_phrase: string }>('/api/sessions/current/quiz', {
       method: 'POST',
       body: JSON.stringify({ answers, optional_note: '' }),
+    }),
+
+  getCategoryConfig: () => request<CategoryConfig>('/api/sessions/category-config'),
+
+  selectCategory: (category_id: string) =>
+    request<{ selected_categories: string[] }>('/api/sessions/current/category', {
+      method: 'POST',
+      body: JSON.stringify({ category_id }),
     }),
 
   getTagConfig: () => request<TagConfig>('/api/sessions/tag-config'),

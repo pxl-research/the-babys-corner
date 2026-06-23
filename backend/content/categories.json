@@ -1,0 +1,61 @@
+{
+  "overview_intro": "Merci! Ik heb een goed beeld van jullie aanpak. Kies een categorie en ik ga meteen voor je aan de slag.",
+  "categories": [
+    {
+      "id": "strollers",
+      "label": "Kinderwagens & buggy's",
+      "status": "ai",
+      "intro": "Kinderwagens zijn onze specialiteit — en voor elk gezin is er het perfecte model. Ik stel je een paar gerichte vragen, zodat ik je precies kan tonen wat bij jullie past.",
+      "url": null
+    },
+    {
+      "id": "car_seats",
+      "label": "Autostoeltjes",
+      "status": "soon",
+      "intro": null,
+      "url": null
+    },
+    {
+      "id": "sleeping",
+      "label": "Slaapkamer & slapen",
+      "status": "soon",
+      "intro": null,
+      "url": null
+    },
+    {
+      "id": "care",
+      "label": "Verzorging",
+      "status": "soon",
+      "intro": null,
+      "url": null
+    },
+    {
+      "id": "feeding",
+      "label": "Voeding",
+      "status": "soon",
+      "intro": null,
+      "url": null
+    },
+    {
+      "id": "safety",
+      "label": "Veiligheid",
+      "status": "soon",
+      "intro": null,
+      "url": null
+    },
+    {
+      "id": "play",
+      "label": "Spelen & ontwikkeling",
+      "status": "soon",
+      "intro": null,
+      "url": null
+    },
+    {
+      "id": "clothing",
+      "label": "Kleding & textiel",
+      "status": "soon",
+      "intro": null,
+      "url": null
+    }
+  ]
+}

@@ -10,7 +10,7 @@ from fastapi import APIRouter, Body, Cookie, HTTPException, BackgroundTasks, Que
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.content import load_quiz_config, load_tag_questions
+from app.content import load_quiz_config, load_tag_questions, load_categories
 from app.database import get_db
 from app.schemas import (
     SessionCreateResponse,
@@ -40,6 +40,7 @@ from app.schemas import (
     TagCountResponse,
     TierInfo,
     NoteRequest,
+    CategoryConfigResponse,
 )
 from app.services.catalog import get_catalog, is_available
 from app.services.profile import compute_profile
@@ -176,6 +177,11 @@ async def tag_config():
         for q in config["questions"]
     ]
     return TagConfigResponse.model_validate({"questions": questions})
+
+
+@router.get("/category-config", response_model=CategoryConfigResponse)
+async def category_config():
+    return load_categories()
 
 
 @router.get("/current", response_model=SessionCurrentResponse)

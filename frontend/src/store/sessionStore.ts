@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { StrollerItem, QuizQuestion, OptionalNoteConfig, TagConfig, RecommendationTier } from '../api/client'
+import type { StrollerItem, QuizQuestion, OptionalNoteConfig, TagConfig, RecommendationTier, CategoryConfig } from '../api/client'
 
 export type AppStatus =
   | 'idle'
@@ -35,6 +35,10 @@ interface SessionStore {
   tagAnswers: Record<string, number[]>
   tagMatchMode: string | null
   droppedTagCount: number
+  categoryConfig: CategoryConfig | null
+  activeCategory: string | null
+  selectedCategories: string[]
+  tagAnswersByCategory: Record<string, Record<string, number[]>>
 
   setSource: (source: 'store' | 'home') => void
   setSession: (id: string, code: string) => void
@@ -52,6 +56,9 @@ interface SessionStore {
   setTagConfig: (config: TagConfig) => void
   setTagAnswer: (questionId: string, indices: number[]) => void
   setTagOutcome: (matchMode: string, droppedCount: number) => void
+  setCategoryConfig: (config: CategoryConfig) => void
+  addSelectedCategory: (id: string) => void
+  startCategory: (id: string) => void
   reset: () => void
 }
 
@@ -77,6 +84,10 @@ const initial = {
   tagAnswers: {} as Record<string, number[]>,
   tagMatchMode: null,
   droppedTagCount: 0,
+  categoryConfig: null,
+  activeCategory: null,
+  selectedCategories: [],
+  tagAnswersByCategory: {} as Record<string, Record<string, number[]>>,
 }
 
 export const useSessionStore = create<SessionStore>()(
@@ -109,8 +120,39 @@ export const useSessionStore = create<SessionStore>()(
       setQuizConfig: (quizConfig) => set({ quizConfig }),
       setTagConfig: (tagConfig) => set({ tagConfig }),
       setTagAnswer: (questionId, indices) =>
-        set((s) => ({ tagAnswers: { ...s.tagAnswers, [questionId]: indices } })),
+        set((s) => {
+          const byCategory = s.activeCategory
+            ? {
+                tagAnswersByCategory: {
+                  ...s.tagAnswersByCategory,
+                  [s.activeCategory]: {
+                    ...(s.tagAnswersByCategory[s.activeCategory] ?? {}),
+                    [questionId]: indices,
+                  },
+                },
+              }
+            : {}
+          return { tagAnswers: { ...s.tagAnswers, [questionId]: indices }, ...byCategory }
+        }),
       setTagOutcome: (tagMatchMode, droppedTagCount) => set({ tagMatchMode, droppedTagCount }),
+      setCategoryConfig: (categoryConfig) => set({ categoryConfig }),
+      addSelectedCategory: (id) =>
+        set((s) => ({
+          selectedCategories: s.selectedCategories.includes(id)
+            ? s.selectedCategories
+            : [...s.selectedCategories, id],
+        })),
+      startCategory: (id) =>
+        set((s) => ({
+          activeCategory: id,
+          tagAnswers: s.tagAnswersByCategory[id] ?? {},
+          recommendations: [],
+          currentBatch: 0,
+          recoTiers: [],
+          tagMatchMode: null,
+          droppedTagCount: 0,
+          favoritesAdaptationActive: false,
+        })),
       reset: () => set(initial),
     }),
     { name: 'babys-corner-session' }

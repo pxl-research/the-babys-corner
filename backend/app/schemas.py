@@ -61,6 +61,19 @@ class TagConfigResponse(BaseModel):
     questions: list[TagQuestion]
 
 
+class Category(BaseModel):
+    id: str
+    label: str
+    status: str  # "ai" | "assortiment" | "soon"
+    intro: Optional[str] = None
+    url: Optional[str] = None
+
+
+class CategoryConfigResponse(BaseModel):
+    overview_intro: str
+    categories: list[Category]
+
+
 class TagAnswerIn(BaseModel):
     question_id: str
     option_indices: list[int] = []
