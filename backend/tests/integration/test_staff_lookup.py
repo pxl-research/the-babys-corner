@@ -123,3 +123,17 @@ async def test_staff_home_email_failed_warning_only_for_home(client):
     assert resp.status_code == 200
     detail = resp.json()
     assert detail["email_failed_warning"] is True
+
+
+async def test_staff_detail_includes_selected_categories_labels(client):
+    await client.post("/api/sessions?source=store")
+    await client.post("/api/sessions/current/category", json={"category_id": "strollers"})
+    answers = [{"question_id": i + 1, "option_index": 1} for i in range(2)]
+    await client.post("/api/sessions/current/quiz", json={"answers": answers, "optional_note": ""})
+    await client.get("/api/sessions/current/recommendations?batch=1")
+    code = (await client.get("/api/sessions/current")).json()["session_code"]
+    await client.post("/api/sessions/current/handoff")
+
+    detail = (await client.get(f"/api/staff/sessions/{code}", headers=STAFF_CREDS)).json()
+    assert "selected_categories" in detail
+    assert "Kinderwagens & buggy's" in detail["selected_categories"]

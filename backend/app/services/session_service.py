@@ -7,6 +7,7 @@ shape lives here so it cannot drift between the two.
 
 import json
 
+from app.content import category_labels
 from app.schemas import NamedItem, StaffSessionDetail, StaffSessionItem
 
 
@@ -90,6 +91,7 @@ def session_detail_from_row(row, catalog=None) -> StaffSessionDetail:
         contact_name=row.get("contact_name"),
         contact_surname=row.get("contact_surname"),
         contact_email=row.get("contact_email"),
+        selected_categories=category_labels(parse_json_field(row.get("selected_categories"), [])),
     )
 
 

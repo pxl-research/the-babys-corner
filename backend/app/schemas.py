@@ -74,6 +74,10 @@ class CategoryConfigResponse(BaseModel):
     categories: list[Category]
 
 
+class CategorySelectRequest(BaseModel):
+    category_id: str
+
+
 class TagAnswerIn(BaseModel):
     question_id: str
     option_indices: list[int] = []
@@ -227,6 +231,7 @@ class SessionCurrentResponse(BaseModel):
     contact_surname: Optional[str] = None
     contact_email: Optional[str] = None
     talking_points: Optional[list[str]] = None
+    selected_categories: list[str] = []
 
 
 class HandoffRequest(BaseModel):
@@ -320,3 +325,4 @@ class StaffSessionDetail(BaseModel):
     contact_name: Optional[str] = None
     contact_surname: Optional[str] = None
     contact_email: Optional[str] = None
+    selected_categories: list[str] = []

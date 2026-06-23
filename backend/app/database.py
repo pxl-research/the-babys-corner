@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS sessions (
     contact_name TEXT,
     contact_surname TEXT,
     contact_email TEXT,
-    tag_answers TEXT
+    tag_answers TEXT,
+    selected_categories TEXT
 );
 """
 
@@ -61,6 +62,7 @@ _MIGRATION_COLUMNS = [
     "contact_surname TEXT",
     "contact_email TEXT",
     "tag_answers TEXT",
+    "selected_categories TEXT",
 ]
 
 

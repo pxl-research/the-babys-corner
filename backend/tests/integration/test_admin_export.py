@@ -84,5 +84,6 @@ async def test_admin_export_contains_required_columns(client):
         "session_id", "session_code", "source", "status",
         "started_at", "handoff_at", "profile",
         "stroller_favorites", "accessory_favorites", "email_status",
+        "selected_categories",
     }
     assert required.issubset(set(headers))

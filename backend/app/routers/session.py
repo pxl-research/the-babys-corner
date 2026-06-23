@@ -41,6 +41,7 @@ from app.schemas import (
     TierInfo,
     NoteRequest,
     CategoryConfigResponse,
+    CategorySelectRequest,
 )
 from app.services.catalog import get_catalog, is_available
 from app.services.profile import compute_profile
@@ -184,6 +185,36 @@ async def category_config():
     return load_categories()
 
 
+@router.post("/current/category")
+async def select_category(
+    body: CategorySelectRequest,
+    session_id: Annotated[Optional[str], Cookie()] = None,
+):
+    if not session_id:
+        raise HTTPException(401, detail=NO_SESSION_DETAIL)
+    session = await _get_session(session_id)
+    _require_active(session)
+
+    cats = {c["id"]: c for c in load_categories()["categories"]}
+    cat = cats.get(body.category_id)
+    if not cat:
+        raise HTTPException(422, detail=f"Unknown category_id: {body.category_id}")
+    if cat["status"] not in ("ai", "assortiment"):
+        raise HTTPException(422, detail=f"Category '{body.category_id}' is not selectable (status: {cat['status']}).")
+
+    existing: list[str] = parse_json_field(session.get("selected_categories"), [])
+    if body.category_id not in existing:
+        existing.append(body.category_id)
+
+    db = await get_db()
+    await db.execute(
+        "UPDATE sessions SET selected_categories=? WHERE session_id=?",
+        (json.dumps(existing), session_id),
+    )
+    await db.commit()
+    return {"selected_categories": existing}
+
+
 @router.get("/current", response_model=SessionCurrentResponse)
 async def get_current(session_id: Annotated[Optional[str], Cookie()] = None):
     if not session_id:
@@ -219,6 +250,7 @@ async def get_current(session_id: Annotated[Optional[str], Cookie()] = None):
         contact_surname=session.get("contact_surname"),
         contact_email=session.get("contact_email"),
         talking_points=parse_json_field(session.get("llm_talking_points"), None),
+        selected_categories=parse_json_field(session.get("selected_categories"), []),
     )
 
 
@@ -846,7 +878,8 @@ async def submit_tag_quiz(
     db = await get_db()
     await db.execute(
         """UPDATE sessions SET filter_tags=?, filter_brands=NULL, filter_collections=NULL,
-           reco_order=?, reco_tiers=?, extra_reco_order=NULL, tag_answers=? WHERE session_id=?""",
+           reco_order=?, reco_tiers=?, extra_reco_order=NULL, tag_answers=?,
+           shown_products='[]', favorites_adaptation_active=0 WHERE session_id=?""",
         (json.dumps(primary_kept), json.dumps(reco_order), json.dumps(tiers),
          json.dumps(tag_answers), session_id),
     )

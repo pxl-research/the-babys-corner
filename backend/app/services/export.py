@@ -1,5 +1,8 @@
 from io import BytesIO
+import json
 import openpyxl
+
+from app.content import category_labels
 
 
 # (export header label, source DB column) — single source of truth so the header
@@ -21,7 +24,24 @@ EXPORT_COLUMNS = [
     ("llm_key_features", "llm_key_features"),
     ("llm_talking_points", "llm_talking_points"),
     ("email_status", "email_status"),
+    ("selected_categories", "selected_categories"),
 ]
+
+
+def _resolve_export_rows(rows: list[dict]) -> list[dict]:
+    """Resolve selected_categories ids → human-readable labels for export."""
+    out = []
+    for row in rows:
+        row = dict(row)
+        raw = row.get("selected_categories")
+        if raw:
+            try:
+                ids = json.loads(raw)
+                row["selected_categories"] = ", ".join(category_labels(ids))
+            except (json.JSONDecodeError, TypeError):
+                pass
+        out.append(row)
+    return out
 
 
 def build_xlsx(rows: list[dict]) -> bytes:
@@ -30,7 +50,7 @@ def build_xlsx(rows: list[dict]) -> bytes:
     ws.title = "Sessions"
 
     ws.append([label for label, _ in EXPORT_COLUMNS])
-    for row in rows:
+    for row in _resolve_export_rows(rows):
         ws.append([row.get(column, "") for _, column in EXPORT_COLUMNS])
 
     buf = BytesIO()
