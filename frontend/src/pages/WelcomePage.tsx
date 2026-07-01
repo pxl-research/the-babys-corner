@@ -7,7 +7,7 @@ import { useSessionStore } from '../store/sessionStore'
 export default function WelcomePage() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
-  const { setSource, setSession, reset } = useSessionStore()
+  const { setSource, setSession, reset, strollerFavorites, accessoryFavorites } = useSessionStore()
   const src = params.get('source') === 'store' ? 'store' : 'home'
 
   useEffect(() => {
@@ -15,10 +15,24 @@ export default function WelcomePage() {
   }, [src, setSource])
 
   async function handleStart() {
+    // Favorites are a user preference across attempts, not session-scoped state —
+    // capture them before reset() so they can be replayed onto the new session below.
+    const carriedStrollerFavs = strollerFavorites
+    const carriedAccessoryFavs = accessoryFavorites
     reset()
     setSource(src)
     const data = await api.createSession(src)
     setSession(data.session_id, data.session_code)
+    try {
+      for (const id of carriedStrollerFavs) {
+        await api.toggleFavorite(id, 'stroller')
+      }
+      for (const id of carriedAccessoryFavs) {
+        await api.toggleFavorite(id, 'accessory')
+      }
+    } catch {
+      // A failed replay shouldn't block starting a new session.
+    }
     navigate('/quiz/1')
   }
 

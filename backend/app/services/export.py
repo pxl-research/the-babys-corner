@@ -10,6 +10,9 @@ from app.content import category_labels
 EXPORT_COLUMNS = [
     ("session_id", "session_id"),
     ("session_code", "session_code"),
+    ("contact_name", "contact_name"),
+    ("contact_surname", "contact_surname"),
+    ("contact_email", "contact_email"),
     ("source", "source"),
     ("status", "status"),
     ("started_at", "started_at"),

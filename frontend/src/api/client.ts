@@ -73,6 +73,7 @@ export interface VariantSummary {
   availability: string
   is_available: boolean
   colour_label: string
+  product_url?: string
 }
 
 export interface AccessoryItem {
@@ -85,6 +86,7 @@ export interface AccessoryItem {
   availability: string
   is_available: boolean
   reason?: string
+  product_url?: string
 }
 
 export interface StrollerItem {
@@ -103,6 +105,7 @@ export interface StrollerItem {
   variant_count?: number
   variant_ids?: string[]
   variant_summaries?: VariantSummary[]
+  product_url?: string
 }
 
 export interface NamedItem {
@@ -121,6 +124,7 @@ export interface ShortlistItem {
   image_url: string
   availability: string
   is_available: boolean
+  product_url?: string
 }
 
 export interface FavoriteItemsResponse {

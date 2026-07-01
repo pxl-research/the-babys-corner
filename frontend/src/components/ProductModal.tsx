@@ -24,6 +24,7 @@ export default function ProductModal({
   const displayName = activeVariant?.name ?? stroller?.name ?? ''
   const displayImage = activeVariant?.image_url ?? stroller?.image_url ?? ''
   const displayPrice = activeVariant?.price ?? stroller?.price ?? 0
+  const displayUrl = activeVariant?.product_url ?? stroller?.product_url ?? ''
   const activeId = activeVariant?.id ?? stroller?.id ?? ''
 
   const descriptionText = stroller?.formatted_description ?? stroller?.description ?? ''
@@ -138,6 +139,16 @@ export default function ProductModal({
                     ))}
                   </div>
                 </div>
+              )}
+              {displayUrl && (
+                <a
+                  href={displayUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium mb-3"
+                >
+                  Bekijk op website
+                </a>
               )}
               <button
                 onClick={() => onToggleFavorite(activeId)}

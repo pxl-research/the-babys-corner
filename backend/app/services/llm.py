@@ -178,17 +178,35 @@ async def rank_first_nine(
     return ordered
 
 
-async def generate_key_features(stroller: dict, profile: str) -> str | None:
-    system = (
-        "You are a stroller advisor. Generate 2-3 key selling points for the given stroller "
-        "based only on the provided product description. Use Dutch. No invented specs."
-    )
-    prompt = (
-        f"Stroller: {stroller.get('name')}\n"
-        f"Description: {stroller.get('description')}\n"
-        f"Profile: {profile}\n"
-        "Return 2-3 bullet points in Dutch."
-    )
+async def generate_key_features(
+    stroller: dict, profile: str, matched_tags: list[str] | None = None
+) -> str | None:
+    if matched_tags:
+        system = (
+            "You are a stroller advisor. Generate 2-3 key selling points for the given stroller "
+            "based only on the provided product description. Ground each point in one of the "
+            "customer's chosen criteria (matched tags) where relevant — explain why the stroller "
+            "fits what they asked for, e.g. 'sluit aan bij jullie keuze voor …'. Use Dutch. "
+            "No invented specs."
+        )
+        prompt = (
+            f"Stroller: {stroller.get('name')}\n"
+            f"Description: {stroller.get('description')}\n"
+            f"Profile: {profile}\n"
+            f"Customer's chosen criteria (matched tags): {', '.join(matched_tags)}\n"
+            "Return 2-3 bullet points in Dutch."
+        )
+    else:
+        system = (
+            "You are a stroller advisor. Generate 2-3 key selling points for the given stroller "
+            "based only on the provided product description. Use Dutch. No invented specs."
+        )
+        prompt = (
+            f"Stroller: {stroller.get('name')}\n"
+            f"Description: {stroller.get('description')}\n"
+            f"Profile: {profile}\n"
+            "Return 2-3 bullet points in Dutch."
+        )
     features = await complete(prompt, system)
     if not features:
         logger.warning(

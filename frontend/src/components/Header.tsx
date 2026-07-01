@@ -48,7 +48,7 @@ export default function Header() {
             <h2 id="restart-title" className="font-display text-xl font-bold text-ink mb-2">
               Opnieuw beginnen?
             </h2>
-            <p className="text-ink/70 text-sm mb-6">Alle antwoorden en favorieten worden gewist.</p>
+            <p className="text-ink/70 text-sm mb-6">Alle antwoorden worden gewist. Jullie favorieten blijven bewaard.</p>
             <div className="flex flex-col gap-3">
               <button
                 onClick={confirmRestart}
