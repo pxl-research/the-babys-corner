@@ -153,7 +153,12 @@ export const useSessionStore = create<SessionStore>()(
           droppedTagCount: 0,
           favoritesAdaptationActive: false,
         })),
-      reset: () => set(initial),
+      reset: () =>
+        set((s) => ({
+          ...initial,
+          strollerFavorites: s.strollerFavorites,
+          accessoryFavorites: s.accessoryFavorites,
+        })),
     }),
     { name: 'babys-corner-session' }
   )
