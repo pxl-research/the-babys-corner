@@ -77,6 +77,7 @@ export default function RecommendationsPage() {
         <h1 className="font-display text-2xl font-bold text-ink mb-1">Onze aanbevelingen voor jullie</h1>
         <p className="text-ink/70 mb-4">
           Op basis van jullie antwoorden hebben we de beste matches voor jullie geselecteerd.
+          Bij elk model zie je meteen waarom het een goede keuze is voor jullie situatie.
         </p>
         {favoritesAdaptationActive && (
           <p className="text-brand-dark text-sm mb-4">We houden rekening met jullie favorieten.</p>
