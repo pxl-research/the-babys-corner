@@ -614,6 +614,7 @@ async def _generate_key_features_for_products(session_id: str, product_ids: list
     session = await _get_session(session_id)
     cached = parse_json_field(session.get("llm_key_features"), {})
     catalog = get_catalog()
+    session_tags = set(parse_json_field(session.get("filter_tags"), []))
 
     changed = False
     for product_id in product_ids:
@@ -622,7 +623,8 @@ async def _generate_key_features_for_products(session_id: str, product_ids: list
         stroller = catalog.get_stroller(product_id)
         if not stroller:
             continue
-        features = await generate_key_features(stroller, profile)
+        matched_tags = [t for t in stroller.get("tags", []) if t in session_tags]
+        features = await generate_key_features(stroller, profile, matched_tags)
         if features:
             cached[product_id] = features
             changed = True
