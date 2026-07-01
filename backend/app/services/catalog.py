@@ -112,6 +112,7 @@ class CatalogService:
                 "availability": s["availability"],
                 "is_available": is_available(s),
                 "colour_label": self._colour_label(s["name"], prefix),
+                "product_url": s.get("product_url", ""),
             })
         return summaries
 

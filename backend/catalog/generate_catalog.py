@@ -91,6 +91,7 @@ def convert_row(row: dict, is_stroller: bool) -> dict:
         "price": parse_price(row["price"]),
         "description": row["description"].strip(),
         "image_url": row["image_link"].strip(),
+        "product_url": (row.get("link") or "").strip(),
         "availability": AVAILABILITY_MAP.get(row["availability"].strip(), row["availability"].strip()),
         "tags": tags,
         "collection": collection,

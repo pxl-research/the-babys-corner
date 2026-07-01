@@ -492,6 +492,7 @@ def _build_products(
                     availability=a["availability"],
                     is_available=is_available(a),
                     reason=cross_sell_reason(s, a),
+                    product_url=a.get("product_url", ""),
                 )
                 for a in cross_sell
             ],
@@ -499,6 +500,7 @@ def _build_products(
             variant_count=s.get("variant_count", 1),
             variant_ids=s.get("variant_ids", []),
             variant_summaries=[VariantSummary(**v) for v in s.get("variant_summaries", [])],
+            product_url=s.get("product_url", ""),
         ))
     return products
 
@@ -1003,6 +1005,7 @@ async def get_favorite_items(session_id: Annotated[Optional[str], Cookie()] = No
             image_url=item["image_url"],
             availability=item["availability"],
             is_available=is_available(item),
+            product_url=item.get("product_url", ""),
         )
 
     stroller_favs = parse_json_field(session.get("stroller_favorites"), [])

@@ -124,6 +124,7 @@ class VariantSummary(BaseModel):
     availability: str
     is_available: bool
     colour_label: str
+    product_url: str = ""
 
 
 class AccessoryItem(BaseModel):
@@ -136,6 +137,7 @@ class AccessoryItem(BaseModel):
     availability: str
     is_available: bool
     reason: str = ""  # why this accessory is shown (e.g. "Uit de collectie")
+    product_url: str = ""
 
 
 class StrollerItem(BaseModel):
@@ -154,6 +156,7 @@ class StrollerItem(BaseModel):
     variant_count: int = 1  # number of colour/size variants of this product (incl. itself)
     variant_ids: list[str] = []  # ids of all variants, available-first; this product included
     variant_summaries: list[VariantSummary] = []  # compact data for the colour picker
+    product_url: str = ""
 
 
 class TierInfo(BaseModel):
@@ -195,6 +198,7 @@ class ShortlistItem(BaseModel):
     image_url: str
     availability: str
     is_available: bool
+    product_url: str = ""
 
 
 class FavoriteItemsResponse(BaseModel):
