@@ -109,6 +109,16 @@ export default function ShortlistPage() {
                           Verwijder
                         </button>
                       </div>
+                      {s.product_url && (
+                        <a
+                          href={s.product_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block text-center text-brand-dark text-sm underline mt-2"
+                        >
+                          Bekijk op website
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -135,6 +145,16 @@ export default function ShortlistPage() {
                           Verwijder
                         </button>
                       </div>
+                      {a.product_url && (
+                        <a
+                          href={a.product_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block text-center text-brand-dark text-sm underline mt-2"
+                        >
+                          Bekijk op website
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>

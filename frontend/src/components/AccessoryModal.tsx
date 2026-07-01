@@ -72,6 +72,16 @@ export default function AccessoryModal({
               <h2 className="font-display text-xl font-bold text-ink mb-1">{accessory.name}</h2>
               <p className="text-lg font-medium text-ink mb-2">€ {accessory.price.toFixed(2)}</p>
               <p className="text-ink/80 mb-6">{accessory.description}</p>
+              {accessory.product_url && (
+                <a
+                  href={accessory.product_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center border border-brand text-brand-dark rounded-btn px-6 py-3 font-medium mb-3"
+                >
+                  Bekijk op website
+                </a>
+              )}
               {(canAdd || canRemove) && (
                 <button
                   onClick={onToggleFavorite}
