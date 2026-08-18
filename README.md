@@ -125,14 +125,22 @@ Open http://localhost:5173. Vite stuurt `/api` door naar `http://localhost:8000`
 
 ## Draaien met Docker
 
-**Ontwikkeling of test:**
+**Zonder HTTPS**, voor lokaal gebruik en voor de VM zonder Caddy:
 
 ```bash
 docker compose up --build
 ```
 
-De frontend is dan bereikbaar op http://localhost:3000 (en op poort 8019, die
-naar dezelfde container verwijst). De backend zit achter nginx en is niet
+De frontend is dan bereikbaar op twee poorten die naar dezelfde container
+verwijzen:
+
+| Poort | Gebruik |
+|---|---|
+| 8019 | lokale deployment |
+| 3000 | de VM |
+
+Beide mappings staan in `docker-compose.yml`; ze zijn er allebei met opzet, zodat
+lokaal en de VM hun eigen poort houden. De backend zit achter nginx en is niet
 rechtstreeks van buiten bereikbaar. De SQLite-database staat in het Docker-volume
 `sqlite_data` en blijft dus bewaard tussen herstarts.
 
@@ -156,6 +164,11 @@ CORS_ORIGINS=https://<domeinnaam>
 
 Het domein moet met een A-record naar de server wijzen en poort 80 en 443 moeten
 open staan; Caddy vraagt zelf het certificaat aan.
+
+Let op: deze overlay haalt de poorten 3000 en 8019 weg (`ports: !reset []` in
+`docker-compose.prod.yml`). Al het verkeer loopt dan via Caddy op 80 en 443. Wie
+de app op poort 3000 wil blijven bereiken, draait dus de gewone
+`docker compose up` zonder deze overlay — en dan is er geen HTTPS.
 
 Genereer een sleutel met:
 

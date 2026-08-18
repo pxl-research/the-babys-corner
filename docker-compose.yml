@@ -12,6 +12,9 @@ services:
 
   frontend:
     build: ./frontend
+    # Both mappings reach the same container, on purpose: 3000 is the port the VM
+    # serves on, 8019 the one used for local deployment. The prod overlay resets
+    # these and routes everything through Caddy on 80/443 instead.
     ports:
       - "3000:80"
       - "8019:80"
