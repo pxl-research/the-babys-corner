@@ -43,4 +43,4 @@ def test_category_label_unknown_returns_id():
 def test_category_labels_multiple():
     labels = category_labels(["strollers", "car_seats"])
     assert labels[0] == "Kinderwagens & buggy's"
-    assert labels[1] == "Autostoeltjes"
+    assert labels[1] == "Autostoelen"
