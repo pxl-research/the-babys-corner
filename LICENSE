@@ -1,0 +1,18 @@
+Copyright (c) 2026 The Baby's Corner
+
+Alle rechten voorbehouden.
+
+Deze software is in opdracht van The Baby's Corner ontwikkeld door PXL
+(PXL-Research, Living Lab). Bij de oplevering gaat de broncode over naar
+The Baby's Corner en is deze hun eigendom.
+
+Er is geen open-sourcelicentie van toepassing. Zonder schriftelijke
+toestemming van de eigenaar mag deze code niet worden gepubliceerd,
+doorgegeven of hergebruikt buiten The Baby's Corner.
+
+Dit bestand legt vast hoe het eigendom bij de oplevering is afgesproken en
+vervangt geen contractuele overeenkomst tussen de partijen.
+
+Componenten van derden (de Python- en npm-pakketten waarvan deze applicatie
+gebruikmaakt) vallen onder hun eigen licentievoorwaarden. De volledige lijst
+staat in backend/uv.lock en frontend/package-lock.json.
